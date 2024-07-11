@@ -60,7 +60,7 @@ To disable a rule, edit the rule's json to specify ```"disabled": true```. At ru
 
 ## <a id="gui"></a>Run from the graphical user interface (GUI)
 
-Running ```PBIXInspectorWinForm.exe``` presents the user with the following interface: 
+Running ```PBIRInspectorWinForm.exe``` presents the user with the following interface: 
 
 ![WinForm 1](DocsImages/WinForm1.png)
 
@@ -97,15 +97,15 @@ All command line parameters are as follows:
 
 - Run "Base-rules.json" rule definitions against PBI report file at "Sales.Report and return results in Json and HTML formats:
 
-``` PBIXInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json" -output "C:\Files\TestRun" -formats "JSON,HTML"```
+``` PBIRInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json" -output "C:\Files\TestRun" -formats "JSON,HTML"```
 
 - Run "Base-rules.json" rule definitions against PBI report file at "Sales.Report and return results to the console only:
 
-``` PBIXInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json" -output "C:\Files\TestRun" -formats "Console"```
+``` PBIRInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json" -output "C:\Files\TestRun" -formats "Console"```
 
 - Run "Base-rules.json" rule definitions against PBI report file at "Sales.Report and return results as Azure DevOps compatible log and tasks commands (see https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#task-commands):
 
-``` PBIXInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json"  -formats "ADO"```
+``` PBIRInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json"  -formats "ADO"```
 
 ## <a id="results"></a>Interpreting results
 
