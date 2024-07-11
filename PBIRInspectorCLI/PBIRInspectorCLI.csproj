@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PBIXInspectorWinLibrary\PBIRInspectorWinLibrary.csproj" />
+    <ProjectReference Include="..\PBIRInspectorWinLibrary\PBIRInspectorWinLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>

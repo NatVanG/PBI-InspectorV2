@@ -22,9 +22,9 @@ namespace PBIXInspectorWinLibrary
         public const string ADOLogIssueTemplate = "##vso[task.logissue type={0};]"; //warning|error
         public const string ADOCompleteTemplate = "##vso[task.complete result={0};]DONE";//Failed|SucceededWithIssues|Succeeded
         public const string GitHubMsgTemplate = "::{0}::";
-        public const string ReadmePageUrl = "https://github.com/NatVanG/PBI-Inspector/blob/part-concept/README.md";
-        public const string LatestReleasePageUrl = "https://github.com/NatVanG/PBI-Inspector/releases";
-        public const string LicensePageUrl = "https://github.com/NatVanG/PBI-Inspector/blob/part-concept/LICENSE";
-        public const string IssuesPageUrl = "https://github.com/NatVanG/PBI-Inspector/issues";
+        public const string ReadmePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/blob/main/README.md";
+        public const string LatestReleasePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/releases";
+        public const string LicensePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/blob/main/LICENSE";
+        public const string IssuesPageUrl = "https://github.com/NatVanG/PBI-InspectorV2/issues";
     }
 }
