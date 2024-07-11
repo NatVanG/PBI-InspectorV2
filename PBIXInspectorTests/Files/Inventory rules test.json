@@ -1,0 +1,268 @@
+{
+  "pbiEntries": [
+    {
+      "name": "reportLayoutBadEncoding",
+      "description": "Bad encoding.",
+      "pbixEntryPath": "Report/Layout",
+      "pbipEntryPath": "Inventory test.Report\\report.json",
+      "contentType": "json",
+      "codepage": 9999,
+      "rules": []
+    },
+    {
+      "name": "reportLayoutBadEntryPath",
+      "description": "Bad entry path.",
+      "pbixEntryPath": "bad path",
+      "pbipEntryPath": "bad path",
+      "contentType": "json",
+      "codepage": 1200,
+      "rules": []
+    },
+    {
+      "name": "reportLayout",
+      "pbixEntryPath": "Report/Layout",
+      "pbipEntryPath": "Inventory test.Report\\report.json",
+      "contentType": "json",
+      "codepage": 1200,
+      "rules": [
+        {
+          "name": "testJsonLogic1",
+          "path": "$.sectionX",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            { "+": [ 1, 1 ] },
+            {},
+            2
+          ]
+        },
+        {
+          "name": "testReportLogic1",
+          "path": "$.sections[*].visualContainers[*]",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "<=": [
+                { "var": "h" },
+                { "var": "w" }
+              ]
+            },
+            {
+              "h": "/0/height",
+              "w": "/0/width"
+            },
+            true
+          ]
+        },
+        {
+          "name": "testReportLogic2b",
+          "path": "$.sections[*].visualContainers[*].config{$.layouts[*].position}",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "<=": [
+                { "var": "h" },
+                { "var": "w" }
+              ]
+            },
+            {
+              "h": "/0/height",
+              "w": "/0/width"
+            },
+            true
+          ]
+        },
+        {
+          "name": "testReportLogic3b",
+          "path": "$.sections[*].visualContainers[*].config{$.layouts[*].position}",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "or": [
+                {
+                  "<": [
+                    { "var": "h" },
+                    { "var": "w" }
+                  ]
+                },
+                {
+                  "==": [
+                    { "var": "w" },
+                    { "var": "h" }
+                  ]
+                }
+              ]
+            },
+            {
+              "h": "/0/height",
+              "w": "/0/width"
+            },
+            true
+          ]
+        },
+        {
+          "name": "testCount",
+          "path": "$",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "count": [
+                {
+                  "var": "s"
+                }
+              ]
+            },
+            {
+              "s": "/sections"
+            },
+            2
+          ]
+        },
+        {
+          "name": "testCount",
+          "description": "Tests count custom rule.",
+          "path": "$",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "count": [
+                {
+                  "map": [
+                    {
+                      "var": "desserts"
+                    },
+                    {
+                      "var": "qty"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "desserts": [
+                {
+                  "name": "apple",
+                  "qty": 1
+                },
+                {
+                  "name": "brownie",
+                  "qty": 2
+                },
+                {
+                  "name": "cupcake",
+                  "qty": 3
+                }
+              ]
+            },
+            3
+          ]
+        },
+        {
+          "name": "testStrContains",
+          "description": "Tests strcontains custom rule.",
+          "path": "$",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "strcontains": [
+                "abcde",
+                "abc"
+              ]
+            },
+            {},
+            1
+          ]
+        },
+        {
+          "name": "textToString",
+          "description": "",
+          "path": "$",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "tostring": [
+                1234
+              ]
+            },
+            {
+            },
+            "1234"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reportTheme1",
+      "path": "Report/StaticResources/SharedResources/BaseThemes/CY22SU11.json",
+      "contentType": "json",
+      "codepage": 65001,
+      "rules": [
+        {
+          "name": "testThemeLogic1",
+          "path": "$",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "==": [
+                { "var": "n" },
+                "CY22SU09"
+              ]
+            },
+            {
+              "n": "/name"
+            },
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reportTheme2",
+      "path": "Report/StaticResources/SharedResources/BaseThemes/CY22SU11X.json",
+      "contentType": "json",
+      "codepage": 65001,
+      "rules": [
+        {
+          "name": "testThemeLogic2",
+          "path": "$",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "==": [
+                { "var": "f" },
+                "#252423"
+              ]
+            },
+            {
+              "f": "/foreground"
+            },
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reportTheme3",
+      "path": "Report/StaticResources/SharedResources/BaseThemes/CY22SU11.json",
+      "contentType": "json",
+      "codepage": 65001,
+      "rules": [
+        {
+          "name": "testThemeLogic3",
+          "path": "$",
+          "pathErrorWhenNoMatch": true,
+          "test": [
+            {
+              "!!": [
+                { "var": "f" }
+              ]
+            },
+            {
+              "f": "/textClasses/callout/fontSize"
+            },
+            true
+          ]
+        }
+      ]
+    }
+  ]
+}
