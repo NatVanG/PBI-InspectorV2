@@ -22,6 +22,7 @@ Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 ## <a name="contents"></a>Contents
 
 - [Intro](#intro)
+- [Releases](#releases)
 - [Base rules](#baserulesoverview)
 - [Run from the Graphical user interface](#gui)
 - [Run from the Command line](#cli)
@@ -38,16 +39,20 @@ So we've DevOps, MLOps and DataOps... but why not VisOps? How can we ensure that
 
 With Microsoft Power BI, visuals are placed on a canvas and formatted as desired, images may be included and theme files referenced. Testing the consistency of the visuals output has thus far typically been a manual process. The [Power BI file format (.pbip) was introduced](https://powerbi.microsoft.com/en-us/blog/deep-dive-into-power-bi-desktop-developer-mode-preview/) then recently [enhanced](https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report) to enable pro developer application lifecycle management and source control.  PBI Inspector provides the ability to define fully configurable testing rules powered by Greg Dennis's Json Logic .NET implementation, see https://json-everything.net/json-logic. 
 
+## <a id="releases"></a>Releases
+
+See releases for the Windows application and Command Line interface (CLI) at: https://github.com/NatVanG/PBI-InspectorV2/releases
+
 ## <a id="baserulesoverview"></a>Base rules
 
 While PBI Inspector supports custom rules, it also includes the following base rules defined at https://github.com/NatVanG/PBI-InspectorV2/blob/part-concept/Rules/Base-rules.json, some rules allow for user parameters:
 
 1. Remove custom visuals which are not used in the report (no user parameters)
 2. Reduce the number of visible visuals on the page (set parameter ```paramMaxVisualsPerPage``` to the maximum number of allowed visible visuals on the page)
-3. Reduce the number of objects within visuals (override hardcoded ```4``` parameter value the the maximum number of allowed objects per visuals)
+3. Reduce the number of objects within visuals (override hardcoded ```6``` parameter value the maximum number of allowed objects per visuals)
 4. Reduce usage of TopN filtering visuals by page (set ```paramMaxTopNFilteringPerPage```)
 5. Reduce usage of Advanced filtering visuals by page (set ```paramMaxAdvancedFilteringVisualsPerPage```)
-6. Reduce number of pages per report (set ```paramMaxNumberOfPagesPerReport```)
+6. Reduce number of pages per report (override hardcoded ```10``` parameter value the maximum number of allowed pages per report)
 7. Avoid setting ‘Show items with no data’ on columns (no user parameters)
 8. Tooltip and Drillthrough pages should be hidden (no user parameters)
 9. Ensure charts use theme colours (no user parameters)
@@ -109,7 +114,7 @@ All command line parameters are as follows:
 
 ## <a id="results"></a>Interpreting results
 
- If a verbose output was requested, then results for both test passes and failures will be reported. The JSON output is intended to be consumed by a subsequent process, for example a Power BI report may be created that uses the JSON file as a data source and visualises the PBI Inspector test results. The HTML page is a more readable format for humans which also includes report page wireframe images when tests are at the report page level. These images are intended to help the user identify visuals that have failed the test such as the example image below. The PBI Inspector logo is also displayed at the centre of each failing visuals as an additional identification aid when the wireframe is busy. 
+ If a verbose output was requested, then results for both test passes and failures will be reported. The JSON output is intended to be consumed by a subsequent process, for example a Power BI report may be created that uses the JSON file as a data source and visualises the PBI Inspector test results. The HTML page is a more readable format for humans which also includes report page wireframe images when tests are at the report page level. These images are intended to help the user identify visuals that have failed the test such as in the example image below. The PBI Inspector logo is also displayed at the centre of each failing visuals as an additional identification aid when the wireframe is busy. 
 
 ![Wireframe with failures](DocsImages/WireframeWithFailures.png)
 
