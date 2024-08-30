@@ -27,6 +27,7 @@ Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 - [Run from the Graphical user interface](#gui)
 - [Run from the Command line](#cli)
 - [Interpreting results](#results)
+- [Azure DevOps integration](#ado)
 - [Running reports on reports](#reporting)
 - [Custom rules guide](#customerruleguide)
 - [Examples](#customrulesexamples)
@@ -121,6 +122,12 @@ All command line parameters are as follows:
 Visuals with a dotted border are visuals hidden by default as the following example:
 
 ![Wireframe with hidden visual](DocsImages/WireframeWithHiddenVisual.png)
+
+## <a id="ado"></a>Azure DevOps integration
+
+For a tutorial on how to run PBI Inspector as part of an Azure DevOps pipeline job (alongside Tabular Editor's BPA rules), see https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-build-pipelines. 
+
+:exclamation: Please note that to work with PBI Inspector V2 the YAML file referenced in the tutorial needs to be updated as follows [ContinuousIntegration-Rules-PBIR.yml](DocsExamples/ContinuousIntegration-Rules-PBIR.yml).
 
 ## <a id="customerruleguide"></a>Custom Rules Guide
 
