@@ -1,4 +1,5 @@
 ﻿using Json.Logic;
+using Json.More;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -39,11 +40,13 @@ namespace PBIXInspectorLibrary.CustomRules
         }
     }
 
-    internal class ToStringJsonConverter : JsonConverter<ToString>
+    internal class ToStringJsonConverter : WeaklyTypedJsonConverter<ToString>
     {
         public override ToString? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var parameters = JsonSerializer.Deserialize<Json.Logic.Rule[]>(ref reader, options);
+            var parameters = reader.TokenType == JsonTokenType.StartArray
+           ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+           : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
             if (parameters is not { Length: 1 })
                 throw new JsonException("The ToString rule needs an array with 1 parameters.");
@@ -55,12 +58,12 @@ namespace PBIXInspectorLibrary.CustomRules
 
         public override void Write(Utf8JsonWriter writer, ToString value, JsonSerializerOptions options)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName("tostring");
-            writer.WriteStartArray();
-            writer.WriteRule(value.InputString, options);
-            writer.WriteEndArray();
-            writer.WriteEndObject();
+            //writer.WriteStartObject();
+            //writer.WritePropertyName("tostring");
+            //writer.WriteStartArray();
+            //writer.WriteRule(value.InputString, options);
+            //writer.WriteEndArray();
+            //writer.WriteEndObject();
         }
     }
 }

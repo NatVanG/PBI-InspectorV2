@@ -47,7 +47,7 @@ public class SetUnionRule : Json.Logic.Rule
 
         foreach (var item in arr1)
         {
-            var copy = item.Copy();
+            var copy = item?.DeepClone();
             if (!union.Any(x => x.IsEquivalentTo(copy)))
             {
                 union.Add(copy);
@@ -56,7 +56,7 @@ public class SetUnionRule : Json.Logic.Rule
 
         foreach (var item in arr2)
         {
-            var copy = item.Copy();
+            var copy = item?.DeepClone();
             if (!union.Any(x => x.IsEquivalentTo(copy)))
             {
                 union.Add(copy);
@@ -67,11 +67,13 @@ public class SetUnionRule : Json.Logic.Rule
     }
 }
 
-internal class SetUnionRuleJsonConverter : JsonConverter<SetUnionRule>
+internal class SetUnionRuleJsonConverter : WeaklyTypedJsonConverter<SetUnionRule>
 {
     public override SetUnionRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var parameters = JsonSerializer.Deserialize<Json.Logic.Rule[]>(ref reader, options);
+        var parameters = reader.TokenType == JsonTokenType.StartArray
+           ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+           : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
         if (parameters is not { Length: 2 })
             throw new JsonException("The union rule needs an array with 2 parameters.");
@@ -81,12 +83,12 @@ internal class SetUnionRuleJsonConverter : JsonConverter<SetUnionRule>
 
     public override void Write(Utf8JsonWriter writer, SetUnionRule value, JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-        writer.WritePropertyName("union");
-        writer.WriteStartArray();
-        writer.WriteRule(value.Set1, options);
-        writer.WriteRule(value.Set2, options);
-        writer.WriteEndArray();
-        writer.WriteEndObject();
+        //writer.WriteStartObject();
+        //writer.WritePropertyName("union");
+        //writer.WriteStartArray();
+        //writer.WriteRule(value.Set1, options);
+        //writer.WriteRule(value.Set2, options);
+        //writer.WriteEndArray();
+        //writer.WriteEndObject();
     }
 }

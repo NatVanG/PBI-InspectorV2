@@ -1,4 +1,5 @@
 ﻿using Json.Logic;
+using Json.More;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -46,11 +47,13 @@ namespace PBIXInspectorLibrary.CustomRules
         }
     }
 
-    internal class StringContainsJsonConverter : JsonConverter<StringContains>
+    internal class StringContainsJsonConverter : WeaklyTypedJsonConverter<StringContains>
     {
         public override StringContains? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var parameters = JsonSerializer.Deserialize<Json.Logic.Rule[]>(ref reader, options);
+            var parameters = reader.TokenType == JsonTokenType.StartArray
+           ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+           : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
             if (parameters is not { Length: 2 })
                 throw new JsonException("The strcontains rule needs an array with 2 parameters.");
@@ -62,14 +65,14 @@ namespace PBIXInspectorLibrary.CustomRules
 
         public override void Write(Utf8JsonWriter writer, StringContains value, JsonSerializerOptions options)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName("strcontains");
-            writer.WriteStartArray();
-            writer.WriteRule(value.SearchString, options);
-            writer.WriteRule(value.ContainsString, options);
+            //writer.WriteStartObject();
+            //writer.WritePropertyName("strcontains");
+            //writer.WriteStartArray();
+            //writer.WriteRule(value.SearchString, options);
+            //writer.WriteRule(value.ContainsString, options);
 
-            writer.WriteEndArray();
-            writer.WriteEndObject();
+            //writer.WriteEndArray();
+            //writer.WriteEndObject();
         }
     }
 }

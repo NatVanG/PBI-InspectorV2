@@ -49,7 +49,7 @@ public class SetSymmetricDifferenceRule : Json.Logic.Rule
         {
             if (!arr2.Any(x => item.IsEquivalentTo(x)))
             {
-                var copy = item.Copy();
+                var copy = item?.DeepClone();
                 if (!symmetricDifference.Any(x => x.IsEquivalentTo(copy)))
                 {
                     symmetricDifference.Add(copy);
@@ -61,7 +61,7 @@ public class SetSymmetricDifferenceRule : Json.Logic.Rule
         {
             if (!arr1.Any(x => item.IsEquivalentTo(x)))
             {
-                var copy = item.Copy();
+                var copy = item?.DeepClone();
                 if (!symmetricDifference.Any(x => x.IsEquivalentTo(copy)))
                 {
                     symmetricDifference.Add(copy);
@@ -73,11 +73,13 @@ public class SetSymmetricDifferenceRule : Json.Logic.Rule
     }
 }
 
-internal class SetSymmetricDifferenceRuleJsonConverter : JsonConverter<SetSymmetricDifferenceRule>
+internal class SetSymmetricDifferenceRuleJsonConverter : WeaklyTypedJsonConverter<SetSymmetricDifferenceRule>
 {
     public override SetSymmetricDifferenceRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var parameters = JsonSerializer.Deserialize<Json.Logic.Rule[]>(ref reader, options);
+        var parameters = reader.TokenType == JsonTokenType.StartArray
+            ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+            : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
         if (parameters is not { Length: 2 })
             throw new JsonException("The symdiff rule needs an array with 2 parameters.");
@@ -87,12 +89,12 @@ internal class SetSymmetricDifferenceRuleJsonConverter : JsonConverter<SetSymmet
 
     public override void Write(Utf8JsonWriter writer, SetSymmetricDifferenceRule value, JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-        writer.WritePropertyName("symdiff");
-        writer.WriteStartArray();
-        writer.WriteRule(value.Set1, options);
-        writer.WriteRule(value.Set2, options);
-        writer.WriteEndArray();
-        writer.WriteEndObject();
+        //writer.WriteStartObject();
+        //writer.WritePropertyName("symdiff");
+        //writer.WriteStartArray();
+        //writer.WriteRule(value.Set1, options);
+        //writer.WriteRule(value.Set2, options);
+        //writer.WriteEndArray();
+        //writer.WriteEndObject();
     }
 }

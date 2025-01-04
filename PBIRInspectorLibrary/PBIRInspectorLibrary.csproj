@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonLogic" Version="4.0.4" />
-    <PackageReference Include="JsonPatch.Net" Version="2.1.0" />
-    <PackageReference Include="JsonPath.Net" Version="0.7.1" />
+    <PackageReference Include="JsonLogic" Version="5.4.0" />
+    <PackageReference Include="JsonPatch.Net" Version="3.3.0" />
+    <PackageReference Include="JsonPath.Net" Version="2.1.0" />
   </ItemGroup>
 
 </Project>

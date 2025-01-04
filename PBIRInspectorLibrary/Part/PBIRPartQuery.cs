@@ -220,7 +220,7 @@ namespace PBIXInspectorLibrary.Part
         public JsonArray ToJsonArray(List<Part> parts)
         {
             if (parts == null || parts.Count == 0) return new JsonArray();
-            return new JsonArray(parts.Select(_ => ToJsonNode(_).Copy()).ToArray());
+            return new JsonArray(parts.Select(_ => ToJsonNode(_)?.DeepClone()).ToArray());
         }
 
         //returns null if the file does not exist or is not a json file or if it's a directory

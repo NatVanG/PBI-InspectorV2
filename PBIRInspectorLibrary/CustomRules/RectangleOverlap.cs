@@ -1,4 +1,5 @@
 ﻿using Json.Logic;
+using Json.More;
 using System.Drawing;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -89,15 +90,13 @@ namespace PBIXInspectorLibrary.CustomRules
     }
 
 
-    internal class RectOverlapJsonConverter : JsonConverter<RectOverlapRule>
+    internal class RectOverlapJsonConverter : WeaklyTypedJsonConverter<RectOverlapRule>
     {
         public override RectOverlapRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var node = JsonSerializer.Deserialize<JsonNode?>(ref reader, options);
-
-            var parameters = node is JsonArray
-                ? node.Deserialize<Json.Logic.Rule[]>()
-                : new[] { node.Deserialize<Json.Logic.Rule>()! };
+            var parameters = reader.TokenType == JsonTokenType.StartArray
+            ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+            : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
             if (parameters == null || parameters.Length == 0)
                 throw new JsonException("The count rule needs an array of at least one parameter.");

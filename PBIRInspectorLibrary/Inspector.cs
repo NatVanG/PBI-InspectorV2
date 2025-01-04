@@ -224,32 +224,22 @@ namespace PBIXInspectorLibrary
 
         private void AddCustomRulesToRegistry()
         {
-            //TODO: Use reflection to add rules
-            /*
-            System.Reflection.Assembly assembly = Assembly.GetExecutingAssembly();
-            string nspace = "PBIXInspectorLibrary.CustomRules";
-
-            var q = from t in Assembly.GetExecutingAssembly().GetTypes()
-                    where t.IsClass && t.Namespace == nspace
-                    select t;
-            q.ToList().ForEach(t1 => Json.Logic.RuleRegistry.AddRule<t1>());
-            */
-
-            Json.Logic.RuleRegistry.AddRule<CustomRules.IsNullOrEmptyRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.CountRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.StringContains>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.ToString>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.ToRecordRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.DrillVariableRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.RectOverlapRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetIntersectionRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetUnionRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetDifferenceRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>();
+            PBIRInspectorSerializerContext context = new PBIRInspectorSerializerContext();
+            Json.Logic.RuleRegistry.AddRule<CustomRules.IsNullOrEmptyRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.CountRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.StringContains>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.ToString>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.ToRecordRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.DrillVariableRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.RectOverlapRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetIntersectionRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetUnionRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetDifferenceRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
         }
 
         private MessageTypeEnum ConvertRuleLogType(string ruleLogType)
@@ -310,7 +300,7 @@ namespace PBIXInspectorLibrary
                                         {
                                             if (newval != null)
                                             {
-                                                newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, newval.Copy()));
+                                                newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, newval?.DeepClone()));
                                             }
                                             else
                                             {
@@ -346,18 +336,18 @@ namespace PBIXInspectorLibrary
                                 else if (value.Equals(CONTEXTNODE))
                                 {
                                     //context array token was used so pass in the parent array
-                                    newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, contextNode.Copy()));
+                                    newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, contextNode?.DeepClone()));
                                 }
                                 else
                                 {
                                     //looks like a literal value
-                                    newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value.Copy()));
+                                    newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value?.DeepClone()));
                                 }
                             }
                             else
                             {
                                 //might be a JsonArray
-                                newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value.Copy()));
+                                newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value?.DeepClone()));
                             }
                         }
                     }
