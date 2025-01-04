@@ -21,7 +21,7 @@ namespace PBIXInspectorTests
             var testResults = new List<TestResult>();
             var outputDir = "";
             ImageUtils.DrawReportPages(fieldMapResults, testResults, outputDir);
-            Assert.IsTrue(string.IsNullOrEmpty(outputDir));
+            Assert.That(string.IsNullOrEmpty(outputDir));
         }
     }
 }
