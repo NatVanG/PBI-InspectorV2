@@ -1,13 +1,13 @@
 ﻿using Json.Logic;
 using Json.Logic.Rules;
 using Json.More;
-using PBIXInspectorLibrary.Part;
+using PBIRInspectorLibrary.Part;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 
-namespace PBIXInspectorLibrary.CustomRules;
+namespace PBIRInspectorLibrary.CustomRules;
 
 /// <summary>
 /// Handles the `var` operation.

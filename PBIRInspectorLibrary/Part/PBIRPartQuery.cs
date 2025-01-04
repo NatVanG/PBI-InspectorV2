@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.ComponentModel;
-using PBIXInspectorLibrary.Part;
+using PBIRInspectorLibrary.Part;
 using System.Reflection;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Json.More;
 
-namespace PBIXInspectorLibrary.Part
+namespace PBIRInspectorLibrary.Part
 {
     internal class PBIRPartQuery : BasePartQuery, IPBIPartQuery
     {

@@ -1,17 +1,17 @@
-﻿namespace PBIXInspectorLibrary.Exceptions
+﻿namespace PBIRInspectorLibrary.Exceptions
 {
-    public class PBIXInspectorException : Exception
+    public class PBIRInspectorException : Exception
     {
-        public PBIXInspectorException()
+        public PBIRInspectorException()
         {
         }
 
-        public PBIXInspectorException(string message)
+        public PBIRInspectorException(string message)
             : base(message)
         {
         }
 
-        public PBIXInspectorException(string message, Exception inner)
+        public PBIRInspectorException(string message, Exception inner)
             : base(message, inner)
         {
         }

@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 
-namespace PBIXInspectorLibrary.Part
+namespace PBIRInspectorLibrary.Part
 {
     internal class Part
     {

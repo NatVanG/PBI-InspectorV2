@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace PBIXInspectorLibrary;
+namespace PBIRInspectorLibrary;
 
 [JsonConverter(typeof(TestConverter))]
 public class Test

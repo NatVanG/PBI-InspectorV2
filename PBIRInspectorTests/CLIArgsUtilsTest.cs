@@ -1,7 +1,7 @@
-﻿using PBIXInspectorWinLibrary.Utils;
+﻿using PBIRInspectorWinLibrary.Utils;
 
 #pragma warning disable CS8602 
-namespace PBIXInspectorTests
+namespace PBIRInspectorTests
 {
     public class CLIArgsUtilsTest
     {

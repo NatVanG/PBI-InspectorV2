@@ -1,6 +1,6 @@
-﻿using PBIXInspectorWinLibrary.Utils;
+﻿using PBIRInspectorWinLibrary.Utils;
 
-namespace PBIXInspectorTests
+namespace PBIRInspectorTests
 {
     [TestFixture]
     public class AppUtilsTests

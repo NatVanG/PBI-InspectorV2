@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PBIXInspectorLibrary.Part
+namespace PBIRInspectorLibrary.Part
 {
     internal enum PartTypeEnum
     {

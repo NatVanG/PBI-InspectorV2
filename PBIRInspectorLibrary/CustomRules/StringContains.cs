@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-namespace PBIXInspectorLibrary.CustomRules
+namespace PBIRInspectorLibrary.CustomRules
 {
     /// <summary>
     /// Handles the `strcontains` operation.

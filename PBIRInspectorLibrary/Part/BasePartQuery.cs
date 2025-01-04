@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace PBIXInspectorLibrary.Part
+namespace PBIRInspectorLibrary.Part
 {
     internal class BasePartQuery
     {

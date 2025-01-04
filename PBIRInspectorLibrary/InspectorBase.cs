@@ -1,8 +1,8 @@
 ﻿//using Newtonsoft.Json;
-using PBIXInspectorLibrary.CustomRules;
+using PBIRInspectorLibrary.CustomRules;
 using System.Text.Json;
 
-namespace PBIXInspectorLibrary
+namespace PBIRInspectorLibrary
 {
     public class InspectorBase
     {

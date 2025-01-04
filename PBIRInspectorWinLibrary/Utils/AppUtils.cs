@@ -1,8 +1,8 @@
-﻿using PBIXInspectorLibrary;
-using PBIXInspectorLibrary.Exceptions;
+﻿using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.Exceptions;
 using System.Diagnostics;
 
-namespace PBIXInspectorWinLibrary.Utils
+namespace PBIRInspectorWinLibrary.Utils
 {
     public class AppUtils
     {
@@ -21,7 +21,7 @@ namespace PBIXInspectorWinLibrary.Utils
             }
             catch
             {
-                throw new PBIXInspectorException(string.Format("Could not launch browser or Windows Exployer for location \"{0}\".", url));
+                throw new PBIRInspectorException(string.Format("Could not launch browser or Windows Exployer for location \"{0}\".", url));
             }
         }
 

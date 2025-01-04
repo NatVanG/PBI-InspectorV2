@@ -1,7 +1,7 @@
-﻿using PBIXInspectorLibrary.Output;
-using PBIXInspectorWinLibrary.Drawing;
+﻿using PBIRInspectorLibrary.Output;
+using PBIRInspectorWinLibrary.Drawing;
 
-namespace PBIXInspectorTests
+namespace PBIRInspectorTests
 {
     [TestFixture]
     internal class ImageUtilsTest

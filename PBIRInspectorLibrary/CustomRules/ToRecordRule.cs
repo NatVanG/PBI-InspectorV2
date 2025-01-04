@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace PBIXInspectorLibrary.CustomRules
+namespace PBIRInspectorLibrary.CustomRules
 {
     /// <summary>
     /// Handles the `torecord` operation.

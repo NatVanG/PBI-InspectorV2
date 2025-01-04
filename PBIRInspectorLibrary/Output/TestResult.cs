@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Nodes;
 
-namespace PBIXInspectorLibrary.Output
+namespace PBIRInspectorLibrary.Output
 {
     public class TestResult
     {

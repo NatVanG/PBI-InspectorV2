@@ -3,9 +3,9 @@ using Json.More;
 using Json.Patch;
 using Json.Path;
 using Json.Pointer;
-using PBIXInspectorLibrary.Exceptions;
-using PBIXInspectorLibrary.Output;
-using PBIXInspectorLibrary.Part;
+using PBIRInspectorLibrary.Exceptions;
+using PBIRInspectorLibrary.Output;
+using PBIRInspectorLibrary.Part;
 using System.Data;
 using System.IO.Compression;
 using System.Reflection;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace PBIXInspectorLibrary
+namespace PBIRInspectorLibrary
 {
     /// <summary>
     /// Iterates through input rules and runs then against input PBIX files
@@ -62,7 +62,7 @@ namespace PBIXInspectorLibrary
 
                 if (inspectionRules == null || inspectionRules.Rules == null || inspectionRules.Rules.Count == 0)
                 {
-                    throw new PBIXInspectorException(string.Format("No rule definitions were found within rules file at \"{0}\".", rulesFilePath));
+                    throw new PBIRInspectorException(string.Format("No rule definitions were found within rules file at \"{0}\".", rulesFilePath));
                 }
                 else
                 {
@@ -71,11 +71,11 @@ namespace PBIXInspectorLibrary
             }
             catch (System.IO.FileNotFoundException e)
             {
-                throw new PBIXInspectorException(string.Format("Rules file with path \"{0}\" not found.", rulesFilePath), e);
+                throw new PBIRInspectorException(string.Format("Rules file with path \"{0}\" not found.", rulesFilePath), e);
             }
             catch (System.Text.Json.JsonException e)
             {
-                throw new PBIXInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesFilePath), e);
+                throw new PBIRInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesFilePath), e);
             }
 
             AddCustomRulesToRegistry();
@@ -180,7 +180,7 @@ namespace PBIXInspectorLibrary
                      }
                     
                 }
-                catch (PBIXInspectorException e)
+                catch (PBIRInspectorException e)
                 {
                     testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
                     continue;
@@ -311,7 +311,7 @@ namespace PBIXInspectorLibrary
                                         {
                                             if (rule.PathErrorWhenNoMatch)
                                             {
-                                                throw new PBIXInspectorException(string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
+                                                throw new PBIRInspectorException(string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
                                             }
                                             else
                                             {
@@ -324,7 +324,7 @@ namespace PBIXInspectorLibrary
                                     {
                                         if (rule.PathErrorWhenNoMatch)
                                         {
-                                            throw new PBIXInspectorException(string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\".", rule.Name, value));
+                                            throw new PBIRInspectorException(string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\".", rule.Name, value));
                                         }
                                         else
                                         {
@@ -354,7 +354,7 @@ namespace PBIXInspectorLibrary
                 }
                 catch (System.Text.Json.JsonException e)
                 {
-                    throw new PBIXInspectorException("JsonException", e);
+                    throw new PBIRInspectorException("JsonException", e);
                 }
 
             }

@@ -24,7 +24,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 
-namespace PBIXInspectorTests
+namespace PBIRInspectorTests
 {
     [JsonConverter(typeof(JsonLogicTestSuiteConverter))]
     public class JsonLogicTestSuite

@@ -1,5 +1,5 @@
 ﻿
-namespace PBIXInspectorWinLibrary.Utils
+namespace PBIRInspectorWinLibrary.Utils
 {
     public class ArgsUtils
     {

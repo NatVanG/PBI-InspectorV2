@@ -1,11 +1,11 @@
-﻿using PBIXInspectorLibrary;
-using PBIXInspectorLibrary.Exceptions;
-using PBIXInspectorLibrary.Output;
-using PBIXInspectorWinLibrary.Drawing;
-using PBIXInspectorWinLibrary.Utils;
+﻿using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.Exceptions;
+using PBIRInspectorLibrary.Output;
+using PBIRInspectorWinLibrary.Drawing;
+using PBIRInspectorWinLibrary.Utils;
 using System.Text.Json;
 
-namespace PBIXInspectorWinLibrary
+namespace PBIRInspectorWinLibrary
 {
     public class Main
     {
@@ -160,7 +160,7 @@ namespace PBIXInspectorWinLibrary
                     }
                 }
             }
-            catch (PBIXInspectorException e)
+            catch (PBIRInspectorException e)
             {
                 OnMessageIssued(MessageTypeEnum.Error, e.Message);
             }

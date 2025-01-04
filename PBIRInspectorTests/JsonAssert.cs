@@ -23,7 +23,7 @@
 using Json.More;
 using System.Text.Json.Nodes;
 
-namespace PBIXInspectorTests
+namespace PBIRInspectorTests
 {
     public static class JsonAssert
     {

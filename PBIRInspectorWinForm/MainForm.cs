@@ -1,7 +1,7 @@
-using PBIXInspectorWinLibrary;
-using PBIXInspectorWinLibrary.Utils;
+using PBIRInspectorWinLibrary;
+using PBIRInspectorWinLibrary.Utils;
 
-namespace PBIXInspectorWinForm
+namespace PBIRInspectorWinForm
 {
     public partial class MainForm : Form
     {
@@ -28,9 +28,9 @@ namespace PBIXInspectorWinForm
             Clear();
         }
 
-        private void Main_MessageIssued(object? sender, PBIXInspectorLibrary.MessageIssuedEventArgs e)
+        private void Main_MessageIssued(object? sender, PBIRInspectorLibrary.MessageIssuedEventArgs e)
         {
-            if (e.MessageType == PBIXInspectorLibrary.MessageTypeEnum.Dialog)
+            if (e.MessageType == PBIRInspectorLibrary.MessageTypeEnum.Dialog)
             {
                 var dr = MessageBox.Show(e.Message, "Delete directory?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (dr == DialogResult.Yes)

@@ -20,13 +20,13 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using PBIXInspectorLibrary;
-using PBIXInspectorLibrary.Exceptions;
-using PBIXInspectorLibrary.Output;
+using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.Exceptions;
+using PBIRInspectorLibrary.Output;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace PBIXInspectorTests;
+namespace PBIRInspectorTests;
 
 /// <summary>
 /// The code in this SuiteRunner is adapted from Greg Dennis's Json Everything test suite (see https://github.com/gregsdennis/json-everything) to ensure that we're not breaking core JsonLogic functionality.
@@ -324,7 +324,7 @@ public class SuiteRunner
 
             var testSuite = JsonSerializer.Deserialize<JsonLogicTestSuite>(content);
             var inspectionRules = new InspectionRules();
-            var rules = testSuite!.Tests.Select(t => new PBIXInspectorLibrary.Rule() { Name = t.Logic, PathErrorWhenNoMatch = false, Test = new PBIXInspectorLibrary.Test() { Logic = t.Logic!, Data = t.Data!, Expected = t.Expected! } });
+            var rules = testSuite!.Tests.Select(t => new PBIRInspectorLibrary.Rule() { Name = t.Logic, PathErrorWhenNoMatch = false, Test = new PBIRInspectorLibrary.Test() { Logic = t.Logic!, Data = t.Data!, Expected = t.Expected! } });
             inspectionRules.Rules = rules.ToList();
 
             return Suite(PBIPFilePath, inspectionRules);
@@ -373,7 +373,7 @@ public class SuiteRunner
         {
             Console.WriteLine(e.Message);
         }
-        catch (PBIXInspectorException e)
+        catch (PBIRInspectorException e)
         {
             Console.WriteLine(e.Message);
         }
@@ -399,7 +399,7 @@ public class SuiteRunner
         {
             Console.WriteLine(e.Message);
         }
-        catch (PBIXInspectorException e)
+        catch (PBIRInspectorException e)
         {
             Console.WriteLine(e.Message);
         }

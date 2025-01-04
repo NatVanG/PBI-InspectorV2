@@ -1,6 +1,6 @@
-﻿using PBIXInspectorLibrary;
-using PBIXInspectorWinLibrary;
-using PBIXInspectorWinLibrary.Utils;
+﻿using PBIRInspectorLibrary;
+using PBIRInspectorWinLibrary;
+using PBIRInspectorWinLibrary.Utils;
 
 internal partial class Program
 {
@@ -19,8 +19,8 @@ internal partial class Program
 
             Welcome();
 
-            PBIXInspectorWinLibrary.Main.WinMessageIssued += Main_MessageIssued;
-            PBIXInspectorWinLibrary.Main.Run(_parsedArgs);
+            PBIRInspectorWinLibrary.Main.WinMessageIssued += Main_MessageIssued;
+            PBIRInspectorWinLibrary.Main.Run(_parsedArgs);
 
             Exit();
         }
@@ -30,12 +30,12 @@ internal partial class Program
         }
         finally
         {
-            PBIXInspectorWinLibrary.Main.WinMessageIssued -= Main_MessageIssued;
-            PBIXInspectorWinLibrary.Main.CleanUp();
+            PBIRInspectorWinLibrary.Main.WinMessageIssued -= Main_MessageIssued;
+            PBIRInspectorWinLibrary.Main.CleanUp();
         }
     }
 
-    private static void Main_MessageIssued(object? sender, PBIXInspectorLibrary.MessageIssuedEventArgs e)
+    private static void Main_MessageIssued(object? sender, PBIRInspectorLibrary.MessageIssuedEventArgs e)
     {
         if (e.MessageType == MessageTypeEnum.Dialog)
         {
@@ -62,7 +62,7 @@ internal partial class Program
             //ADO output only
             if (_parsedArgs.ADOOutput && e.MessageType == MessageTypeEnum.Complete)
             {
-                string completionStatus = PBIXInspectorWinLibrary.Main.ErrorCount > 0 ? "Failed" : ((PBIXInspectorWinLibrary.Main.WarningCount > 0) ? "SucceededWithIssues" : "Succeeded");
+                string completionStatus = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? "Failed" : ((PBIRInspectorWinLibrary.Main.WarningCount > 0) ? "SucceededWithIssues" : "Succeeded");
 
                 Console.WriteLine(Constants.ADOCompleteTemplate, completionStatus);
             }

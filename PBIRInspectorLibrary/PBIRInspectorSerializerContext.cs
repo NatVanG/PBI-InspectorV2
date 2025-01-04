@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Json.Logic.Rules;
 
-namespace PBIXInspectorLibrary;
+namespace PBIRInspectorLibrary;
 
 [JsonSerializable(typeof(Json.Logic.Rule))]
 [JsonSerializable(typeof(CustomRules.CountRule))]

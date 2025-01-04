@@ -1,4 +1,4 @@
-﻿namespace PBIXInspectorLibrary
+﻿namespace PBIRInspectorLibrary
 {
     public interface IInspectionRules
     {
