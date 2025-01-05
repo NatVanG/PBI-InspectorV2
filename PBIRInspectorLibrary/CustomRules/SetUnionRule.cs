@@ -83,6 +83,7 @@ internal class SetUnionRuleJsonConverter : WeaklyTypedJsonConverter<SetUnionRule
 
     public override void Write(Utf8JsonWriter writer, SetUnionRule value, JsonSerializerOptions options)
     {
+        throw new NotImplementedException();
         //writer.WriteStartObject();
         //writer.WritePropertyName("union");
         //writer.WriteStartArray();

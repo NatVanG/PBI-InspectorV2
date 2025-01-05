@@ -41,11 +41,6 @@ namespace PBIRInspectorLibrary.Part
             return result;
         }
 
-        public object? Invoke(string query)
-        {
-            return Invoke(query, ContextService.GetInstance().Part);
-        }
-
         public static Part Parent(Part part)
         {
             return part.Parent;

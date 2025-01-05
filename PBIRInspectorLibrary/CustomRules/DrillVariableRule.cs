@@ -120,6 +120,7 @@ internal class DrillVariableRuleJsonConverter : WeaklyTypedJsonConverter<DrillVa
 
     public override void Write(Utf8JsonWriter writer, DrillVariableRule value, JsonSerializerOptions options)
     {
+        throw new NotImplementedException();
         //writer.WriteStartObject();
         //writer.WritePropertyName("drillvar");
         //if (value.DefaultValue != null)

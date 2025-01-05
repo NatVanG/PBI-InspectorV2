@@ -77,6 +77,7 @@ internal class SetIntersectionRuleJsonConverter : WeaklyTypedJsonConverter<SetIn
 
     public override void Write(Utf8JsonWriter writer, SetIntersectionRule value, JsonSerializerOptions options)
     {
+        throw new NotImplementedException();
         //writer.WriteStartObject();
         //writer.WritePropertyName("intersection");
         //writer.WriteStartArray();

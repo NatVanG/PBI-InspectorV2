@@ -58,6 +58,7 @@ namespace PBIRInspectorLibrary.CustomRules
 
         public override void Write(Utf8JsonWriter writer, ToString value, JsonSerializerOptions options)
         {
+            throw new NotImplementedException();
             //writer.WriteStartObject();
             //writer.WritePropertyName("tostring");
             //writer.WriteStartArray();

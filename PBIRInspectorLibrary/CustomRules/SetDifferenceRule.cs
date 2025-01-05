@@ -77,6 +77,7 @@ internal class SetDifferenceRuleJsonConverter : WeaklyTypedJsonConverter<SetDiff
 
     public override void Write(Utf8JsonWriter writer, SetDifferenceRule value, JsonSerializerOptions options)
     {
+        throw new NotImplementedException();
         //writer.WriteStartObject();
         //writer.WritePropertyName("difference");
         //writer.WriteStartArray();

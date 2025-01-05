@@ -80,6 +80,7 @@ namespace PBIRInspectorLibrary.CustomRules
 
         public override void Write(Utf8JsonWriter writer, PathRule value, JsonSerializerOptions options)
         {
+            throw new NotImplementedException();
             //writer.WriteStartObject();
             //writer.WritePropertyName("path");
             //if (value.DefaultValue != null)

@@ -54,6 +54,7 @@ namespace PBIRInspectorLibrary.CustomRules
 
         public override void Write(Utf8JsonWriter writer, IsNullOrEmptyRule value, JsonSerializerOptions options)
         {
+            throw new NotImplementedException();
             //writer.WriteStartObject();
             //writer.WritePropertyName("isnullorempty");
             //writer.WriteRule(value.Value, options);

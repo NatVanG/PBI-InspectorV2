@@ -89,6 +89,7 @@ internal class SetSymmetricDifferenceRuleJsonConverter : WeaklyTypedJsonConverte
 
     public override void Write(Utf8JsonWriter writer, SetSymmetricDifferenceRule value, JsonSerializerOptions options)
     {
+        throw new NotImplementedException();
         //writer.WriteStartObject();
         //writer.WritePropertyName("symdiff");
         //writer.WriteStartArray();

@@ -64,6 +64,6 @@ internal class PartRuleJsonConverter : WeaklyTypedJsonConverter<PartRule>
 
 	public override void Write(Utf8JsonWriter writer, PartRule value, JsonSerializerOptions options)
 	{
-		//throw new NotImplementedException();
+		throw new NotImplementedException();
 	}
 }

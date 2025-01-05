@@ -66,6 +66,7 @@ namespace PBIRInspectorLibrary.CustomRules
 
             public override void Write(Utf8JsonWriter writer, ToRecordRule value, JsonSerializerOptions options)
             {
+                throw new NotImplementedException();
                 //writer.WriteStartObject();
                 //writer.WritePropertyName("torecord");
                 //writer.WriteRules(value.Items, options);
