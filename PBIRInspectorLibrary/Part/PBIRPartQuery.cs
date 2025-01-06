@@ -15,6 +15,9 @@ using Json.More;
 
 namespace PBIRInspectorLibrary.Part
 {
+    /// <summary>
+    /// https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report#pbir-format
+    /// </summary>
     internal class PBIRPartQuery : BasePartQuery, IPBIPartQuery
     {
         private const string NAMEPOINTER = "/name";
