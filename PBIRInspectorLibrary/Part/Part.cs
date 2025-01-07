@@ -9,17 +9,25 @@ namespace PBIRInspectorLibrary.Part
     {
         public Part Parent { get; private set; }
 
-        public string Name { get; set; }
+        // The name of the file or folder
+        public string FileSystemName { get; private set; }
 
-        public string Path { get; private set; }
+        // The full path to the file or folder
+        public string FileSystemPath { get; private set; }
 
-        public JsonNode? Content { get; set; }
+        // The type of the part i.e. File or Folder
+        public PartTypeEnum PartType { get; private set; }
 
-        public Part(string name, string path, Part parent = null)
+        public JsonNode? JsonContent { get; set; }
+
+        public Byte[] ByteContent { get; set; }
+
+        public Part(string fileSystemName, string fileSystemPath, Part parent = null, PartTypeEnum partType = default)
         {
             Parent = parent;
-            Name = name;
-            Path = path;
+            FileSystemName = fileSystemName;
+            FileSystemPath = fileSystemPath;
+            PartType = partType;
         }
 
         public List<Part> Parts { get; set; }
@@ -42,12 +50,16 @@ namespace PBIRInspectorLibrary.Part
 
         public void Save()
         {
-            if (this.Content == null) return;
-            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            var updatedJson = Content.ToJsonString(jsonOptions);
-            File.WriteAllText(Path, updatedJson);
+            if (this.JsonContent != null)
+            {
+                var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+                var updatedJson = JsonContent.ToJsonString(jsonOptions);
+                File.WriteAllText(FileSystemPath, updatedJson);
+            }
+            else if (this.ByteContent != null)
+            {
+                File.WriteAllBytes(FileSystemPath, ByteContent);
+            }
         }
     }
-
-
 }

@@ -16,7 +16,7 @@ using System.Text.Json.Nodes;
 namespace PBIRInspectorLibrary
 {
     /// <summary>
-    /// Iterates through input rules and runs then against input PBIX files
+    /// Iterates through input rules and runs them against input PBI files
     /// </summary>
     public class Inspector : InspectorBase
     {
@@ -90,7 +90,7 @@ namespace PBIRInspectorLibrary
             //TODO: determine which flavour of IPBIPartQuery to instantiate.
             IPBIPartQuery partQuery = new PBIRPartQuery(_pbiFilePath);
             ContextService.GetInstance().PartQuery = partQuery;
-            
+
 
             foreach (var rule in rules)
             {
@@ -110,10 +110,10 @@ namespace PBIRInspectorLibrary
                 }
 
                 bool result = false;
-                
+
                 try
                 {
-                   var parts = new List<Part.Part>();
+                    var parts = new List<Part.Part>();
 
                     if (!string.IsNullOrEmpty(rule.Part))
                     {
@@ -135,19 +135,25 @@ namespace PBIRInspectorLibrary
 
                     foreach (var part in parts)
                     {
+                        if (part == null)
+                        {
+                            MessageTypeEnum msgType = rule.PathErrorWhenNoMatch ? MessageTypeEnum.Error : MessageTypeEnum.Warning;
+                            OnMessageIssued(msgType, string.Format("Rule \"{0}\" - Part(s) \"{1}\" not found.", rule.Name, rule.Part));
+                            continue;
+                        }
+
                         ContextService.GetInstance().Part = part;
                         var node = partQuery.ToJsonNode(part);
                         var newdata = MapRuleDataPointersToValues(node, rule, node);
 
-                        var parentName = partQuery.PartName(part);
-                        var parentDisplayName = partQuery.PartDisplayName(part) ?? partQuery.PartName(part);
+                        var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null; 
+                        var parentPageDisplayName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartDisplayName(part) ?? partQuery.PartName(part) : "N/A";
 
                         var jruleresult = jrule.Apply(newdata);
                         result = rule.Test.Expected.IsEquivalentTo(jruleresult);
                         var ruleLogType = ConvertRuleLogType(rule.LogType);
                         string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
-                        testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = parentName, ParentDisplayName = parentDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
-
+                        testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
 
                         //PATCH
                         if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
@@ -161,48 +167,41 @@ namespace PBIRInspectorLibrary
                                     var filteredPatchParts = allPatchParts.Where(_ => arr.ToJsonString().Contains(partQuery.PartName(_)));
                                     foreach (var filteredPart in filteredPatchParts)
                                     {
-                                        var filteredNode = partQuery.ToJsonNode(filteredPart);
-                                        var patchResult = rule.Patch.Ops.Apply(filteredNode);
-                                        filteredPart.Content = patchResult.Result;
-                                        filteredPart.Save();
+                                        ApplyPatch(partQuery, rule, filteredPart);
                                     }
                                 }
-                            }
-                            else
-                            {
-                                var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
-                                var patchNode = partQuery.ToJsonNode(patchPart);
-                                var patchResult = rule.Patch.Ops.Apply(patchNode);
-                                patchPart.Content = patchResult.Result;
-                                patchPart.Save();
+                                else
+                                {
+                                    var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
+                                    ApplyPatch(partQuery, rule, patchPart);
+                                }
                             }
                         }
-                     }
-                    
+                    }
                 }
                 catch (PBIRInspectorException e)
                 {
                     testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
                     continue;
                 }
-                
+
             }
             return testResults;
         }
 
-        private string TryGetJsonNodeStringValue(JsonNode node, string query)
+        private void ApplyPatch(IPBIPartQuery partQuery, Rule? rule, Part.Part? partToPatch)
         {
-            JsonPointer pt = JsonPointer.Parse(query);
-
-            if (pt.TryEvaluate(node, out var result))
+            var node = partQuery.ToJsonNode(partToPatch);
+            var patchResult = rule.Patch.Ops.Apply(node);
+            if (patchResult.IsSuccess)
             {
-                if (result is JsonValue val)
-                {
-                    return val.ToString();
-                }
+                partToPatch.JsonContent = patchResult.Result;
+                partToPatch.Save();
             }
-
-            return null;
+            else
+            {
+                OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Patch failed for part \"{1}\". Error: \"{2}\".", rule.Id, partToPatch.FileSystemPath, patchResult.Error));
+            }
         }
 
         protected void OnMessageIssued(MessageTypeEnum messageType, string message)

@@ -5,7 +5,7 @@
       "name": "Show visual axes titles",
       "description": "Check that certain charts have both axes title showing.",
       "part": "Pages",
-      "disabled": true,
+      "disabled": false,
       "applyPatch": true,
       "test": [
         {

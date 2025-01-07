@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Json.Logic.Rules;
+using Json.Patch;
 
 namespace PBIRInspectorLibrary;
 
@@ -21,4 +22,6 @@ namespace PBIRInspectorLibrary;
 [JsonSerializable(typeof(CustomRules.StringContains))]
 [JsonSerializable(typeof(CustomRules.ToRecordRule))]
 [JsonSerializable(typeof(CustomRules.ToString))]
+[JsonSerializable(typeof(JsonPatch))]
+[JsonSerializable(typeof(PatchResult))]
 internal partial class PBIRInspectorSerializerContext : JsonSerializerContext;

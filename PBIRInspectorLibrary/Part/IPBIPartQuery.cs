@@ -42,6 +42,8 @@ namespace PBIRInspectorLibrary.Part
 
         public abstract List<Part> Bookmarks(Part context);
 
+        public abstract List<Part> Files(Part context);
+
         public abstract Part? UniquePart(string query, Part context);
 
         public abstract JsonNode? ToJsonNode(Part context);

@@ -52,7 +52,7 @@ namespace PBIRInspectorLibrary.Part
             return TopParent(part.Parent);
         }
 
-        protected static string TryGetJsonNodeStringValue(JsonNode node, string query)
+        protected static string? TryGetJsonNodeStringValue(JsonNode node, string query)
         {
             JsonPointer pt = JsonPointer.Parse(query);
 
