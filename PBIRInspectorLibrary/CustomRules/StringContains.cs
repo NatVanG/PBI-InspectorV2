@@ -37,6 +37,8 @@ namespace PBIRInspectorLibrary.CustomRules
             var searchString = SearchString.Apply(data, contextData);
             var containsString = ContainsString.Apply(data, contextData);
 
+            if (searchString == null) return 0;
+            
             if (searchString is not JsonValue searchStringValue || !searchStringValue.TryGetValue(out string? stringSearchString))
                 throw new JsonLogicException($"strcontains rule: searchString parameter value is not a string.");
 

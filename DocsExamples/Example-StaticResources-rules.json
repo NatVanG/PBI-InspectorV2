@@ -1,0 +1,85 @@
+{
+  "rules": [
+    {
+      "id": "LIST_STATICRESOURCES",
+      "name": "List staticresources.",
+      "description": "",
+      "part": "RegisteredResources",
+      "test": [
+        {
+          "map": [
+            {
+              "part": "Files"
+            },
+            {
+              "var": "annotations.1.value"
+            }
+          ]
+        },
+        {
+        },
+        []
+      ]
+    },
+    {
+      "id": "LIST_STATICRESOURCES_V2",
+      "name": "List staticresources v2.",
+      "description": "list png files only",
+      "disabled": false,
+      "part": "StaticResources",
+      "test": [
+        {
+          "map": [
+            {
+              "filter": [
+                {
+                  "part": "Files"
+                },
+                {
+                  "strcontains": [
+                    {
+                      "var": "annotations.1.value"
+                    },
+                    "png"
+                  ]
+                }
+              ]
+            },
+            {
+              "var": "annotations.1.value"
+            }
+          ]
+        },
+        {
+        },
+        []
+      ]
+    },
+    {
+      "id": "LIST_STATICRESOURCES_V3",
+      "name": "List staticresources v3.",
+      "description": "list png files only",
+      "disabled": false,
+      "part": "StaticResources",
+      "test": [
+        {
+          "merge": [
+            {
+              "map": [
+                {
+                  "part": "Files"
+                },
+                {
+                  "path": "$.annotations[?@.name =='pbiri_filesystemname'].value"
+                }
+              ]
+            }
+          ]
+        },
+        {
+        },
+        []
+      ]
+    }
+  ]
+}

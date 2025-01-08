@@ -234,17 +234,31 @@ namespace PBIRInspectorLibrary.Part
             if (context.JsonContent != null) return context.JsonContent;
 
             JsonNode? node = null;
-
+            
             if (File.Exists(context.FileSystemPath))
             {
                 try
                 {
                     node = JsonNode.Parse(File.ReadAllText(context.FileSystemPath));
-                    context.JsonContent = node;
                 }
-                catch (System.Text.Json.JsonException ex)
+                catch (System.Text.Json.JsonException)
                 {
-                    throw new Exception($"Error parsing {context.FileSystemPath}", ex);
+                    //this is not a json file so add annotation with the file system path; this is so JsonLogic rules can still be applied
+                    node = new JsonObject();
+
+                    if (node is JsonObject jsonObject)
+                    {
+                        var annotations = new JsonArray
+                        {
+                            new JsonObject { ["name"] = "pbiri_filesystempath", ["value"] =  context.FileSystemPath },
+                            new JsonObject { ["name"] = "pbiri_filesystemname", ["value"] =  context.FileSystemName }
+                        };
+                        jsonObject["annotations"] = annotations;
+                    }
+                }
+                finally
+                {
+                    context.JsonContent = node;
                 }
             }
 

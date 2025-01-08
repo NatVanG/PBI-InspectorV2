@@ -20,8 +20,6 @@ namespace PBIRInspectorLibrary.Part
 
         public JsonNode? JsonContent { get; set; }
 
-        public Byte[] ByteContent { get; set; }
-
         public Part(string fileSystemName, string fileSystemPath, Part parent = null, PartTypeEnum partType = default)
         {
             Parent = parent;
@@ -55,10 +53,6 @@ namespace PBIRInspectorLibrary.Part
                 var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
                 var updatedJson = JsonContent.ToJsonString(jsonOptions);
                 File.WriteAllText(FileSystemPath, updatedJson);
-            }
-            else if (this.ByteContent != null)
-            {
-                File.WriteAllBytes(FileSystemPath, ByteContent);
             }
         }
     }

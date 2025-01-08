@@ -43,6 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocsExamples", "DocsExample
 		DocsExamples\Example-patches.json = DocsExamples\Example-patches.json
 		DocsExamples\Example-pbir-rules.json = DocsExamples\Example-pbir-rules.json
 		DocsExamples\Example-ReportPageFieldMap.json = DocsExamples\Example-ReportPageFieldMap.json
+		DocsExamples\Example-StaticResources-rules.json = DocsExamples\Example-StaticResources-rules.json
 		DocsExamples\Example-theme-rules.json = DocsExamples\Example-theme-rules.json
 		DocsExamples\Examples-rules.json = DocsExamples\Examples-rules.json
 		DocsExamples\Reid-rules.json = DocsExamples\Reid-rules.json
