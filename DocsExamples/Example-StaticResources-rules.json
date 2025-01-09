@@ -56,6 +56,44 @@
       ]
     },
     {
+      "id": "LIST_STATICRESOURCES_FILESIZE",
+      "name": "List staticresources file sizes.",
+      "description": "list sizes of png files only",
+      "disabled": false,
+      "part": "StaticResources",
+      "test": [
+        {
+          "map": [
+            {
+              "filter": [
+                {
+                  "part": "Files"
+                },
+                {
+                  "strcontains": [
+                    {
+                      "var": "annotations.1.value"
+                    },
+                    "png"
+                  ]
+                }
+              ]
+            },
+            {
+              "filesize": [
+                {
+                  "var": "annotations.0.value"
+                }
+              ]
+            }
+          ]
+        },
+        {
+        },
+        []
+      ]
+    },
+    {
       "id": "LIST_STATICRESOURCES_V3",
       "name": "List staticresources v3.",
       "description": "list png files only",
