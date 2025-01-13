@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -21,11 +22,12 @@ public class TestConverter : JsonConverter<Test?>
     {
         var node = JsonSerializer.Deserialize<JsonNode?>(ref reader, options);
         if (node is not JsonArray arr) return null;
-        if (arr.Count < 3) throw new InvalidOperationException("ERROR: Rule should be defined as a three member array for logic, data and expected result.");
+        var arrLen = arr.Count;
+        if (arrLen < 2 || arrLen > 3) throw new InvalidOperationException("ERROR: Rule should be defined as a two or three member array for logic, data (optional) and expected result.");
 
         var logic = JsonSerializer.Serialize(arr[0], new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
-        var data = arr[1];
-        var expected = arr[2];
+        var data = arrLen > 2 ? arr[1] : new JsonObject();
+        var expected = arrLen > 2 ? arr[2] : arr[1];
 
         return new Test
         {

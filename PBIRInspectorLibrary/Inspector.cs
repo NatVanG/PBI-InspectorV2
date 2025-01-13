@@ -144,7 +144,7 @@ namespace PBIRInspectorLibrary
 
                         ContextService.GetInstance().Part = part;
                         var node = partQuery.ToJsonNode(part);
-                        var newdata = MapRuleDataPointersToValues(node, rule, node);
+                        var newdata = MapRuleDataPointersToValues(node, rule);
 
                         var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null; 
                         var parentPageDisplayName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartDisplayName(part) ?? partQuery.PartName(part) : "N/A";
@@ -270,93 +270,87 @@ namespace PBIRInspectorLibrary
         /// <param name="token"></param>
         /// <param name="rule"></param>
         /// <returns></returns>
-        private JsonNode? MapRuleDataPointersToValues(JsonNode? target, Rule rule, JsonNode? contextNode)
+        private JsonNode? MapRuleDataPointersToValues(JsonNode? target, Rule rule)
         {
             if (target == null || rule.Test.Data == null || rule.Test.Data is not JsonObject) return rule.Test.Data;
+            if (rule.Test.Data is JsonObject && rule.Test.Data.AsObject().Count() == 0) return target;
 
             var newdata = new JsonObject();
 
             var olddata = rule.Test.Data.AsObject();
 
-            if (target != null)
+            try
             {
-                try
+                foreach (var item in olddata)
                 {
-                    if (olddata != null && olddata.Count() > 0)
+                    if (item.Value is JsonValue)
                     {
-                        foreach (var item in olddata)
+                        var value = item.Value.AsValue().Stringify();
+                        if (value.StartsWith(JSONPOINTERSTART)) //check for JsonPointer syntax
                         {
-                            if (item.Value is JsonValue)
+                            try
                             {
-                                var value = item.Value.AsValue().Stringify();
-                                if (value.StartsWith(JSONPOINTERSTART)) //check for JsonPointer syntax
+                                //var pointer = JsonPointer.Parse(value);
+                                //var evalsuccess = pointer.TryEvaluate(target, out var newval);
+                                var evalsuccess = EvalPath(value, target, out var newval);
+                                if (evalsuccess)
                                 {
-                                    try
+                                    if (newval != null)
                                     {
-                                        //var pointer = JsonPointer.Parse(value);
-                                        //var evalsuccess = pointer.TryEvaluate(target, out var newval);
-                                        var evalsuccess = EvalPath(value, target, out var newval);
-                                        if (evalsuccess)
-                                        {
-                                            if (newval != null)
-                                            {
-                                                newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, newval?.DeepClone()));
-                                            }
-                                            else
-                                            {
-                                                //TODO: handle null value?
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (rule.PathErrorWhenNoMatch)
-                                            {
-                                                throw new PBIRInspectorException(string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
-                                            }
-                                            else
-                                            {
-                                                OnMessageIssued(MessageTypeEnum.Information, string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
-                                                continue;
-                                            }
-                                        }
+                                        newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, newval?.DeepClone()));
                                     }
-                                    catch (PointerParseException e)
+                                    else
                                     {
-                                        if (rule.PathErrorWhenNoMatch)
-                                        {
-                                            throw new PBIRInspectorException(string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\".", rule.Name, value));
-                                        }
-                                        else
-                                        {
-                                            OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\". Inner Exception: \"{2}\".", rule.Name, value, e.Message));
-                                            continue;
-                                        }
+                                        //TODO: handle null value?
                                     }
-                                }
-                                else if (value.Equals(CONTEXTNODE))
-                                {
-                                    //context array token was used so pass in the parent array
-                                    newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, contextNode?.DeepClone()));
                                 }
                                 else
                                 {
-                                    //looks like a literal value
-                                    newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value?.DeepClone()));
+                                    if (rule.PathErrorWhenNoMatch)
+                                    {
+                                        throw new PBIRInspectorException(string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
+                                    }
+                                    else
+                                    {
+                                        OnMessageIssued(MessageTypeEnum.Information, string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
+                                        continue;
+                                    }
                                 }
                             }
-                            else
+                            catch (PointerParseException e)
                             {
-                                //might be a JsonArray
-                                newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value?.DeepClone()));
+                                if (rule.PathErrorWhenNoMatch)
+                                {
+                                    throw new PBIRInspectorException(string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\".", rule.Name, value));
+                                }
+                                else
+                                {
+                                    OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\". Inner Exception: \"{2}\".", rule.Name, value, e.Message));
+                                    continue;
+                                }
                             }
                         }
+                        else if (value.Equals(CONTEXTNODE))
+                        {
+                            //context array token was used so pass in the parent array
+                            newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, target?.DeepClone()));
+                        }
+                        else
+                        {
+                            //looks like a literal value
+                            newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value?.DeepClone()));
+                        }
+                    }
+                    else
+                    {
+                        //might be a JsonArray
+                        newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value?.DeepClone()));
                     }
                 }
-                catch (System.Text.Json.JsonException e)
-                {
-                    throw new PBIRInspectorException("JsonException", e);
-                }
-
+            }
+            catch (System.Text.Json.JsonException e)
+            {
+                throw new PBIRInspectorException("JsonException", e);
             }
 
             return newdata;
