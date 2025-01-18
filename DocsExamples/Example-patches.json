@@ -85,6 +85,7 @@
       "name": "Disable local slow datasource settings",
       "description": "Check that report slow data source settings are all disabled.",
       "part": "Report",
+      "disabled": true,
       "applyPatch": true,
       "test": [
         {
@@ -146,6 +147,29 @@
             "op": "replace",
             "path": "/slowDataSourceSettings/isApplyAllButtonEnabled",
             "value": false
+          }
+        ]
+      ]
+    },
+    {
+      "id": "ACTIVE_PAGE",
+      "name": "Ensure report's active page index is set to first page",
+      "description": "",
+      "part": "PagesHeader",
+      "applyPatch": true,
+      "test": [
+        {
+          "var": "activePageName"
+        },
+        "ReportSection89a9619c7025093ade1c"
+      ],
+      "patch": [
+        "PagesHeader",
+        [
+          {
+            "op": "replace",
+            "path": "/activePageName",
+            "value": "ReportSection89a9619c7025093ade1c"
           }
         ]
       ]

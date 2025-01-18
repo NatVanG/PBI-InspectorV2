@@ -158,23 +158,20 @@ namespace PBIRInspectorLibrary
                         //PATCH
                         if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
                         {
-                            if (jruleresult != null && jruleresult is JsonArray arr)
+                            if (jruleresult != null && jruleresult is JsonArray arr && arr.Count() > 0)
                             {
-                                if (arr.Count() > 0)
+                                var allPatchParts = (List<Part.Part>)partQuery.Invoke(rule.Patch.PartName, part);
+                                //TODO: use another method to filter parts i.e. other than ToJSonString
+                                var filteredPatchParts = allPatchParts.Where(_ => arr.ToJsonString().Contains(partQuery.PartName(_)));
+                                foreach (var filteredPart in filteredPatchParts)
                                 {
-                                    var allPatchParts = (List<Part.Part>)partQuery.Invoke(rule.Patch.PartName, part);
-                                    //TODO: use another method to filter parts i.e. other than ToJSonString
-                                    var filteredPatchParts = allPatchParts.Where(_ => arr.ToJsonString().Contains(partQuery.PartName(_)));
-                                    foreach (var filteredPart in filteredPatchParts)
-                                    {
-                                        ApplyPatch(partQuery, rule, filteredPart);
-                                    }
+                                    ApplyPatch(partQuery, rule, filteredPart);
                                 }
-                                else
-                                {
-                                    var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
-                                    ApplyPatch(partQuery, rule, patchPart);
-                                }
+                            }
+                            else
+                            {
+                                var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
+                                ApplyPatch(partQuery, rule, patchPart);
                             }
                         }
                     }
