@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
   "name": "1a67964cf02b6170c3b8",
   "position": {
     "x": 548.57142857142856,
     "y": 8.4072249589490973,
     "z": 0,
-    "width": 731.42857142857144,
     "height": 692.54515599343188,
+    "width": 731.42857142857144,
     "tabOrder": 0
   },
   "visual": {
@@ -67,22 +67,7 @@
     "objects": {
       "display": [
         {
-          "properties": {
-            "viewportHeight": {
-              "expr": {
-                "Literal": {
-                  "Value": "682.5451559934319D"
-                }
-              }
-            },
-            "viewportWidth": {
-              "expr": {
-                "Literal": {
-                  "Value": "721.4285714285714D"
-                }
-              }
-            }
-          }
+          "properties": {}
         }
       ],
       "developer": [
@@ -91,7 +76,7 @@
             "version": {
               "expr": {
                 "Literal": {
-                  "Value": "'1.6.2.1'"
+                  "Value": "'1.7.2.1'"
                 }
               }
             }
@@ -132,7 +117,7 @@
             "version": {
               "expr": {
                 "Literal": {
-                  "Value": "'5.16.3'"
+                  "Value": "'5.20.1'"
                 }
               }
             },
@@ -168,6 +153,26 @@
               "expr": {
                 "Literal": {
                   "Value": "50D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "682.5451559934319D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "721.4285714285714D"
                 }
               }
             }

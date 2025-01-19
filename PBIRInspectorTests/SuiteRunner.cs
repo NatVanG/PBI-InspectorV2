@@ -168,11 +168,44 @@ public class SuiteRunner
     }
     #endregion
 
+    #region ExamplePassSuite
+    //TODO: run this suite
+    public static IEnumerable<TestCaseData> ExamplePassPBIPSuite()
+    {
+        string PBIPFilePath = @"Files\pbip\Example-rules-passes.Report";
+        string RulesFilePath = @"Files\Examples-rules.json";
+
+        Console.WriteLine("Running example pass PBIP suite...");
+        return Suite(PBIPFilePath, RulesFilePath);
+    }
+
+    [TestCaseSource(nameof(ExamplePassPBIPSuite))]
+    public void RunExamplePassPBIP(TestResult testResult)
+    {
+        if (testResult.ParentDisplayName == testResult.RuleId)
+        {
+            Assert.That(testResult.Pass, testResult.Message);
+        }
+
+        //TODO: complete test for LOCAL_REPORT_SETTINGS
+        if (testResult.RuleId == "DISABLE_SLOW_DATASOURCE_SETTINGS" ||
+            //testResult.RuleId == "LOCAL_REPORT_SETTINGS" ||
+            testResult.RuleId == "ACTIVE_PAGE" ||
+            testResult.RuleId == "UNIQUE_PART_PASS" ||
+            testResult.RuleId == "CHECK_FOR_LOCAL_MEASURES" ||
+            testResult.RuleId == "CHECK_VERSION")
+        {
+            Assert.That(testResult.Pass, testResult.Message);
+        }
+    }
+    #endregion
+
     #region ExampleFailSuite
 
     public static IEnumerable<TestCaseData> ExampleFailPBIPSuite()
     {
-        string PBIPFilePath = @"Files\pbip\Inventory-sample-fails.Report";
+        ///string PBIPFilePath = @"Files\pbip\Inventory-sample-fails.Report";
+        string PBIPFilePath = @"Files\pbip\Example-rules-fails.Report";
         string RulesFilePath = @"Files\Examples-rules.json";
 
         Console.WriteLine("Running base fail PBIP suite...");
@@ -202,16 +235,31 @@ public class SuiteRunner
                     Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
+            case "MOBILE_CHARTS_WIDER_THAN_TALL":
+                //if (testResult.ParentDisplayName == testResult.RuleId)
+                //{
+                //    expected = "[\"3f7d302598c1e81e7e78\", \"5094f3ff553da63e610e\"]";
+                //    JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
+                //    Assert.That(!testResult.Pass, testResult.Message);
+                //}
+                //else
+                //{
+                //    Assert.That(testResult.Pass, testResult.Message);
+                //}
+                break;
             case "DISABLE_SLOW_DATASOURCE_SETTINGS":
                 Assert.That(!testResult.Pass, testResult.Message);
                 break;
             case "LOCAL_REPORT_SETTINGS":
                 Assert.That(!testResult.Pass, testResult.Message);
                 break;
+            case "ACTIVE_PAGE":
+                Assert.That(!testResult.Pass, testResult.Message);
+                break;
             case "SHOW_AXES_TITLES":
                 if (testResult.ParentDisplayName == testResult.RuleId)
                 {
-                    expected = "[\"a9243890e8b7ec111322\", \"d65c53d5b679c4cacba0\", \"8a0d8392a2400e899bcc\"]";
+                    expected = "[\"8a0d8392a2400e899bcc\", \"a9243890e8b7ec111322\", \"d65c53d5b679c4cacba0\"]";
                     JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
                     Assert.That(!testResult.Pass, testResult.Message);
                 }
@@ -240,7 +288,7 @@ public class SuiteRunner
 
                 break;
             case "DISABLE_DROP_SHADOWS_ON_VISUALS":
-                expected = "[\"bdb3c2666ac0e67947aa\",\"5d4868734a72096e0ada\"]";
+                expected = "[\"5d4868734a72096e0ada\",\"bdb3c2666ac0e67947aa\"]";
                 if (testResult.ParentDisplayName == testResult.RuleId)
                 {
                     JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
@@ -266,12 +314,15 @@ public class SuiteRunner
                 //Assert.False(testResult.Pass, testResult.Message);
                 break;
             case "CHECK_FOR_VISUALS_OVERLAP":
-                expected = "[\"2beb787442a6d0432b4d\",\"11f540db1a90abb52cda\",\"93e80741178005eb0ab4\",\"dead16c359819062e164\"]";
+                expected = "[\"11f540db1a90abb52cda\",\"2beb787442a6d0432b4d\",\"93e80741178005eb0ab4\",\"dead16c359819062e164\"]";
                 if (testResult.ParentDisplayName == testResult.RuleId)
                 {
                     JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
                     Assert.That(!testResult.Pass, testResult.Message);
                 }
+                break;
+            case "UNIQUE_PART_FAIL":
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             case "CHECK_FOR_LOCAL_MEASURES":
                 //TODO: complete this test

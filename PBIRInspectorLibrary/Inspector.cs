@@ -141,7 +141,11 @@ namespace PBIRInspectorLibrary
                             MessageTypeEnum msgType = rule.PathErrorWhenNoMatch ? MessageTypeEnum.Error : MessageTypeEnum.Information;
                             var msg = string.Format("Rule \"{0}\" - Part(s) \"{1}\" not found.", rule.Name, rule.Part);
                             OnMessageIssued(msgType, msg);
-                            testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = null, ParentDisplayName = "N/A", Pass = !rule.PathErrorWhenNoMatch, Message = msg, Expected = rule.Test.Expected, Actual = null });
+
+                            if (rule.PathErrorWhenNoMatch)
+                            {
+                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = null, ParentDisplayName = "N/A", Pass = false, Message = msg, Expected = rule.Test.Expected, Actual = null });
+                            }
                         }
                         else
                         {

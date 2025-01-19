@@ -30,8 +30,6 @@
             }
           ]
         },
-        {
-        },
         []
       ]
     },
@@ -64,8 +62,6 @@
               "var": "name"
             }
           ]
-        },
-        {
         },
         []
       ]
@@ -328,8 +324,6 @@
             }
           ]
         },
-        {
-        },
         []
       ]
     },
@@ -518,9 +512,6 @@
             }
           ]
         },
-        {
-          "visualsConfigArray": "."
-        },
         []
       ]
     },
@@ -563,7 +554,6 @@
             }
           ]
         },
-        {},
         []
       ]
     },
@@ -571,6 +561,7 @@
       "id": "CHECK_FOR_VISUALS_OVERLAP",
       "name": "Check for visuals overlap with a 5px margin",
       "description": "Returns names of visuals that overlap while inflating visuals rectangle area by 5px left, right, top and bottom. Currently this does not check for overlap with the sides of report page itself. This rule does not currently work with visual groups.",
+      "disabled": false,
       "part": "Pages",
       "test": [
         {
@@ -665,15 +656,30 @@
             5
           ]
         },
-        {},
         []
       ]
     },
     {
-      "id": "UNIQUE_PART",
-      "name": "",
-      "description": "",
-      "disabled": true,
+      "id": "UNIQUE_PART_FAIL",
+      "name": "Unique part",
+      "description": "Return a unique part",
+      "pathErrorWhenNoMatch": true,
+      "part": "Bookmarkb82c990a9a1720ce9d73X.bookmark.json",
+      "test": [
+        {
+          "var": "bookmarkName"
+        },
+        {
+          "bookmarkName": "/name"
+        },
+        "Bookmarkb82c990a9a1720ce9d73"
+      ]
+    },
+    {
+      "id": "UNIQUE_PART_PASS",
+      "name": "Unique part",
+      "description": "Return a unique part",
+      "pathErrorWhenNoMatch": true,
       "part": "Bookmarkb82c990a9a1720ce9d73.bookmark.json",
       "test": [
         {
@@ -689,7 +695,6 @@
       "id": "CHECK_FOR_LOCAL_MEASURES",
       "name": "Check for locally defined measures",
       "description": "Returns an array of report-level measure definitions",
-      "pathErrorWhenNoMatch":  false,
       "part": "ReportExtensions",
       "test": [
         {
@@ -731,8 +736,6 @@
               "var": "version"
             }
           ]
-        },
-        {
         },
         "2.0.0"
       ]

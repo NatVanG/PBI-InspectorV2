@@ -45,16 +45,6 @@
     <ProjectReference Include="..\PBIRInspectorWinLibrary\PBIRInspectorWinLibrary.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Files\Inventory rules sample.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Files\Inventory rules test.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Files\JsonLogicTests.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+
 
 </Project>
