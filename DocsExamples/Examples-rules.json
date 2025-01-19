@@ -112,19 +112,12 @@
     {
       "id": "LOCAL_REPORT_SETTINGS",
       "name": "Local report settings",
-      "description": "Check local report settings other than slow data source settings. This rule creates a json record of current local setting values and compares to a json record of expected values. Currently, if this rules fails, I recommend comparing both output json records formatted in Visual Studio code to easily identify the failed setting values.",
+      "description": "Check local report settings other than slow data source settings. This rule creates a json record of current local setting values and compares it to a json record of expected values. Currently, if this rules fails, I recommend comparing both output json records formatted in Visual Studio code to easily identify the failed setting values.",
+      "pathErrorWhenNoMatch": false,
       "part": "Report",
       "test": [
         {
           "torecord": [
-            "activePageIndex",
-            {
-              "var": "activePageIndex"
-            },
-            "defaultDrillFilterOtherVisuals",
-            {
-              "var": "defaultDrillFilterOtherVisuals"
-            },
             "isPersistentUserStateDisabled",
             {
               "var": "isPersistentUserStateDisabled"
@@ -141,17 +134,17 @@
             {
               "var": "exportDataMode"
             },
-            "useNewFilterPaneExperience",
+            "isReportAnnotationsDisabled",
             {
-              "var": "useNewFilterPaneExperience"
-            },
-            "optOutNewFilterPaneExperience",
-            {
-              "var": "optOutNewFilterPaneExperience"
+              "var": "isReportAnnotationsDisabled"
             },
             "defaultFilterActionIsDataFilter",
             {
               "var": "defaultFilterActionIsDataFilter"
+            },
+            "defaultDrillFilterOtherVisuals",
+            {
+              "var": "defaultDrillFilterOtherVisuals"
             },
             "useCrossReportDrillthrough",
             {
@@ -165,68 +158,116 @@
             {
               "var": "allowInlineExploration"
             },
-            "disableFilterPaneSearch",
-            {
-              "var": "disableFilterPaneSearch"
-            },
-            "enableDeveloperMode",
-            {
-              "if": [
-                {
-                  "!!": [ { "var": "enableDeveloperMode" } ]
-                },
-                {
-                  "var": "enableDeveloperMode"
-                },
-                false
-              ]
-            },
             "useEnhancedTooltips",
             {
               "var": "useEnhancedTooltips"
             },
+            "useScaledTooltips",
+            {
+              "var": "useScaledTooltips"
+            },
+            "filterPaneHiddenInEditMode",
+            {
+              "var": "filterPaneHiddenInEditMode"
+            },
+            "disableFilterPaneSearch",
+            {
+              "var": "disableFilterPaneSearch"
+            },
+            "pagesPosition",
+            {
+              "var": "pagesPosition"
+            },
+            "allowAutomatedInsightsNotification",
+            {
+              "var": "allowAutomatedInsightsNotification"
+            },
             "useDefaultAggregateDisplayName",
             {
               "var": "useDefaultAggregateDisplayName"
+            },
+            "enableDeveloperMode",
+            {
+              "var": "enableDeveloperMode"
+            },
+            "pauseQueries",
+            {
+              "var": "pauseQueries"
+            },
+            "queryLimitOption",
+            {
+              "var": "queryLimitOption"
+            },
+            "customMemoryLimit",
+            {
+              "var": "customMemoryLimit"
+            },
+            "customTimeoutLimit",
+            {
+              "var": "customTimeoutLimit"
             }
           ]
         },
         {
-          "activePageIndex": "/activeSectionIndex",
-          "defaultDrillFilterOtherVisuals": "/defaultDrillFilterOtherVisuals",
           "isPersistentUserStateDisabled": "/settings/isPersistentUserStateDisabled",
           "hideVisualContainerHeader": "/settings/hideVisualContainerHeader",
           "useStylableVisualContainerHeader": "/settings/useStylableVisualContainerHeader",
           "exportDataMode": "/settings/exportDataMode",
-          "useNewFilterPaneExperience": "/settings/useNewFilterPaneExperience",
-          "optOutNewFilterPaneExperience": "/settings/optOutNewFilterPaneExperience",
+          "isReportAnnotationsDisabled": "/settings/isReportAnnotationsDisabled",
           "defaultFilterActionIsDataFilter": "/settings/defaultFilterActionIsDataFilter",
+          "defaultDrillFilterOtherVisuals": "/settings/defaultDrillFilterOtherVisuals",
           "useCrossReportDrillthrough": "/settings/useCrossReportDrillthrough",
           "allowChangeFilterTypes": "/settings/allowChangeFilterTypes",
           "allowInlineExploration": "/settings/allowInlineExploration",
-          "disableFilterPaneSearch": "/settings/disableFilterPaneSearch",
-          "enableDeveloperMode": "/settings/enableDeveloperMode",
           "useEnhancedTooltips": "/settings/useEnhancedTooltips",
-          "useDefaultAggregateDisplayName": "/settings/useDefaultAggregateDisplayName"
+          "useScaledTooltips": "/settings/useScaledTooltips",
+          "filterPaneHiddenInEditMode": "/settings/filterPaneHiddenInEditMode",
+          "disableFilterPaneSearch": "/settings/disableFilterPaneSearch",
+          "pagesPosition": "/settings/pagesPosition",
+          "allowAutomatedInsightsNotification": "settings/allowAutomatedInsightsNotification",
+          "useDefaultAggregateDisplayName": "/settings/useDefaultAggregateDisplayName",
+          "enableDeveloperMode": "/settings/enableDeveloperMode",
+          "pauseQueries": "/settings/pauseQueries",
+          "queryLimitOption": "/settings/queryLimitOption",
+          "customMemoryLimit": "/settings/customMemoryLimit",
+          "customTimeoutLimit": "/settings/customTimeoutLimit"
         },
         {
-          "activePageIndex": 0,
-          "defaultDrillFilterOtherVisuals": true,
-          "isPersistentUserStateDisabled": true,
-          "hideVisualContainerHeader": false,
+          "isPersistentUserStateDisabled": false,
+          "hideVisualContainerHeader": true,
           "useStylableVisualContainerHeader": true,
-          "exportDataMode": 1,
-          "useNewFilterPaneExperience": true,
-          "optOutNewFilterPaneExperience": false,
-          "defaultFilterActionIsDataFilter": true,
-          "useCrossReportDrillthrough": false,
+          "exportDataMode": "AllowSummarizedAndUnderlying",
+          "isReportAnnotationsDisabled": false,
+          "defaultFilterActionIsDataFilter": false,
+          "defaultDrillFilterOtherVisuals": true,
+          "useCrossReportDrillthrough": true,
           "allowChangeFilterTypes": true,
-          "allowInlineExploration": false,
-          "disableFilterPaneSearch": false,
-          "enableDeveloperMode": false,
+          "allowInlineExploration": true,
           "useEnhancedTooltips": true,
-          "useDefaultAggregateDisplayName": true
+          "useScaledTooltips": true,
+          "filterPaneHiddenInEditMode": true,
+          "disableFilterPaneSearch": false,
+          "pagesPosition": "PagesPane",
+          "allowAutomatedInsightsNotification": true,
+          "useDefaultAggregateDisplayName": false,
+          "enableDeveloperMode": false,
+          "pauseQueries": false,
+          "queryLimitOption": "Premium",
+          "customMemoryLimit": "1048576",
+          "customTimeoutLimit": "225"
         }
+      ]
+    },
+    {
+      "id": "ACTIVE_PAGE",
+      "name": "Active page",
+      "description": "Ensure report's active page index is set to the correct page",
+      "part": "PagesHeader",
+      "test": [
+        {
+          "var": "activePageName"
+        },
+        "ReportSectionABC"
       ]
     },
     {
@@ -648,6 +689,7 @@
       "id": "CHECK_FOR_LOCAL_MEASURES",
       "name": "Check for locally defined measures",
       "description": "Returns an array of report-level measure definitions",
+      "pathErrorWhenNoMatch":  false,
       "part": "ReportExtensions",
       "test": [
         {

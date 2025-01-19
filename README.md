@@ -30,6 +30,7 @@ Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 - [Azure DevOps integration](#ado)
 - [Running reports on reports](#reporting)
 - [Custom rules guide](#customerruleguide)
+- [Patching](#patching)
 - [Examples](#customrulesexamples)
 - [Known issues](#knownissues)
 - [Report an issue](#reportanissue)
@@ -149,7 +150,7 @@ Each rule object has the following properties:
     "name": "A name that is shown in HTML results with wireframe images.",
     "description": "Details to help you and others understand what this rule does",
     "disabled": true|false(default),
-    "part": "Optional. One of Report|Pages|AllPages|Visuals|AllVisuals|Bookmarks|AllBookmarks. If the part specified is an array with multiple items (such as "Pages"), the rule will apply to each array item in sequence."
+    "part": "Optional. One of Report|Pages|PagesHeader|AllPages|Visuals|AllVisuals|Bookmarks|BookmarksHeader|AllBookmarks. If the part specified is an array with multiple items (such as "Pages"), the rule will apply to each array item in sequence."
     "test": [
     //test logic
     ,
@@ -233,6 +234,8 @@ For example (without the optional patch logic), the following rule checks that, 
     }
  ```
 
+## <a id="patching"></a>Patching
+
 Optionally a rule can now also define a *patch* to fix items (e.g. visuals) failing the test. For example a patch for the test above is as follows. The patch iterates through the failing visual names returned and fixes the "Visuals" part of the report definition by setting the "showAxisTitle" property to "true" for both the category and value axes:
 
 ```json
@@ -257,7 +260,7 @@ A patch definition has the following structure:
 
 ```json
 "patch": [
-        "One of Report|Pages|AllPages|Visuals|AllVisuals|Bookmarks|AllBookmarks",
+        "One of Report|Pages|PagesHeader|AllPages|Visuals|AllVisuals|Bookmarks|BookmarksHeader|AllBookmarks",
         [patch logic operator array]
       ]
 ```
@@ -343,6 +346,34 @@ Therefore the full rule example including the patch is as follows:
             "op": "replace",
             "path": "/visual/objects/valueAxis/0/properties/showAxisTitle/expr/Literal/Value",
             "value": "true"
+          }
+        ]
+      ]
+    }
+```
+
+Here's another custom rule with patch example that sets the report's default page. First we test the report's activePageName, if it's incorrect we replace it:
+
+```json
+{
+      "id": "ACTIVE_PAGE",
+      "name": "Ensure report's active page index is set to the correct page",
+      "description": "",
+      "part": "PagesHeader",
+      "applyPatch": true,
+      "test": [
+        {
+          "var": "activePageName"
+        },
+        "ReportSection89a9619c7025093ade1c"
+      ],
+      "patch": [
+        "PagesHeader",
+        [
+          {
+            "op": "replace",
+            "path": "/activePageName",
+            "value": "ReportSection89a9619c7025093ade1c"
           }
         ]
       ]
