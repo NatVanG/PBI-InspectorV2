@@ -1,8 +1,8 @@
 ﻿using Json.More;
-using PBIXInspectorLibrary.CustomRules;
+using PBIRInspectorLibrary.CustomRules;
 using System.Text.Json.Nodes;
 
-namespace PBIXInspectorTests
+namespace PBIRInspectorTests
 {
     [TestFixture]
     public class CustomRulesTests

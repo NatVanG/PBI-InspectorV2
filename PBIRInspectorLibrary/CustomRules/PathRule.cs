@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace PBIXInspectorLibrary.CustomRules
+namespace PBIRInspectorLibrary.CustomRules
 {
     /// <summary>
     /// Handles the `path` operation.
@@ -60,19 +60,17 @@ namespace PBIXInspectorLibrary.CustomRules
         private JsonArray ToJsonArray(NodeList? nodes)
         {
             if (nodes == null || nodes.Count == 0) return new JsonArray();
-            return new JsonArray(nodes.Select(_ => _.Value.Copy()).ToArray());
+            return new JsonArray(nodes.Select(_ => _.Value?.DeepClone()).ToArray());
         }
     }
 
-    internal class PathRuleJsonConverter : JsonConverter<PathRule>
+    internal class PathRuleJsonConverter : WeaklyTypedJsonConverter<PathRule>
     {
         public override PathRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var node = JsonSerializer.Deserialize<JsonNode?>(ref reader, options);
-
-            var parameters = node is JsonArray
-                ? node.Deserialize<Json.Logic.Rule[]>()
-                : new[] { node.Deserialize<Json.Logic.Rule>()! };
+            var parameters = reader.TokenType == JsonTokenType.StartArray
+           ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+           : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
             if (parameters is not ({ Length: 1 }))
                 throw new JsonException("The path rule needs an array with 1 parameter.");
@@ -82,19 +80,20 @@ namespace PBIXInspectorLibrary.CustomRules
 
         public override void Write(Utf8JsonWriter writer, PathRule value, JsonSerializerOptions options)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName("path");
-            if (value.DefaultValue != null)
-            {
-                writer.WriteStartArray();
-                writer.WriteRule(value.Path, options);
-                writer.WriteRule(value.DefaultValue, options);
-                writer.WriteEndArray();
-            }
-            else
-                writer.WriteRule(value.Path, options);
+            throw new NotImplementedException();
+            //writer.WriteStartObject();
+            //writer.WritePropertyName("path");
+            //if (value.DefaultValue != null)
+            //{
+            //    writer.WriteStartArray();
+            //    writer.WriteRule(value.Path, options);
+            //    writer.WriteRule(value.DefaultValue, options);
+            //    writer.WriteEndArray();
+            //}
+            //else
+            //    writer.WriteRule(value.Path, options);
 
-            writer.WriteEndObject();
+            //writer.WriteEndObject();
         }
     }
 }

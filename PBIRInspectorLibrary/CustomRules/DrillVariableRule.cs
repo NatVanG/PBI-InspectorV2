@@ -1,10 +1,11 @@
 ﻿using Json.Logic;
+using Json.More;
 using Json.Pointer;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace PBIXInspectorLibrary.CustomRules;
+namespace PBIRInspectorLibrary.CustomRules;
 
 /// <summary>
 /// Handles the `drillvar` operation.
@@ -96,15 +97,15 @@ public class DrillVariableRule : Json.Logic.Rule
     }
 }
 
-internal class DrillVariableRuleJsonConverter : JsonConverter<DrillVariableRule>
+internal class DrillVariableRuleJsonConverter : WeaklyTypedJsonConverter<DrillVariableRule>
 {
     public override DrillVariableRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var node = JsonSerializer.Deserialize<JsonNode?>(ref reader, options);
 
-        var parameters = node is JsonArray
-            ? node.Deserialize<Json.Logic.Rule[]>()
-            : new[] { node.Deserialize<Json.Logic.Rule>()! };
+        var parameters = reader.TokenType == JsonTokenType.StartArray
+            ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+            : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
         if (parameters is not ({ Length: 0 } or { Length: 1 } or { Length: 2 }))
             throw new JsonException("The var rule needs an array with 0, 1, or 2 parameters.");
@@ -119,18 +120,19 @@ internal class DrillVariableRuleJsonConverter : JsonConverter<DrillVariableRule>
 
     public override void Write(Utf8JsonWriter writer, DrillVariableRule value, JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-        writer.WritePropertyName("drillvar");
-        if (value.DefaultValue != null)
-        {
-            writer.WriteStartArray();
-            writer.WriteRule(value.Path, options);
-            writer.WriteRule(value.DefaultValue, options);
-            writer.WriteEndArray();
-        }
-        else
-            writer.WriteRule(value.Path, options);
+        throw new NotImplementedException();
+        //writer.WriteStartObject();
+        //writer.WritePropertyName("drillvar");
+        //if (value.DefaultValue != null)
+        //{
+        //    writer.WriteStartArray();
+        //    writer.WriteRule(value.Path, options);
+        //    writer.WriteRule(value.DefaultValue, options);
+        //    writer.WriteEndArray();
+        //}
+        //else
+        //    writer.WriteRule(value.Path, options);
 
-        writer.WriteEndObject();
+        //writer.WriteEndObject();
     }
 }

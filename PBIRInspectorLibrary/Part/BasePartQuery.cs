@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace PBIXInspectorLibrary.Part
+namespace PBIRInspectorLibrary.Part
 {
     internal class BasePartQuery
     {
@@ -41,11 +41,6 @@ namespace PBIXInspectorLibrary.Part
             return result;
         }
 
-        public object? Invoke(string query)
-        {
-            return Invoke(query, ContextService.GetInstance().Part);
-        }
-
         public static Part Parent(Part part)
         {
             return part.Parent;
@@ -57,7 +52,7 @@ namespace PBIXInspectorLibrary.Part
             return TopParent(part.Parent);
         }
 
-        protected static string TryGetJsonNodeStringValue(JsonNode node, string query)
+        protected static string? TryGetJsonNodeStringValue(JsonNode node, string query)
         {
             JsonPointer pt = JsonPointer.Parse(query);
 

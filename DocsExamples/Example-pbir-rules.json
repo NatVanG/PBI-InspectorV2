@@ -1,0 +1,129 @@
+{
+  "rules": [
+    {
+      "id": "DEFINITION_PBIR_CHECK_VERSION",
+      "name": "Check the version attribute value in a definition.pbir file.",
+      "disabled": false,
+      "description": "",
+      "part": "definition.pbir",
+      "test": [
+        {
+          "var": "version"
+        },
+        "4.0"
+      ]
+    },
+    {
+      "id": "THEME_NAME",
+      "name": "Theme name",
+      "description": "",
+      "part": "Report",
+      "disabled": false,
+      "test": [
+        {
+          "var": "themeCollection.baseTheme.name"
+        },
+        "CY22SU11"
+      ]
+    },
+    {
+      "id": "THEME_NAME",
+      "name": "Theme name",
+      "description": "",
+      "part": "Report.json",
+      "disabled": false,
+      "test": [
+        {
+          "var": "themeName"
+        },
+        {
+          "themeName": "/themeCollection/baseTheme/name"
+        },
+        "CY22SU11"
+      ]
+    },
+    {
+      "id": "DEFINITION_PBIR_CHECK_VERSION_V2",
+      "name": "Check the version attribute value in a definition.pbir file V2.",
+      "disabled": false,
+      "description": "",
+      "part": "definition.pbir",
+      "test": [
+        {
+          "var": "myversion"
+        },
+        {
+          "myversion": "/version"
+        },
+        "4.0"
+      ]
+    },
+    {
+      "id": "DEFINITION_PBIR_DATASETREFERENCE_BYPATH",
+      "name": "Check the byPath attribute definition.pbir file.",
+      "disabled": false,
+      "description": "",
+      "test": [
+        {
+          "query": [
+            {
+              "part": "definition.pbir"
+            },
+            {
+              "var": "datasetReference.byPath.path"
+            }
+          ]
+        },
+        "../Inventory sample - fails.Dataset"
+      ]
+    },
+    {
+      "id": "DEFINITION_PBIR_DATASETREFERENCE_BYPATH_V2",
+      "name": "Check the byPath attribute definition.pbir file v2.",
+      "disabled": false,
+      "part": "definition.pbir",
+      "description": "",
+      "test": [
+        {
+          "var": "datasetReference.byPath.path"
+        },
+        "../Inventory sample - fails.Dataset"
+      ]
+    },
+    {
+      "id": "DEFINITION_PBIR_DATASETREFERENCE_BYPATH_V3",
+      "name": "Check the byPath attribute definition.pbir file v3.",
+      "disabled": false,
+      "part": "definition.pbir",
+      "description": "",
+      "test": [
+        {
+          "var": "datasetRef"
+        },
+        {
+          "datasetRef": "/datasetReference/byPath/path"
+        },
+        "../Inventory sample - fails.Dataset"
+      ]
+    },
+    {
+      "id": "DEFINITION_PBIR_DATASETREFERENCE_BYCONNECTION",
+      "name": "Check the byConnection attribute definition.pbir file.",
+      "disabled": false,
+      "description": "",
+      "test": [
+        {
+          "query": [
+            {
+              "part": "definition-liveConnect.pbir"
+            },
+            {
+              "var": "datasetReference.byConnection.connectionType"
+            }
+          ]
+        },
+        "pbiServiceXmlaStyleLive"
+      ]
+    }
+  ]
+}

@@ -1,11 +1,13 @@
 ﻿using Json.Logic;
-using PBIXInspectorLibrary.Part;
+using Json.Logic.Rules;
+using Json.More;
+using PBIRInspectorLibrary.Part;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 
-namespace PBIXInspectorLibrary.CustomRules;
+namespace PBIRInspectorLibrary.CustomRules;
 
 /// <summary>
 /// Handles the `var` operation.
@@ -46,17 +48,15 @@ public class PartRule : Json.Logic.Rule
     }
 }
 
-internal class PartRuleJsonConverter : JsonConverter<PartRule>
+internal class PartRuleJsonConverter : WeaklyTypedJsonConverter<PartRule>
 {
 	public override PartRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
-		var node = JsonSerializer.Deserialize<JsonNode?>(ref reader, options);
+        var parameters = reader.TokenType == JsonTokenType.StartArray
+           ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+           : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
-		var parameters = node is JsonArray
-			? node.Deserialize<Json.Logic.Rule[]>()
-			: new[] { node.Deserialize<Json.Logic.Rule>()! };
-
-		if (parameters is not ({ Length: 1 }))
+        if (parameters is not ({ Length: 1 }))
 			throw new JsonException("The part rule needs an array with 1 parameter.");
 
 		return new PartRule(parameters[0]);

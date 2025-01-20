@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace PBIXInspectorLibrary.Part
+namespace PBIRInspectorLibrary.Part
 {
     internal interface IPBIPartQuery
     {
@@ -41,6 +41,8 @@ namespace PBIXInspectorLibrary.Part
         public abstract List<Part> AllBookmarks(Part context);
 
         public abstract List<Part> Bookmarks(Part context);
+
+        public abstract List<Part> Files(Part context);
 
         public abstract Part? UniquePart(string query, Part context);
 

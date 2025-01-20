@@ -7,14 +7,17 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.ComponentModel;
-using PBIXInspectorLibrary.Part;
+using PBIRInspectorLibrary.Part;
 using System.Reflection;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Json.More;
 
-namespace PBIXInspectorLibrary.Part
+namespace PBIRInspectorLibrary.Part
 {
+    /// <summary>
+    /// https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report#pbir-format
+    /// </summary>
     internal class PBIRPartQuery : BasePartQuery, IPBIPartQuery
     {
         private const string NAMEPOINTER = "/name";
@@ -45,17 +48,17 @@ namespace PBIXInspectorLibrary.Part
                 reportFolderPath = path;
             }
 
-            this.RootPart = new Part("root", reportFolderPath!);
+            this.RootPart = new Part("root", reportFolderPath!, null, PartTypeEnum.Folder);
             SetParts(this.RootPart);
         }
 
         //TODO: add support for pbir or folder.
-        public string ReportPath(Part context)
+        private string ReportPath(Part context)
         {
             var node = ToJsonNode(context);
             var val = TryGetJsonNodeStringValue(node, REPORTFOLDERPOINTER);
 
-            val = Path.Combine(Path.GetDirectoryName(context.Path), val);
+            val = Path.Combine(Path.GetDirectoryName(context.FileSystemPath), val);
 
             return val;
         }
@@ -63,43 +66,35 @@ namespace PBIXInspectorLibrary.Part
         //TODO: implement for folders
         public string PartName(Part context)
         {
-            string val = string.Empty;
+            string? val = null;
 
-            //if (PartType(context) == PartTypeEnum.File && context.Name.EndsWith(".json"))
-            //{
+            if (context.PartType == PartTypeEnum.File && context.FileSystemName.EndsWith(".json"))
+            {
                 var node = ToJsonNode(context);
                 val = TryGetJsonNodeStringValue(node, NAMEPOINTER);
-            //}
-            //else
-            //{
-            //    val = context.Name;
-            //}
+            }
 
-            return val;
+            return val ?? context.FileSystemName;
         }
 
         //TODO: implement for folders
         public string PartDisplayName(Part context)
         {
-            string val = string.Empty;
+            string? val = null;
 
-            //if (PartType(context) == PartTypeEnum.File && context.Name.EndsWith(".json"))
-            //{
+            if (context.PartType == PartTypeEnum.File && context.FileSystemName.EndsWith(".json"))
+            {
                 var node = ToJsonNode(context);
                 val = TryGetJsonNodeStringValue(node, DISPLAYNAMEPOINTER);
-            //}
-            //else
-            //{
-            //    val = context.Name;
-            //}
+            }
 
-            return val;
+            return val ?? context.FileSystemName;
         }
 
         public Part Report(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                          where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("report.json")
+                                          where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("report.json")
                                           select p;
 
             return q.Single();
@@ -109,7 +104,7 @@ namespace PBIXInspectorLibrary.Part
         public Part? ReportExtensions(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                  where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("reportExtensions.json")
+                                  where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("reportExtensions.json")
                                   select p;
 
             return q.SingleOrDefault();
@@ -118,7 +113,7 @@ namespace PBIXInspectorLibrary.Part
         public Part Version(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                          where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("version.json")
+                                          where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("version.json")
                                           select p;
 
             return q.Single();
@@ -127,7 +122,7 @@ namespace PBIXInspectorLibrary.Part
         public Part PagesHeader(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                          where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("pages.json")
+                                          where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("pages.json")
                                           select p;
 
             return q.Single();
@@ -135,8 +130,8 @@ namespace PBIXInspectorLibrary.Part
 
         public List<Part> Pages(Part context)
         {
-            IEnumerable<Part> q = from p in Part.Flatten(PartType(context) == PartTypeEnum.File ? context.Parent : context)
-                                          where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("page.json")
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
+                                          where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("page.json")
                                           select p;
 
             return q.ToList();
@@ -149,8 +144,8 @@ namespace PBIXInspectorLibrary.Part
 
         public List<Part> Visuals(Part context)
         {
-            IEnumerable<Part> q = from p in Part.Flatten(PartType(context) == PartTypeEnum.File ? context.Parent : context)
-                                            where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("visual.json")
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
+                                            where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("visual.json")
                                             select p;
 
             return q.ToList();
@@ -163,8 +158,8 @@ namespace PBIXInspectorLibrary.Part
 
         public List<Part> MobileVisuals(Part context)
         {
-            IEnumerable<Part> q = from p in Part.Flatten(PartType(context) == PartTypeEnum.File ? context.Parent : context)
-                                            where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("mobile.json")
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
+                                            where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("mobile.json")
                                             select p;
 
             return q.ToList();
@@ -173,7 +168,7 @@ namespace PBIXInspectorLibrary.Part
         public Part BookmarksHeader(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                            where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("bookmarks.json")
+                                            where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("bookmarks.json")
                                             select p;
 
             return q.Single();
@@ -187,9 +182,18 @@ namespace PBIXInspectorLibrary.Part
 
         public List<Part> Bookmarks(Part context)
         {
-            IEnumerable<Part> q = from p in Part.Flatten(PartType(context) == PartTypeEnum.File ? context.Parent : context)
-                                            where PartType(p) == PartTypeEnum.File && p.Name.EndsWith("bookmark.json")
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
+                                            where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("bookmark.json")
                                             select p;
+
+            return q.ToList();
+        }
+
+        public List<Part> Files(Part context)
+        {
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
+                                  where p.PartType == PartTypeEnum.File
+                                  select p;
 
             return q.ToList();
         }
@@ -197,7 +201,7 @@ namespace PBIXInspectorLibrary.Part
         public Part? UniquePart(string query, Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                            where p.Name.EndsWith(query, StringComparison.InvariantCultureIgnoreCase)
+                                            where p.FileSystemName.EndsWith(query, StringComparison.InvariantCultureIgnoreCase)
                                             select p;
 
             return q.SingleOrDefault();
@@ -213,73 +217,71 @@ namespace PBIXInspectorLibrary.Part
             }
             else
             {
-                return PartType((Part)value) == PartTypeEnum.File ? ToJsonNode((Part)value) : null;
+                return ((Part)value).PartType == PartTypeEnum.File ? ToJsonNode((Part)value) : null;
             }
         }
 
         public JsonArray ToJsonArray(List<Part> parts)
         {
             if (parts == null || parts.Count == 0) return new JsonArray();
-            return new JsonArray(parts.Select(_ => ToJsonNode(_).Copy()).ToArray());
+            return new JsonArray(parts.Select(_ => ToJsonNode(_)?.DeepClone()).ToArray());
         }
 
         //returns null if the file does not exist or is not a json file or if it's a directory
         public JsonNode? ToJsonNode(Part context)
         {
             if (context == null) return null;
-            if (context.Content != null) return context.Content;
+            if (context.JsonContent != null) return context.JsonContent;
 
             JsonNode? node = null;
-
-            if (File.Exists(context.Path))
+            
+            if (File.Exists(context.FileSystemPath))
             {
                 try
                 {
-                    node = JsonNode.Parse(File.ReadAllText(context.Path));
-                    context.Content = node;
+                    node = JsonNode.Parse(File.ReadAllText(context.FileSystemPath));
                 }
-                catch (System.Text.Json.JsonException ex)
+                catch (System.Text.Json.JsonException)
                 {
-                    throw new Exception($"Error parsing {context.Path}", ex);
+                    //this is not a json file so add annotation with the file system path; this is so JsonLogic rules can still be applied
+                    node = new JsonObject();
+
+                    if (node is JsonObject jsonObject)
+                    {
+                        var annotations = new JsonArray
+                        {
+                            new JsonObject { ["name"] = "pbiri_filesystempath", ["value"] =  context.FileSystemPath },
+                            new JsonObject { ["name"] = "pbiri_filesystemname", ["value"] =  context.FileSystemName }
+                        };
+                        jsonObject["annotations"] = annotations;
+                    }
+                }
+                finally
+                {
+                    context.JsonContent = node;
                 }
             }
 
             return node;
         }
 
-        private static PartTypeEnum PartType(Part context)
-        {
-            if (File.Exists(context.Path))
-            {
-                return PartTypeEnum.File;
-            }
-            else if (Directory.Exists(context.Path))
-            {
-                return PartTypeEnum.Folder;
-            }
-            else
-            {
-                throw new Exception($"Path {context.Path} does not exist");
-            }
-        }
-
         private void SetParts(Part context)
         {
-            if (!Directory.Exists(context.Path)) return;
+            if (!Directory.Exists(context.FileSystemPath)) return;
 
             context.Parts = new List<Part>();
 
-            foreach (string filePath in Directory.GetFiles(context.Path))
+            foreach (string filePath in Directory.GetFiles(context.FileSystemPath))
             {
                 FileInfo fileInfo = new FileInfo(filePath);
-                Part filePart = new Part(fileInfo.Name, fileInfo.FullName, context);
+                Part filePart = new Part(fileInfo.Name, fileInfo.FullName, context, PartTypeEnum.File);
                 context.Parts.Add(filePart);
             }
 
-            foreach (string dirPath in Directory.GetDirectories(context.Path))
+            foreach (string dirPath in Directory.GetDirectories(context.FileSystemPath))
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(dirPath);
-                Part dirPart = new Part(dirInfo.Name, dirInfo.FullName, context);
+                Part dirPart = new Part(dirInfo.Name, dirInfo.FullName, context, PartTypeEnum.Folder);
                 context.Parts.Add(dirPart);
                 SetParts(dirPart);
             }

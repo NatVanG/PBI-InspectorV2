@@ -1,4 +1,4 @@
-﻿namespace PBIXInspectorLibrary.Output
+﻿namespace PBIRInspectorLibrary.Output
 {
     public class TestRun
     {

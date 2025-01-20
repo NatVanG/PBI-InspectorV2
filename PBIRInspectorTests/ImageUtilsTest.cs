@@ -1,7 +1,7 @@
-﻿using PBIXInspectorLibrary.Output;
-using PBIXInspectorWinLibrary.Drawing;
+﻿using PBIRInspectorLibrary.Output;
+using PBIRInspectorWinLibrary.Drawing;
 
-namespace PBIXInspectorTests
+namespace PBIRInspectorTests
 {
     [TestFixture]
     internal class ImageUtilsTest
@@ -21,7 +21,7 @@ namespace PBIXInspectorTests
             var testResults = new List<TestResult>();
             var outputDir = "";
             ImageUtils.DrawReportPages(fieldMapResults, testResults, outputDir);
-            Assert.IsTrue(string.IsNullOrEmpty(outputDir));
+            Assert.That(string.IsNullOrEmpty(outputDir));
         }
     }
 }

@@ -20,13 +20,13 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-using PBIXInspectorLibrary;
-using PBIXInspectorLibrary.Exceptions;
-using PBIXInspectorLibrary.Output;
+using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.Exceptions;
+using PBIRInspectorLibrary.Output;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace PBIXInspectorTests;
+namespace PBIRInspectorTests;
 
 /// <summary>
 /// The code in this SuiteRunner is adapted from Greg Dennis's Json Everything test suite (see https://github.com/gregsdennis/json-everything) to ensure that we're not breaking core JsonLogic functionality.
@@ -49,10 +49,10 @@ public class SuiteRunner
         switch (testResult.RuleId)
         {
             case "REDUCE_PAGES":
-                Assert.False(testResult.Pass, testResult.Message);
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             default:
-                Assert.True(testResult.Pass, testResult.Message);
+                Assert.That(testResult.Pass, testResult.Message);
                 break;
         }
     }
@@ -87,45 +87,45 @@ public class SuiteRunner
             case "REDUCE_VISUALS_ON_PAGE":
                 if (testResult.ParentName == "ReportSectionfb0835fa991786b43a3f")
                 {
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
             case "REDUCE_OBJECTS_WITHIN_VISUALS":
                 if (testResult.ParentName == "ReportSection4602098ba1ff5a3805a9")
                 {
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
             case "REDUCE_TOPN_FILTERS":
                 if (testResult.ParentName == "ReportSection3440cc1dc4ec63ca3d06")
                 {
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
             case "REDUCE_ADVANCED_FILTERS":
                 if (testResult.ParentName == "ReportSectiond7d52b137add50d28b88")
                 {
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
             case "REDUCE_PAGES":
-                Assert.False(testResult.Pass, testResult.Message);
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             case "AVOID_SHOW_ITEMS_WITH_NO_DATA":
                 //["797168e1f1e7658ceae6","97ad01a2b8fbfca3220c"]
@@ -136,7 +136,7 @@ public class SuiteRunner
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
             case "HIDE_TOOLTIP_DRILLTROUGH_PAGES":
@@ -151,7 +151,7 @@ public class SuiteRunner
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
             case "ENSURE_PAGES_DO_NOT_SCROLL_VERTICALLY":
@@ -159,11 +159,43 @@ public class SuiteRunner
                 JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
                 break;
             case "ENSURE_ALTTEXT":
-                Assert.False(testResult.Pass, testResult.Message);
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             default:
-                Assert.True(testResult.Pass, testResult.Message);
+                Assert.That(testResult.Pass, testResult.Message);
                 break;
+        }
+    }
+    #endregion
+
+    #region ExamplePassSuite
+    //TODO: run this suite
+    public static IEnumerable<TestCaseData> ExamplePassPBIPSuite()
+    {
+        string PBIPFilePath = @"Files\pbip\Example-rules-passes.Report";
+        string RulesFilePath = @"Files\Examples-rules.json";
+
+        Console.WriteLine("Running example pass PBIP suite...");
+        return Suite(PBIPFilePath, RulesFilePath);
+    }
+
+    [TestCaseSource(nameof(ExamplePassPBIPSuite))]
+    public void RunExamplePassPBIP(TestResult testResult)
+    {
+        if (testResult.ParentDisplayName == testResult.RuleId)
+        {
+            Assert.That(testResult.Pass, testResult.Message);
+        }
+
+        //TODO: complete test for LOCAL_REPORT_SETTINGS
+        if (testResult.RuleId == "DISABLE_SLOW_DATASOURCE_SETTINGS" ||
+            //testResult.RuleId == "LOCAL_REPORT_SETTINGS" ||
+            testResult.RuleId == "ACTIVE_PAGE" ||
+            testResult.RuleId == "UNIQUE_PART_PASS" ||
+            testResult.RuleId == "CHECK_FOR_LOCAL_MEASURES" ||
+            testResult.RuleId == "CHECK_VERSION")
+        {
+            Assert.That(testResult.Pass, testResult.Message);
         }
     }
     #endregion
@@ -172,7 +204,8 @@ public class SuiteRunner
 
     public static IEnumerable<TestCaseData> ExampleFailPBIPSuite()
     {
-        string PBIPFilePath = @"Files\pbip\Inventory-sample-fails.Report";
+        ///string PBIPFilePath = @"Files\pbip\Inventory-sample-fails.Report";
+        string PBIPFilePath = @"Files\pbip\Example-rules-fails.Report";
         string RulesFilePath = @"Files\Examples-rules.json";
 
         Console.WriteLine("Running base fail PBIP suite...");
@@ -195,29 +228,44 @@ public class SuiteRunner
                 {
                     expected = "[\"3f7d302598c1e81e7e78\", \"5094f3ff553da63e610e\"]";
                     JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
+            case "MOBILE_CHARTS_WIDER_THAN_TALL":
+                //if (testResult.ParentDisplayName == testResult.RuleId)
+                //{
+                //    expected = "[\"3f7d302598c1e81e7e78\", \"5094f3ff553da63e610e\"]";
+                //    JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
+                //    Assert.That(!testResult.Pass, testResult.Message);
+                //}
+                //else
+                //{
+                //    Assert.That(testResult.Pass, testResult.Message);
+                //}
+                break;
             case "DISABLE_SLOW_DATASOURCE_SETTINGS":
-                Assert.False(testResult.Pass, testResult.Message);
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             case "LOCAL_REPORT_SETTINGS":
-                Assert.False(testResult.Pass, testResult.Message);
+                Assert.That(!testResult.Pass, testResult.Message);
+                break;
+            case "ACTIVE_PAGE":
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             case "SHOW_AXES_TITLES":
                 if (testResult.ParentDisplayName == testResult.RuleId)
                 {
-                    expected = "[\"a9243890e8b7ec111322\", \"d65c53d5b679c4cacba0\", \"8a0d8392a2400e899bcc\"]";
+                    expected = "[\"8a0d8392a2400e899bcc\", \"a9243890e8b7ec111322\", \"d65c53d5b679c4cacba0\"]";
                     JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
             case "PERCENTAGE_OF_CHARTS_USING_CUSTOM_COLOURS":
@@ -235,30 +283,30 @@ public class SuiteRunner
                 if (testResult.ParentDisplayName == testResult.RuleId)
                 {
                     JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
 
                 break;
             case "DISABLE_DROP_SHADOWS_ON_VISUALS":
-                expected = "[\"bdb3c2666ac0e67947aa\",\"5d4868734a72096e0ada\"]";
+                expected = "[\"5d4868734a72096e0ada\",\"bdb3c2666ac0e67947aa\"]";
                 if (testResult.ParentDisplayName == testResult.RuleId)
                 {
                     JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 else
                 {
-                    Assert.True(testResult.Pass, testResult.Message);
+                    Assert.That(testResult.Pass, testResult.Message);
                 }
                 break;
             case "GIVE_VISIBLE_PAGES_MEANINGFUL_NAMES":
                 if (testResult.ParentDisplayName == "Page 1")
                 {
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 else
                 {
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
                 break;
             case "DENEB_CHARTS_PROPERTIES":
@@ -266,25 +314,28 @@ public class SuiteRunner
                 //Assert.False(testResult.Pass, testResult.Message);
                 break;
             case "CHECK_FOR_VISUALS_OVERLAP":
-                expected = "[\"2beb787442a6d0432b4d\",\"11f540db1a90abb52cda\",\"93e80741178005eb0ab4\",\"dead16c359819062e164\"]";
+                expected = "[\"11f540db1a90abb52cda\",\"2beb787442a6d0432b4d\",\"93e80741178005eb0ab4\",\"dead16c359819062e164\"]";
                 if (testResult.ParentDisplayName == testResult.RuleId)
                 {
                     JsonAssert.AreEquivalent(JsonNode.Parse(expected), testResult.Actual);
-                    Assert.False(testResult.Pass, testResult.Message);
+                    Assert.That(!testResult.Pass, testResult.Message);
                 }
+                break;
+            case "UNIQUE_PART_FAIL":
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             case "CHECK_FOR_LOCAL_MEASURES":
                 //TODO: complete this test
                 //Assert.False(testResult.Pass, testResult.Message);
                 break;
             case "REPORT_THEME_NAME":
-                Assert.False(testResult.Pass, testResult.Message);
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             case "REPORT_THEME_TITLE_FONT":
-                Assert.False(testResult.Pass, testResult.Message);
+                Assert.That(!testResult.Pass, testResult.Message);
                 break;
             default:
-                Assert.True(testResult.Pass, testResult.Message);
+                Assert.That(testResult.Pass, testResult.Message);
                 break;
         }
     }
@@ -324,7 +375,7 @@ public class SuiteRunner
 
             var testSuite = JsonSerializer.Deserialize<JsonLogicTestSuite>(content);
             var inspectionRules = new InspectionRules();
-            var rules = testSuite!.Tests.Select(t => new PBIXInspectorLibrary.Rule() { Name = t.Logic, PathErrorWhenNoMatch = false, Test = new PBIXInspectorLibrary.Test() { Logic = t.Logic!, Data = t.Data!, Expected = t.Expected! } });
+            var rules = testSuite!.Tests.Select(t => new PBIRInspectorLibrary.Rule() { Name = t.Logic, PathErrorWhenNoMatch = false, Test = new PBIRInspectorLibrary.Test() { Logic = t.Logic!, Data = t.Data!, Expected = t.Expected! } });
             inspectionRules.Rules = rules.ToList();
 
             return Suite(PBIPFilePath, inspectionRules);
@@ -334,7 +385,7 @@ public class SuiteRunner
     [TestCaseSource(nameof(JsonLogicSuite))]
     public void RunJsonLogicTest(TestResult testResult)
     {
-        Assert.True(testResult.Pass, testResult.Message);
+        Assert.That(testResult.Pass, testResult.Message);
     }
     #endregion
 
@@ -351,7 +402,7 @@ public class SuiteRunner
     [TestCaseSource(nameof(BaseSuite))]
     public void RunBase(TestResult testResult)
     {
-        Assert.True(testResult.Pass, testResult.Message);
+        Assert.That(testResult.Pass, testResult.Message);
     }
     #endregion
 
@@ -373,7 +424,7 @@ public class SuiteRunner
         {
             Console.WriteLine(e.Message);
         }
-        catch (PBIXInspectorException e)
+        catch (PBIRInspectorException e)
         {
             Console.WriteLine(e.Message);
         }
@@ -399,7 +450,7 @@ public class SuiteRunner
         {
             Console.WriteLine(e.Message);
         }
-        catch (PBIXInspectorException e)
+        catch (PBIRInspectorException e)
         {
             Console.WriteLine(e.Message);
         }

@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 
-namespace PBIXInspectorLibrary.CustomRules;
+namespace PBIRInspectorLibrary.CustomRules;
 
 /// <summary>
 /// Handles the `diff` operation.
@@ -49,7 +49,7 @@ public class SetDifferenceRule : Json.Logic.Rule
         {
             if (!arr2.Any(x => item.IsEquivalentTo(x)))
             {
-                var copy = item.Copy();
+                var copy = item?.DeepClone();
                 if (!difference.Any(x => x.IsEquivalentTo(copy)))
                 {
                     difference.Add(copy);
@@ -61,11 +61,13 @@ public class SetDifferenceRule : Json.Logic.Rule
     }
 }
 
-internal class SetDifferenceRuleJsonConverter : JsonConverter<SetDifferenceRule>
+internal class SetDifferenceRuleJsonConverter : WeaklyTypedJsonConverter<SetDifferenceRule>
 {
     public override SetDifferenceRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var parameters = JsonSerializer.Deserialize<Json.Logic.Rule[]>(ref reader, options);
+        var parameters = reader.TokenType == JsonTokenType.StartArray
+           ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+           : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
         if (parameters is not { Length: 2 })
             throw new JsonException("The difference rule needs an array with 2 parameters.");
@@ -75,12 +77,13 @@ internal class SetDifferenceRuleJsonConverter : JsonConverter<SetDifferenceRule>
 
     public override void Write(Utf8JsonWriter writer, SetDifferenceRule value, JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-        writer.WritePropertyName("difference");
-        writer.WriteStartArray();
-        writer.WriteRule(value.Set1, options);
-        writer.WriteRule(value.Set2, options);
-        writer.WriteEndArray();
-        writer.WriteEndObject();
+        throw new NotImplementedException();
+        //writer.WriteStartObject();
+        //writer.WritePropertyName("difference");
+        //writer.WriteStartArray();
+        //writer.WriteRule(value.Set1, options);
+        //writer.WriteRule(value.Set2, options);
+        //writer.WriteEndArray();
+        //writer.WriteEndObject();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Runtime;
 
-namespace PBIXInspectorLibrary
+namespace PBIRInspectorLibrary
 {
     /// <summary>
     /// Deserialises inspection rules from json 

@@ -1,8 +1,8 @@
-﻿using PBIXInspectorLibrary.Output;
+﻿using PBIRInspectorLibrary.Output;
 using System.Drawing;
 using System.Text.Json.Nodes;
 
-namespace PBIXInspectorWinLibrary.Drawing
+namespace PBIRInspectorWinLibrary.Drawing
 {
     public class ImageUtils
     {
@@ -34,7 +34,7 @@ namespace PBIXInspectorWinLibrary.Drawing
                     var pageDisplayName = fields.ParentDisplayName;
                     //TODO: page size is currently hardcoded to 1280x720 (i.e. 16x9 aspect ratio). 
                     var pageSize = new ReportPage.PageSize { Height = 720, Width = 1280 };
-                    List<PBIXInspectorWinLibrary.Drawing.ReportPage.VisualContainer> visuals = new List<ReportPage.VisualContainer>();
+                    List<PBIRInspectorWinLibrary.Drawing.ReportPage.VisualContainer> visuals = new List<ReportPage.VisualContainer>();
                     foreach (var f in fields.Actual.AsArray())
                     {
                         var name = f["name"].ToString();

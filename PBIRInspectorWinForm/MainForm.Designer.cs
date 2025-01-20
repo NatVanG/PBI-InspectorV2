@@ -1,4 +1,4 @@
-﻿namespace PBIXInspectorWinForm
+﻿namespace PBIRInspectorWinForm
 {
     partial class MainForm
     {

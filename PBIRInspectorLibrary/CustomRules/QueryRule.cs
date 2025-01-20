@@ -1,9 +1,10 @@
 ﻿using Json.Logic;
+using Json.More;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace PBIXInspectorLibrary.CustomRules
+namespace PBIRInspectorLibrary.CustomRules
 {
     /// <summary>
     /// Handles the `query` operation.
@@ -38,11 +39,13 @@ namespace PBIXInspectorLibrary.CustomRules
         }
     }
 
-    internal class QueryJsonConverter : JsonConverter<QueryRule>
+    internal class QueryJsonConverter : WeaklyTypedJsonConverter<QueryRule>
     {
         public override QueryRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var parameters = JsonSerializer.Deserialize<Json.Logic.Rule[]>(ref reader, options);
+            var parameters = reader.TokenType == JsonTokenType.StartArray
+           ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+           : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
             if (parameters is not { Length: 2 })
                 throw new JsonException("The query rule needs an array with 2 parameters.");
@@ -52,13 +55,14 @@ namespace PBIXInspectorLibrary.CustomRules
 
         public override void Write(Utf8JsonWriter writer, QueryRule value, JsonSerializerOptions options)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName("query");
-            writer.WriteStartArray();
-            writer.WriteRule(value.Input, options);
-            writer.WriteRule(value.Rule, options);
-            writer.WriteEndArray();
-            writer.WriteEndObject();
+            throw new NotImplementedException();
+            //writer.WriteStartObject();
+            //writer.WritePropertyName("query");
+            //writer.WriteStartArray();
+            //writer.WriteRule(value.Input, options);
+            //writer.WriteRule(value.Rule, options);
+            //writer.WriteEndArray();
+            //writer.WriteEndObject();
         }
     }
 

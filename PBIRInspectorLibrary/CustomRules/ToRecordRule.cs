@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace PBIXInspectorLibrary.CustomRules
+namespace PBIRInspectorLibrary.CustomRules
 {
     /// <summary>
     /// Handles the `torecord` operation.
@@ -44,21 +44,19 @@ namespace PBIXInspectorLibrary.CustomRules
                 var keyValue = key.Apply(data, contextData).Stringify();
                 var item = Items[i + 1];
                 var value = item.Apply(data, contextData);
-                result.Add(keyValue, value.Copy());
+                result.Add(keyValue, value?.DeepClone());
             }
 
             return result;
         }
 
-        internal class ToRecordRuleJsonConverter : JsonConverter<ToRecordRule>
+        internal class ToRecordRuleJsonConverter : WeaklyTypedJsonConverter<ToRecordRule>
         {
             public override ToRecordRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                var node = JsonSerializer.Deserialize<JsonNode?>(ref reader, options);
-
-                var parameters = node is JsonArray
-                    ? node.Deserialize<Json.Logic.Rule[]>()
-                    : new[] { node.Deserialize<Json.Logic.Rule>()! };
+                var parameters = reader.TokenType == JsonTokenType.StartArray
+                   ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+                   : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
                 if (parameters == null || parameters.Length == 0)
                     throw new JsonException("The torecord rule needs an array of parameters.");
@@ -68,10 +66,11 @@ namespace PBIXInspectorLibrary.CustomRules
 
             public override void Write(Utf8JsonWriter writer, ToRecordRule value, JsonSerializerOptions options)
             {
-                writer.WriteStartObject();
-                writer.WritePropertyName("torecord");
-                writer.WriteRules(value.Items, options);
-                writer.WriteEndObject();
+                throw new NotImplementedException();
+                //writer.WriteStartObject();
+                //writer.WritePropertyName("torecord");
+                //writer.WriteRules(value.Items, options);
+                //writer.WriteEndObject();
             }
         }
     }

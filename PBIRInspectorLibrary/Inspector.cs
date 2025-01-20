@@ -3,9 +3,9 @@ using Json.More;
 using Json.Patch;
 using Json.Path;
 using Json.Pointer;
-using PBIXInspectorLibrary.Exceptions;
-using PBIXInspectorLibrary.Output;
-using PBIXInspectorLibrary.Part;
+using PBIRInspectorLibrary.Exceptions;
+using PBIRInspectorLibrary.Output;
+using PBIRInspectorLibrary.Part;
 using System.Data;
 using System.IO.Compression;
 using System.Reflection;
@@ -13,10 +13,10 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace PBIXInspectorLibrary
+namespace PBIRInspectorLibrary
 {
     /// <summary>
-    /// Iterates through input rules and runs then against input PBIX files
+    /// Iterates through input rules and runs them against input PBI files
     /// </summary>
     public class Inspector : InspectorBase
     {
@@ -62,7 +62,7 @@ namespace PBIXInspectorLibrary
 
                 if (inspectionRules == null || inspectionRules.Rules == null || inspectionRules.Rules.Count == 0)
                 {
-                    throw new PBIXInspectorException(string.Format("No rule definitions were found within rules file at \"{0}\".", rulesFilePath));
+                    throw new PBIRInspectorException(string.Format("No rule definitions were found within rules file at \"{0}\".", rulesFilePath));
                 }
                 else
                 {
@@ -71,11 +71,11 @@ namespace PBIXInspectorLibrary
             }
             catch (System.IO.FileNotFoundException e)
             {
-                throw new PBIXInspectorException(string.Format("Rules file with path \"{0}\" not found.", rulesFilePath), e);
+                throw new PBIRInspectorException(string.Format("Rules file with path \"{0}\" not found.", rulesFilePath), e);
             }
             catch (System.Text.Json.JsonException e)
             {
-                throw new PBIXInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesFilePath), e);
+                throw new PBIRInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesFilePath), e);
             }
 
             AddCustomRulesToRegistry();
@@ -90,10 +90,11 @@ namespace PBIXInspectorLibrary
             //TODO: determine which flavour of IPBIPartQuery to instantiate.
             IPBIPartQuery partQuery = new PBIRPartQuery(_pbiFilePath);
             ContextService.GetInstance().PartQuery = partQuery;
-            
+
 
             foreach (var rule in rules)
             {
+                var ruleLogType = ConvertRuleLogType(rule.LogType);
                 ContextService.GetInstance().Part = partQuery.RootPart;
 
                 OnMessageIssued(MessageTypeEnum.Information, string.Format("Running Rule \"{0}\".", rule.Name));
@@ -110,10 +111,10 @@ namespace PBIXInspectorLibrary
                 }
 
                 bool result = false;
-                
+
                 try
                 {
-                   var parts = new List<Part.Part>();
+                    var parts = new List<Part.Part>();
 
                     if (!string.IsNullOrEmpty(rule.Part))
                     {
@@ -135,74 +136,78 @@ namespace PBIXInspectorLibrary
 
                     foreach (var part in parts)
                     {
-                        ContextService.GetInstance().Part = part;
-                        var node = partQuery.ToJsonNode(part);
-                        var newdata = MapRuleDataPointersToValues(node, rule, node);
-
-                        var parentName = partQuery.PartName(part);
-                        var parentDisplayName = partQuery.PartDisplayName(part) ?? partQuery.PartName(part);
-
-                        var jruleresult = jrule.Apply(newdata);
-                        result = rule.Test.Expected.IsEquivalentTo(jruleresult);
-                        var ruleLogType = ConvertRuleLogType(rule.LogType);
-                        string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
-                        testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = parentName, ParentDisplayName = parentDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
-
-
-                        //PATCH
-                        if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
+                        if (part == null)
                         {
-                            if (jruleresult != null && jruleresult is JsonArray arr)
+                            MessageTypeEnum msgType = rule.PathErrorWhenNoMatch ? MessageTypeEnum.Error : MessageTypeEnum.Information;
+                            var msg = string.Format("Rule \"{0}\" - Part(s) \"{1}\" not found.", rule.Name, rule.Part);
+                            OnMessageIssued(msgType, msg);
+
+                            if (rule.PathErrorWhenNoMatch)
                             {
-                                if (arr.Count() > 0)
+                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = null, ParentDisplayName = "N/A", Pass = false, Message = msg, Expected = rule.Test.Expected, Actual = null });
+                            }
+                        }
+                        else
+                        {
+                            ContextService.GetInstance().Part = part;
+                            var node = partQuery.ToJsonNode(part);
+                            var newdata = MapRuleDataPointersToValues(node, rule);
+
+                            var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null;
+                            var parentPageDisplayName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartDisplayName(part) ?? partQuery.PartName(part) : "N/A";
+
+                            var jruleresult = jrule.Apply(newdata);
+                            result = rule.Test.Expected.IsEquivalentTo(jruleresult);
+                            
+                            string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
+                            testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
+
+                            //PATCH
+                            if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
+                            {
+                                if (jruleresult != null && jruleresult is JsonArray arr && arr.Count() > 0)
                                 {
                                     var allPatchParts = (List<Part.Part>)partQuery.Invoke(rule.Patch.PartName, part);
+
                                     //TODO: use another method to filter parts i.e. other than ToJSonString
                                     var filteredPatchParts = allPatchParts.Where(_ => arr.ToJsonString().Contains(partQuery.PartName(_)));
                                     foreach (var filteredPart in filteredPatchParts)
                                     {
-                                        var filteredNode = partQuery.ToJsonNode(filteredPart);
-                                        var patchResult = rule.Patch.Ops.Apply(filteredNode);
-                                        filteredPart.Content = patchResult.Result;
-                                        filteredPart.Save();
+                                        ApplyPatch(partQuery, rule, filteredPart);
                                     }
                                 }
-                            }
-                            else
-                            {
-                                var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
-                                var patchNode = partQuery.ToJsonNode(patchPart);
-                                var patchResult = rule.Patch.Ops.Apply(patchNode);
-                                patchPart.Content = patchResult.Result;
-                                patchPart.Save();
+                                else
+                                {
+                                    var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
+                                    ApplyPatch(partQuery, rule, patchPart);
+                                }
                             }
                         }
-                     }
-                    
+                    }
                 }
-                catch (PBIXInspectorException e)
+                catch (PBIRInspectorException e)
                 {
                     testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
                     continue;
                 }
-                
+
             }
             return testResults;
         }
 
-        private string TryGetJsonNodeStringValue(JsonNode node, string query)
+        private void ApplyPatch(IPBIPartQuery partQuery, Rule? rule, Part.Part? partToPatch)
         {
-            JsonPointer pt = JsonPointer.Parse(query);
-
-            if (pt.TryEvaluate(node, out var result))
+            var node = partQuery.ToJsonNode(partToPatch);
+            var patchResult = rule.Patch.Ops.Apply(node);
+            if (patchResult.IsSuccess)
             {
-                if (result is JsonValue val)
-                {
-                    return val.ToString();
-                }
+                partToPatch.JsonContent = patchResult.Result;
+                partToPatch.Save();
             }
-
-            return null;
+            else
+            {
+                OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Patch failed for part \"{1}\". Error: \"{2}\".", rule.Id, partToPatch.FileSystemPath, patchResult.Error));
+            }
         }
 
         protected void OnMessageIssued(MessageTypeEnum messageType, string message)
@@ -224,32 +229,23 @@ namespace PBIXInspectorLibrary
 
         private void AddCustomRulesToRegistry()
         {
-            //TODO: Use reflection to add rules
-            /*
-            System.Reflection.Assembly assembly = Assembly.GetExecutingAssembly();
-            string nspace = "PBIXInspectorLibrary.CustomRules";
-
-            var q = from t in Assembly.GetExecutingAssembly().GetTypes()
-                    where t.IsClass && t.Namespace == nspace
-                    select t;
-            q.ToList().ForEach(t1 => Json.Logic.RuleRegistry.AddRule<t1>());
-            */
-
-            Json.Logic.RuleRegistry.AddRule<CustomRules.IsNullOrEmptyRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.CountRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.StringContains>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.ToString>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.ToRecordRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.DrillVariableRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.RectOverlapRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetIntersectionRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetUnionRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetDifferenceRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>();
+            PBIRInspectorSerializerContext context = new PBIRInspectorSerializerContext();
+            Json.Logic.RuleRegistry.AddRule<CustomRules.IsNullOrEmptyRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.CountRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.StringContains>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.ToString>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.ToRecordRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.DrillVariableRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.RectOverlapRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetIntersectionRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetUnionRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetDifferenceRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.FileSizeRule>(context);
         }
 
         private MessageTypeEnum ConvertRuleLogType(string ruleLogType)
@@ -280,93 +276,85 @@ namespace PBIXInspectorLibrary
         /// <param name="token"></param>
         /// <param name="rule"></param>
         /// <returns></returns>
-        private JsonNode? MapRuleDataPointersToValues(JsonNode? target, Rule rule, JsonNode? contextNode)
+        private JsonNode? MapRuleDataPointersToValues(JsonNode? target, Rule rule)
         {
             if (target == null || rule.Test.Data == null || rule.Test.Data is not JsonObject) return rule.Test.Data;
+            if (rule.Test.Data is JsonObject && rule.Test.Data.AsObject().Count() == 0) return target;
 
             var newdata = new JsonObject();
 
             var olddata = rule.Test.Data.AsObject();
 
-            if (target != null)
+            try
             {
-                try
+                foreach (var item in olddata)
                 {
-                    if (olddata != null && olddata.Count() > 0)
+                    if (item.Value is JsonValue)
                     {
-                        foreach (var item in olddata)
+                        var value = item.Value.AsValue().Stringify();
+                        if (value.StartsWith(JSONPOINTERSTART)) //check for JsonPointer syntax
                         {
-                            if (item.Value is JsonValue)
+                            try
                             {
-                                var value = item.Value.AsValue().Stringify();
-                                if (value.StartsWith(JSONPOINTERSTART)) //check for JsonPointer syntax
+                                var evalsuccess = EvalPath(value, target, out var newval);
+                                if (evalsuccess)
                                 {
-                                    try
+                                    if (newval != null)
                                     {
-                                        //var pointer = JsonPointer.Parse(value);
-                                        //var evalsuccess = pointer.TryEvaluate(target, out var newval);
-                                        var evalsuccess = EvalPath(value, target, out var newval);
-                                        if (evalsuccess)
-                                        {
-                                            if (newval != null)
-                                            {
-                                                newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, newval.Copy()));
-                                            }
-                                            else
-                                            {
-                                                //TODO: handle null value?
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (rule.PathErrorWhenNoMatch)
-                                            {
-                                                throw new PBIXInspectorException(string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
-                                            }
-                                            else
-                                            {
-                                                OnMessageIssued(MessageTypeEnum.Information, string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
-                                                continue;
-                                            }
-                                        }
+                                        newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, newval?.DeepClone()));
                                     }
-                                    catch (PointerParseException e)
+                                    else
                                     {
-                                        if (rule.PathErrorWhenNoMatch)
-                                        {
-                                            throw new PBIXInspectorException(string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\".", rule.Name, value));
-                                        }
-                                        else
-                                        {
-                                            OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\". Inner Exception: \"{2}\".", rule.Name, value, e.Message));
-                                            continue;
-                                        }
+                                        //TODO: handle null value?
                                     }
-                                }
-                                else if (value.Equals(CONTEXTNODE))
-                                {
-                                    //context array token was used so pass in the parent array
-                                    newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, contextNode.Copy()));
                                 }
                                 else
                                 {
-                                    //looks like a literal value
-                                    newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value.Copy()));
+                                    if (rule.PathErrorWhenNoMatch)
+                                    {
+                                        throw new PBIRInspectorException(string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
+                                    }
+                                    else
+                                    {
+                                        OnMessageIssued(MessageTypeEnum.Information, string.Format("Rule \"{0}\" - Could not evaluate json pointer \"{1}\".", rule.Name, value));
+                                        continue;
+                                    }
                                 }
                             }
-                            else
+                            catch (PointerParseException e)
                             {
-                                //might be a JsonArray
-                                newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value.Copy()));
+                                if (rule.PathErrorWhenNoMatch)
+                                {
+                                    throw new PBIRInspectorException(string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\".", rule.Name, value));
+                                }
+                                else
+                                {
+                                    OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Pointer parse exception for value \"{1}\". Inner Exception: \"{2}\".", rule.Name, value, e.Message));
+                                    continue;
+                                }
                             }
                         }
+                        else if (value.Equals(CONTEXTNODE))
+                        {
+                            //context array token was used so pass in the parent array
+                            newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, target?.DeepClone()));
+                        }
+                        else
+                        {
+                            //looks like a literal value
+                            newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value?.DeepClone()));
+                        }
+                    }
+                    else
+                    {
+                        //might be a JsonArray
+                        newdata.Add(new KeyValuePair<string, JsonNode?>(item.Key, item.Value?.DeepClone()));
                     }
                 }
-                catch (System.Text.Json.JsonException e)
-                {
-                    throw new PBIXInspectorException("JsonException", e);
-                }
-
+            }
+            catch (System.Text.Json.JsonException e)
+            {
+                throw new PBIRInspectorException("JsonException", e);
             }
 
             return newdata;

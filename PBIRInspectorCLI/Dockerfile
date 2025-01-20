@@ -8,18 +8,18 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["PBIXInspectorCLI/PBIXInspectorCLI.csproj", "PBIXInspectorCLI/"]
-COPY ["PBIXInspectorWinLibrary/PBIXInspectorWinLibrary.csproj", "PBIXInspectorWinLibrary/"]
-COPY ["PBIXInspectorLibrary/PBIXInspectorLibrary.csproj", "PBIXInspectorLibrary/"]
-RUN dotnet restore "PBIXInspectorCLI/PBIXInspectorCLI.csproj"
+COPY ["PBIRInspectorCLI/PBIRInspectorCLI.csproj", "PBIRInspectorCLI/"]
+COPY ["PBIRInspectorWinLibrary/PBIRInspectorWinLibrary.csproj", "PBIRInspectorWinLibrary/"]
+COPY ["PBIRInspectorLibrary/PBIRInspectorLibrary.csproj", "PBIRInspectorLibrary/"]
+RUN dotnet restore "PBIRInspectorCLI/PBIRInspectorCLI.csproj"
 COPY . .
-WORKDIR "/src/PBIXInspectorCLI"
-RUN dotnet build "PBIXInspectorCLI.csproj" -c Release -o /app/build
+WORKDIR "/src/PBIRInspectorCLI"
+RUN dotnet build "PBIRInspectorCLI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "PBIXInspectorCLI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "PBIRInspectorCLI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "PBIXInspectorCLI.dll"]
+ENTRYPOINT ["dotnet", "PBIRInspectorCLI.dll"]

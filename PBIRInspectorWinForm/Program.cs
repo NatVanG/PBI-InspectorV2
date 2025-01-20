@@ -1,4 +1,4 @@
-namespace PBIXInspectorWinForm
+namespace PBIRInspectorWinForm
 {
     internal static class Program
     {

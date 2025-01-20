@@ -1,4 +1,4 @@
-﻿namespace PBIXInspectorLibrary
+﻿namespace PBIRInspectorLibrary
 {
     public class MessageIssuedEventArgs : EventArgs
     {

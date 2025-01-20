@@ -375,3 +375,19 @@ FodyWeavers.xsd
 /DocsExamples/ReportExample/PBI Inspector Reporting.Report/.pbi
 /PBIXInspectorWinForm/Files/pbip/Inventory sample.Dataset/.pbi
 /PBIXInspectorWinForm/Files/pbip/Inventory sample.Report/.pbi
+/PBIRInspectorTests/Files/pbip/Inventory-sample-fails.Report/.pbi/localSettings.json
+/PBIRInspectorTests/Files/pbip/Inventory sample.SemanticModel/.pbi/cache.abf
+/PBIRInspectorTests/Files/pbip/Inventory sample.SemanticModel/.pbi/editorSettings.json
+/PBIRInspectorTests/Files/pbip/Inventory sample.SemanticModel/.pbi/localSettings.json
+/PBIRInspectorTests/Files/pbip/Inventory sample.Report/.pbi/localSettings.json
+/PBIRInspectorTests/Files/pbip/Example-rules-fails.SemanticModel/.pbi/cache.abf
+/PBIRInspectorTests/Files/pbip/Example-rules-fails.SemanticModel/.pbi/editorSettings.json
+/PBIRInspectorTests/Files/pbip/Example-rules-fails.SemanticModel/.pbi/localSettings.json
+/PBIRInspectorTests/Files/pbip/Example-rules-fails.Report/.pbi/localSettings.json
+/PBIRInspectorTests/Files/pbip/Inventory-sample-fails.SemanticModel/.pbi/cache.abf
+/PBIRInspectorTests/Files/pbip/Inventory-sample-fails.SemanticModel/.pbi/editorSettings.json
+/PBIRInspectorTests/Files/pbip/Inventory-sample-fails.SemanticModel/.pbi/localSettings.json
+/PBIRInspectorTests/Files/pbip/Example-rules-passes.Report/.pbi/localSettings.json
+/PBIRInspectorTests/Files/pbip/Example-rules-passes.SemanticModel/.pbi/cache.abf
+/PBIRInspectorTests/Files/pbip/Example-rules-passes.SemanticModel/.pbi/editorSettings.json
+/PBIRInspectorTests/Files/pbip/Example-rules-passes.SemanticModel/.pbi/localSettings.json

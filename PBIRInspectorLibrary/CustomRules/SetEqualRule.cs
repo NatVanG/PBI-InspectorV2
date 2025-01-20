@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 
-namespace PBIXInspectorLibrary.CustomRules;
+namespace PBIRInspectorLibrary.CustomRules;
 
 /// <summary>
 /// Handles the `equalsets` operation.
@@ -65,11 +65,13 @@ public class SetEqualRule : Json.Logic.Rule
     }
 }
 
-internal class SetEqualRuleJsonConverter : JsonConverter<SetEqualRule>
+internal class SetEqualRuleJsonConverter : WeaklyTypedJsonConverter<SetEqualRule>
 {
     public override SetEqualRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var parameters = JsonSerializer.Deserialize<Json.Logic.Rule[]>(ref reader, options);
+        var parameters = reader.TokenType == JsonTokenType.StartArray
+           ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
+           : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
         if (parameters is not { Length: 2 })
             throw new JsonException("The symdiff rule needs an array with 2 parameters.");
@@ -79,12 +81,13 @@ internal class SetEqualRuleJsonConverter : JsonConverter<SetEqualRule>
 
     public override void Write(Utf8JsonWriter writer, SetEqualRule value, JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-        writer.WritePropertyName("symdiff");
-        writer.WriteStartArray();
-        writer.WriteRule(value.Set1, options);
-        writer.WriteRule(value.Set2, options);
-        writer.WriteEndArray();
-        writer.WriteEndObject();
+        throw new NotImplementedException();
+        //writer.WriteStartObject();
+        //writer.WritePropertyName("symdiff");
+        //writer.WriteStartArray();
+        //writer.WriteRule(value.Set1, options);
+        //writer.WriteRule(value.Set2, options);
+        //writer.WriteEndArray();
+        //writer.WriteEndObject();
     }
 }
