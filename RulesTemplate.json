@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "id": "template",
+      "name": "Rule Template",
+      "description": "Rule template",
+      "disabled": true,
+      "logType": "warning",
+      "test": [
+        true,
+        {},
+        true
+      ]
+    }
+  ]
+}

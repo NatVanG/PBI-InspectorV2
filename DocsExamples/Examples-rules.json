@@ -257,13 +257,20 @@
     {
       "id": "ACTIVE_PAGE",
       "name": "Active page",
-      "description": "Ensure report's active page index is set to the correct page",
+      "description": "Ensure report's active page is set to the first page",
       "part": "PagesHeader",
       "test": [
         {
-          "var": "activePageName"
+          "==": [
+            {
+              "var": "activePageName"
+            },
+            {
+              "var": "pageOrder.0"
+            }
+          ]
         },
-        "ReportSectionABC"
+        true
       ]
     },
     {
