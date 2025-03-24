@@ -74,7 +74,7 @@ namespace PBIRInspectorWinLibrary
 #else
                 _testResults = _insp.Inspect().Where(_ => (!Main._args.Verbose && !_.Pass) || (Main._args.Verbose));
 #endif
-                if (Main._args.CONSOLEOutput || Main._args.ADOOutput)
+                if (Main._args.CONSOLEOutput || Main._args.ADOOutput || Main._args.GITHUBOutput)
                 {
                     foreach (var result in _testResults)
                     {
@@ -85,7 +85,7 @@ namespace PBIRInspectorWinLibrary
                 }
 
                 //Ensure output dir exists
-                if (!Main._args.ADOOutput && (Main._args.JSONOutput || Main._args.HTMLOutput || Main._args.PNGOutput))
+                if (!(Main._args.ADOOutput || Main._args.GITHUBOutput) && (Main._args.JSONOutput || Main._args.HTMLOutput || Main._args.PNGOutput))
                 {
                     if (!Directory.Exists(Main._args.OutputDirPath))
                     {
@@ -93,7 +93,7 @@ namespace PBIRInspectorWinLibrary
                     }
                 }
 
-                if (!Main._args.ADOOutput && (Main._args.JSONOutput || Main._args.HTMLOutput))
+                if (!(Main._args.ADOOutput || Main._args.GITHUBOutput) && (Main._args.JSONOutput || Main._args.HTMLOutput))
                 {
                     var outputFilePath = string.Empty;
                     var pbiFileNameWOextension = Path.GetFileNameWithoutExtension(Main._args.PBIFilePath);
@@ -116,7 +116,7 @@ namespace PBIRInspectorWinLibrary
                     }
                 }
 
-                if (!Main._args.ADOOutput && (Main._args.PNGOutput || Main._args.HTMLOutput))
+                if (!(Main._args.ADOOutput || Main._args.GITHUBOutput) && (Main._args.PNGOutput || Main._args.HTMLOutput))
                 {
                     _fieldMapInsp = new Inspector(Main._args.PBIFilePath, Constants.ReportPageFieldMapFilePath);
 #if DEBUG                    
@@ -139,7 +139,7 @@ namespace PBIRInspectorWinLibrary
                     ImageUtils.DrawReportPages(_fieldMapResults, _testResults, outputPNGDirPath);
                 }
 
-                if (!Main._args.ADOOutput && Main._args.HTMLOutput)
+                if (!(Main._args.ADOOutput || Main._args.GITHUBOutput) && Main._args.HTMLOutput)
                 {
                     string pbiinspectorlogobase64 = string.Concat(Constants.Base64ImgPrefix, ImageUtils.ConvertBitmapToBase64(Constants.PBIInspectorPNG));
                     //string nowireframebase64 = string.Concat(Base64ImgPrefix, ImageUtils.ConvertBitmapToBase64(@"Files\png\nowireframe.png"));
@@ -211,7 +211,7 @@ namespace PBIRInspectorWinLibrary
 
         private static void MessageIssued(MessageIssuedEventArgs e)
         {
-            if (_args != null && _args.ADOOutput)
+            if (_args != null && (_args.ADOOutput || _args.GITHUBOutput))
             {
                 if (e.MessageType == MessageTypeEnum.Error) ErrorCount++;
                 if (e.MessageType == MessageTypeEnum.Warning) WarningCount++;

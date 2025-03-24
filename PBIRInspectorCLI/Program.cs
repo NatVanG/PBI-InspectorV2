@@ -39,9 +39,9 @@ internal partial class Program
     {
         if (e.MessageType == MessageTypeEnum.Dialog)
         {
-            if (_parsedArgs.ADOOutput)
+            if (_parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput)
             {
-                //Running in non-interactive mode on Azure DevOps.
+                //Running in non-interactive mode on Azure DevOps or GitHub.
                 e.DialogOKResponse = true;
             }
             else
@@ -53,8 +53,8 @@ internal partial class Program
         }
         else
         {
-            //Console and ADO outputs
-            if (!_parsedArgs.ADOOutput || (_parsedArgs.ADOOutput && (e.MessageType == MessageTypeEnum.Error || e.MessageType == MessageTypeEnum.Warning)))
+            //Console and ADO/GitHub outputs
+            if ((!_parsedArgs.ADOOutput && !_parsedArgs.GITHUBOutput) || ((_parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput) && (e.MessageType == MessageTypeEnum.Error || e.MessageType == MessageTypeEnum.Warning)))
             {
                 Console.WriteLine(FormatConsoleMessage(e.MessageType, e.Message));
             }
@@ -66,14 +66,21 @@ internal partial class Program
 
                 Console.WriteLine(Constants.ADOCompleteTemplate, completionStatus);
             }
+
+            //GitHub output only
+            if (_parsedArgs.GITHUBOutput && e.MessageType == MessageTypeEnum.Complete)
+            {
+                int exitCode = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? 1 : 0;
+                Environment.ExitCode = exitCode;
+            }
         }
     }
 
     private static String FormatConsoleMessage(MessageTypeEnum messageType, string message)
     {
-        string template = _parsedArgs.ADOOutput ? Constants.ADOLogIssueTemplate : "{0}";
-        string msgType = _parsedArgs.ADOOutput ? messageType.ToString().ToLower() : messageType.ToString();
-        string msgSeparator = _parsedArgs.ADOOutput ? "" : ": ";
+        string template = _parsedArgs.ADOOutput ? Constants.ADOLogIssueTemplate : _parsedArgs.GITHUBOutput ? Constants.GitHubMsgTemplate : "{0}";
+        string msgType = _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput ? messageType.ToString().ToLower() : messageType.ToString();
+        string msgSeparator = _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput ? "" : ": ";
         string messageTypeFormat = string.Format(template, msgType);
 
         return string.Concat(messageTypeFormat, msgSeparator, message);
@@ -82,7 +89,7 @@ internal partial class Program
     private static void Welcome()
     {
 #if !DEBUG
-     if (!_parsedArgs.CONSOLEOutput || _parsedArgs.ADOOutput) return;
+     if (!_parsedArgs.CONSOLEOutput || _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput) return;
 #endif
 
         Console.ForegroundColor = ConsoleColor.Magenta;
@@ -92,11 +99,14 @@ internal partial class Program
 
     private static void Exit()
     {
-#if !DEBUG
-        if (!_parsedArgs.CONSOLEOutput || _parsedArgs.ADOOutput) return;
-#endif
-        Console.ResetColor();
-        Console.WriteLine("\nPress any key to quit application.");
-        Console.ReadLine();
+        if (_parsedArgs.CONSOLEOutput || !(_parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput))
+        {
+            Console.ResetColor();
+            Console.WriteLine("\nPress any key to quit application.");
+            Console.ReadLine();
+        }
+
+        var exitCode = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? 1 : 0;
+        Environment.Exit(exitCode);
     }
 }

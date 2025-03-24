@@ -21,7 +21,7 @@ namespace PBIRInspectorWinLibrary
         public const string PNGOutputDir = "PBIInspectorPNG";
         public const string ADOLogIssueTemplate = "##vso[task.logissue type={0};]"; //warning|error
         public const string ADOCompleteTemplate = "##vso[task.complete result={0};]DONE";//Failed|SucceededWithIssues|Succeeded
-        public const string GitHubMsgTemplate = "::{0}::";
+        public const string GitHubMsgTemplate = "::{0}:: "; //warning|error
         public const string ReadmePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/blob/main/README.md";
         public const string LatestReleasePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/releases";
         public const string LicensePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/blob/main/LICENSE";
