@@ -257,13 +257,20 @@
     {
       "id": "ACTIVE_PAGE",
       "name": "Active page",
-      "description": "Ensure report's active page index is set to the correct page",
+      "description": "Ensure report's active page is set to the first page",
       "part": "PagesHeader",
       "test": [
         {
-          "var": "activePageName"
+          "==": [
+            {
+              "var": "activePageName"
+            },
+            {
+              "var": "pageOrder.0"
+            }
+          ]
         },
-        "ReportSectionABC"
+        true
       ]
     },
     {
@@ -738,6 +745,35 @@
           ]
         },
         "2.0.0"
+      ]
+    },
+    {
+      "id": "VARY_BY_REPORT_NAME",
+      "name": "Vary by report name",
+      "description": "Run rule only if report display name is 'Inventory sample'",
+      "test": [
+        {
+          "?:": [
+            {
+              "==": [
+                {
+                  "query": [
+                    {
+                      "part": ".platform"
+                    },
+                    {
+                      "var": "metadata.displayName"
+                    }
+                  ]
+                },
+                "Inventory sample"
+              ]
+            },
+            "Rule output",
+            "This is another report"
+          ]
+        },
+        "This is another report"
       ]
     }
   ]
