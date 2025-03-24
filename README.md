@@ -6,14 +6,16 @@
 
 This is a community project that is not supported by Microsoft. 
 
-:exclamation: This version of PBI Inspector only supports the new enhanced metadata file format (PBIR), see https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report. For the older PBIR-legacy file format, please use the previous version of PBI Inspector available at https://github.com/NatVanG/PBI-Inspector. 
+:exclamation: This version of PBI Inspector only supports the new enhanced metadata file format (PBIR), see https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report. For the older PBIR-legacy file format, please use the previous version of PBI Inspector available at https://github.com/NatVanG/PBI-Inspector :exclamation:
 
 ## Breaking changes :boom:
 To support the new enhanced report format (PBIR), a new "part" custom command has been introduced which helps to navigate to or iterate over the new metadata file format's parts such as "Pages", "Visuals", "Bookmarks" etc. Rules defined against the new format are not backward compatible with the older PBIR-legacy format and vice versa.
 
 ## Thanks :pray:
 
-Thanks to [Michael Kovalsky](https://github.com/m-kovalsky) and [Rui Romano](https://github.com/ruiromano) for their feedback on this project. Thanks also to [Luke Young](https://www.linkedin.com/in/luke-young-2301/) for creating the PBI Inspector logo.
+Thanks to [Michael Kovalsky](https://github.com/m-kovalsky) of [Semantic Link Labs](https://github.com/microsoft/semantic-link-labs) fame and [Rui Romano](https://github.com/ruiromano) for their feedback on this project. Thanks also to [Luke Young](https://www.linkedin.com/in/luke-young-2301/) for creating the PBI Inspector logo. 
+
+Special thanks also to [David Mitchell](https://www.linkedin.com/in/davidmitchell85) for his unwavering support and advocacy of PBI Inspector. Check out [David's Microsoft blog post and tooling](https://www.microsoft.com/en-us/microsoft-fabric/blog/2024/12/02/automate-your-migration-to-microsoft-fabric-capacities/) for automating the migration of workspaces from Power BI Premium to Microsoft Fabric capacities.
 
 ## Bugs :beetle:
 
@@ -32,6 +34,7 @@ Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 - [Custom rules guide](#customerruleguide)
 - [Patching](#patching)
 - [Examples](#customrulesexamples)
+- [Wiki](#wiki)
 - [Known issues](#knownissues)
 - [Report an issue](#reportanissue)
 
@@ -39,7 +42,7 @@ Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 
 So we've DevOps, MLOps and DataOps... but why not VisOps? How can we ensure that business intelligence charts and other visuals within report pages are published in a consistent, performance optimised and accessible state? For example, are local report settings set in a consistent manner for a consistent user experience? Are visuals deviating from the specified theme by, say, using custom colours? Are visuals kept lean so they render quickly? Are charts axes titles displayed? etc.
 
-With Microsoft Power BI, visuals are placed on a canvas and formatted as desired, images may be included and theme files referenced. Testing the consistency of the visuals output has thus far typically been a manual process. The [Power BI file format (.pbip) was introduced](https://powerbi.microsoft.com/en-us/blog/deep-dive-into-power-bi-desktop-developer-mode-preview/) then recently [enhanced](https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report) to enable pro developer application lifecycle management and source control.  PBI Inspector provides the ability to define fully configurable testing rules powered by Greg Dennis's Json Logic .NET implementation, see https://json-everything.net/json-logic. 
+With Microsoft Power BI, visuals are placed on a canvas and formatted as desired, images may be included and theme files referenced. Testing the consistency of the visuals output has thus far typically been a manual process. The [Power BI Project file format (.pbip) was introduced](https://powerbi.microsoft.com/en-us/blog/deep-dive-into-power-bi-desktop-developer-mode-preview/) then more recently [enhanced](https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report) to enable pro developer application lifecycle management and source control also known as CI/CD. PBI Inspector V2 contributes to CI/CD for Power BI reports by providing the ability to define fully configurable testing rules written in json. PBI Inspector V2 is powered by Greg Dennis's Json Logic .NET implementation, see https://json-everything.net/json-logic. 
 
 ## <a id="releases"></a>Releases
 
@@ -47,7 +50,7 @@ See releases for the Windows application and Command Line interface (CLI) at: ht
 
 ## <a id="baserulesoverview"></a>Base rules
 
-While PBI Inspector supports custom rules, it also includes the following base rules defined at https://github.com/NatVanG/PBI-InspectorV2/blob/part-concept/Rules/Base-rules.json, some rules allow for user parameters:
+While PBI Inspector V2 supports custom rules, it also includes the following base rules defined at https://github.com/NatVanG/PBI-InspectorV2/blob/part-concept/Rules/Base-rules.json, some rules allow for user parameters:
 
 1. Remove custom visuals which are not used in the report (no user parameters)
 2. Reduce the number of visible visuals on the page (set parameter ```paramMaxVisualsPerPage``` to the maximum number of allowed visible visuals on the page)
@@ -61,9 +64,9 @@ While PBI Inspector supports custom rules, it also includes the following base r
 10. Ensure pages do not scroll vertically (no user parameters)
 11. Ensure alternativeText has been defined for all visuals (disabled by default, no user parameters)
 
-To modify parameters, save a local copy of the Base-rules.json file at https://github.com/NatVanG/PBI-InspectorV2/blob/part-concept/Rules/Base-rules.json and point PBI Inspector to the new file.
+To modify parameters, save a local copy of the Base-rules.json file at https://github.com/NatVanG/PBI-InspectorV2/blob/part-concept/Rules/Base-rules.json and point PBI Inspector V2 to the new file.
 
-To disable a rule, edit the rule's json to specify ```"disabled": true```. At runtime PBI Inspector will ignore any disabled rule.
+To disable a rule, edit the rule's json to specify ```"disabled": true```. At runtime PBI Inspector V2 will ignore any disabled rule.
 
 ## <a id="gui"></a>Run from the graphical user interface (GUI)
 
@@ -71,7 +74,7 @@ Running ```PBIRInspectorWinForm.exe``` presents the user with the following inte
 
 ![WinForm 1](DocsImages/WinForm1.png)
 
-1. Browse to your local PBI Desktop File, either the *.pbip file or its parent folder. 
+1. Browse to your local PBI Desktop File, either the *.pbip file or its parent folder. :pencil: Support for .PBIX file using the enhanced report metadata will be added in a subsequent release.
 2. Either use the base rules file included in the application or select your own.
 3. Use the "Browse" button to select an output directory to which the results will be written. Alternatively, select the "Use temp files" check box to write the resuls to a temporary folder that will be deleted upon exiting the application.
 4. Select output formats, either JSON or HTML or both. To simply view the test results in a formatted page select the HTML output.
@@ -98,7 +101,7 @@ All command line parameters are as follows:
 - **JSON** writes results to a Json file.
 - **HTML** writes results to a formatted Html page. If no output directory is specified and the HTML format is specified, then a browser page will be opened to display the HTML results. When specifying "HTML" format, report page wireframe images will be created so there is no need to also include the "PNG" format. 
 - **PNG** draws report pages wireframes clearly showing any failing visuals. 
-- **ADO** outputs Azure DevOps compatible task commands for use in a deployment pipeline. Task commands issued are "task.logissue" and "task.complete", see https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#task-commands. PBI Inspector rules definition can be given a "logType" attribute of either "warning" or "error" which will be passed to the Azure DevOps task command as follows: ```##vso[task.logissue type=warning|error]```. When specifying "ADO" all other output format types will be ignored.
+- **ADO** outputs Azure DevOps compatible task commands for use in a deployment pipeline. Task commands issued are "task.logissue" and "task.complete", see https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#task-commands. PBI Inspector V2 rules definition can be given a "logType" attribute of either "warning" or "error" which will be passed to the Azure DevOps task command as follows: ```##vso[task.logissue type=warning|error]```. When specifying "ADO" all other output format types will be ignored.
 
 **Commmand line examples:**
 
@@ -116,7 +119,7 @@ All command line parameters are as follows:
 
 ## <a id="results"></a>Interpreting results
 
- If a verbose output was requested, then results for both test passes and failures will be reported. The JSON output is intended to be consumed by a subsequent process, for example a Power BI report may be created that uses the JSON file as a data source and visualises the PBI Inspector test results. The HTML page is a more readable format for humans which also includes report page wireframe images when tests are at the report page level. These images are intended to help the user identify visuals that have failed the test such as in the example image below. The PBI Inspector logo is also displayed at the centre of each failing visuals as an additional identification aid when the wireframe is busy. 
+ If a verbose output was requested, then results for both test passes and failures will be reported. The JSON output is intended to be consumed by a subsequent process, for example a Power BI report may be created that uses the JSON file as a data source and visualises the PBI Inspector V2 test results. The HTML page is a more readable format for humans which also includes report page wireframe images when tests are at the report page level. These images are intended to help the user identify visuals that have failed the test such as in the example image below. The PBI Inspector V2 logo is also displayed at the centre of each failing visuals as an additional identification aid when the wireframe is busy. 
 
 ![Wireframe with failures](DocsImages/WireframeWithFailures.png)
 
@@ -126,11 +129,13 @@ Visuals with a dotted border are visuals hidden by default as the following exam
 
 ## <a id="ado"></a>Azure DevOps integration
 
-For a tutorial on how to run PBI Inspector as part of an Azure DevOps pipeline job (alongside Tabular Editor's BPA rules), see https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-build-pipelines. 
+For a tutorial on how to run PBI Inspector V2 as part of an Azure DevOps pipeline job (alongside Tabular Editor's BPA rules), see https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-build-pipelines. 
 
 :exclamation: Please note that to work with PBI Inspector V2 the YAML file referenced in the tutorial needs to be updated as follows [ContinuousIntegration-Rules-PBIR.yml](DocsExamples/ContinuousIntegration-Rules-PBIR.yml).
 
 ## <a id="customerruleguide"></a>Custom Rules Guide
+
+:pencil: This is a high-level guide to custom rules for a deeper explanation of rules and operators see the [PBI Inspector V2 wiki](https://github.com/NatVanG/PBI-InspectorV2/wiki).
 
 Custom rules are defined in a JSON file as an array of rule objects as follows:
 
@@ -265,7 +270,7 @@ A patch definition has the following structure:
       ]
 ```
 
-The patch logic operator array is defined as per the JSON Patch specification at https://tools.ietf.org/html/rfc6902. PBI Inspector uses the .NET implementation of JSON Patch, for see https://docs.json-everything.net/patch/basics/.
+The patch logic operator array is defined as per the JSON Patch specification at https://tools.ietf.org/html/rfc6902. PBI Inspector V2 uses the .NET implementation of JSON Patch, for see https://docs.json-everything.net/patch/basics/.
 
 Therefore the full rule example including the patch is as follows:
 
@@ -380,12 +385,51 @@ Here's another custom rule with patch example that sets the report's default pag
     }
 ```
 
+Although somewhat of an anti-pattern, it is possible to vary a rule's test based on the report name which is retrieved from the .platform file as shown below:
+
+```json
+{
+      "id": "VARY_BY_REPORT_NAME",
+      "name": "Vary by report name",
+      "description": "Run rule only if report display name is 'Inventory sample'",
+      "test": [
+        {
+          "?:": [
+            {
+              "==": [
+                {
+                  "query": [
+                    {
+                      "part": ".platform"
+                    },
+                    {
+                      "var": "metadata.displayName"
+                    }
+                  ]
+                },
+                "Inventory sample"
+              ]
+            },
+            "Rule output",
+            "This is another report."
+          ]
+        },
+        "Rule output"
+      ]
+    }
+```
+
 ## <a id="customrulesexamples"></a>Rule File Examples
 
 For full rule file examples see:
-- [Base Rules](Rules/Base-rules.json)
-- [Example Rules](DocsExamples/Examples-rules.json)
-- [Example Rules with Patches](DocsExamples/Example-patches.json)
+- [Base Rules](Rules/Base-rules.json) - The set of rules that ships with PBI Inspector V2
+- [Example Rules](DocsExamples/Examples-rules.json) - An ever growing library of example rules
+- [Example Rules with Patches](DocsExamples/Example-patches.json) - Examples of patches to fix issues
+- [Rules Template](DocsExamples/RulesTemplate.json) - A simple rules file  template to get you started with your own rules
+
+## <a id="wiki"></a>Wiki
+
+For an in-depth understanding of PBI Inspector V2 rules and operators see the [PBI Inspector V2 wiki](https://github.com/NatVanG/PBI-InspectorV2/wiki).
 
 ## <a id="knownissues"></a>Known issues
 

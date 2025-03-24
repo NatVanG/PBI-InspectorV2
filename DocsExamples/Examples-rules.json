@@ -746,6 +746,35 @@
         },
         "2.0.0"
       ]
+    },
+    {
+      "id": "VARY_BY_REPORT_NAME",
+      "name": "Vary by report name",
+      "description": "Run rule only if report display name is 'Inventory sample'",
+      "test": [
+        {
+          "?:": [
+            {
+              "==": [
+                {
+                  "query": [
+                    {
+                      "part": ".platform"
+                    },
+                    {
+                      "var": "metadata.displayName"
+                    }
+                  ]
+                },
+                "Inventory sample"
+              ]
+            },
+            "Rule output",
+            "This is another report."
+          ]
+        },
+        "Rule output"
+      ]
     }
   ]
 }
