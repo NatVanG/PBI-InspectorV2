@@ -32,12 +32,14 @@ namespace PBIRInspectorWinLibrary.Utils
         {
             set
             {
-                var formats = value.Split(",");
+                var formatDelimiters = new char[] { ',', ';', '|' };
+                var formats = value.Split(formatDelimiters, StringSplitOptions.RemoveEmptyEntries);
                 const string PNG = "PNG";
                 const string HTML = "HTML";
                 const string JSON = "JSON";
                 const string CONSOLE = "Console";
                 const string ADO = "ADO";
+                const string GITHUB = "GitHub";
 
                 if (formats.Length > 0)
                 {
@@ -45,9 +47,10 @@ namespace PBIRInspectorWinLibrary.Utils
                     HTMLOutput = formats.Contains(HTML, StringComparer.OrdinalIgnoreCase);
                     JSONOutput = formats.Contains(JSON, StringComparer.OrdinalIgnoreCase);
                     ADOOutput = formats.Contains(ADO, StringComparer.OrdinalIgnoreCase);
+                    GITHUBOutput = formats.Contains(GITHUB, StringComparer.OrdinalIgnoreCase);
                 }
 
-                CONSOLEOutput = formats.Contains(CONSOLE, StringComparer.OrdinalIgnoreCase) || !(PNGOutput || HTMLOutput || JSONOutput || ADOOutput);
+                CONSOLEOutput = formats.Contains(CONSOLE, StringComparer.OrdinalIgnoreCase) || !(PNGOutput || HTMLOutput || JSONOutput || ADOOutput || GITHUBOutput);
             }
         }
 
@@ -58,6 +61,8 @@ namespace PBIRInspectorWinLibrary.Utils
         public bool JSONOutput { get; private set; }
 
         public bool ADOOutput { get; private set; }
+
+        public bool GITHUBOutput { get; private set; }
 
         public bool CONSOLEOutput { get; private set; }
 
