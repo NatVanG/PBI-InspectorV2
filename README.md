@@ -50,7 +50,7 @@ See releases for the Windows application and Command Line interface (CLI) at: ht
 
 ## <a id="baserulesoverview"></a>Base rules
 
-While PBI Inspector V2 supports custom rules, it also includes the following base rules defined at https://github.com/NatVanG/PBI-InspectorV2/blob/part-concept/Rules/Base-rules.json, some rules allow for user parameters:
+While PBI Inspector V2 supports custom rules, it also includes the following base rules defined at https://github.com/NatVanG/PBI-InspectorV2/blob/main/Rules/Base-rules.json, some rules allow for user parameters:
 
 1. Remove custom visuals which are not used in the report (no user parameters)
 2. Reduce the number of visible visuals on the page (set parameter ```paramMaxVisualsPerPage``` to the maximum number of allowed visible visuals on the page)
@@ -58,13 +58,13 @@ While PBI Inspector V2 supports custom rules, it also includes the following bas
 4. Reduce usage of TopN filtering visuals by page (set ```paramMaxTopNFilteringPerPage```)
 5. Reduce usage of Advanced filtering visuals by page (set ```paramMaxAdvancedFilteringVisualsPerPage```)
 6. Reduce number of pages per report (override hardcoded ```10``` parameter value the maximum number of allowed pages per report)
-7. Avoid setting ‘Show items with no data’ on columns (no user parameters)
+7. Avoid setting â€˜Show items with no dataâ€™ on columns (no user parameters)
 8. Tooltip and Drillthrough pages should be hidden (no user parameters)
 9. Ensure charts use theme colours (no user parameters)
 10. Ensure pages do not scroll vertically (no user parameters)
 11. Ensure alternativeText has been defined for all visuals (disabled by default, no user parameters)
 
-To modify parameters, save a local copy of the Base-rules.json file at https://github.com/NatVanG/PBI-InspectorV2/blob/part-concept/Rules/Base-rules.json and point PBI Inspector V2 to the new file.
+To modify parameters, save a local copy of the Base-rules.json file at https://github.com/NatVanG/PBI-InspectorV2/blob/main/Rules/Base-rules.json and point PBI Inspector V2 to the new file.
 
 To disable a rule, edit the rule's json to specify ```"disabled": true```. At runtime PBI Inspector V2 will ignore any disabled rule.
 
