@@ -48,8 +48,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocsExamples", "DocsExample
 		DocsExamples\Example-theme-rules.json = DocsExamples\Example-theme-rules.json
 		DocsExamples\Examples-rules.json = DocsExamples\Examples-rules.json
 		DocsExamples\Reid-rules.json = DocsExamples\Reid-rules.json
-		RulesTemplate.json = RulesTemplate.json
-		Sample-CopyJob-Rules.json = Sample-CopyJob-Rules.json
+		DocsExamples\RulesTemplate.json = DocsExamples\RulesTemplate.json
+		DocsExamples\Sample-CopyJob-Rules.json = DocsExamples\Sample-CopyJob-Rules.json
 		DocsExamples\Themeable-properties-rules.json = DocsExamples\Themeable-properties-rules.json
 	EndProjectSection
 EndProject
