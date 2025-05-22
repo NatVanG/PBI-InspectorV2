@@ -24,7 +24,7 @@ namespace PBIRInspectorLibrary
         private const string CONTEXTNODE = ".";
         internal const char DRILLCHAR = '>';
 
-        private string? _pbiFilePath, _rulesFilePath;
+        private string? _fabricItemPath, _rulesFilePath;
         private InspectionRules? _inspectionRules;
 
         public event EventHandler<MessageIssuedEventArgs>? MessageIssued;
@@ -37,11 +37,11 @@ namespace PBIRInspectorLibrary
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pbiFilePath"></param>
+        /// <param name="fabricItemPath"></param>
         /// <param name="inspectionRules"></param>
-        public Inspector(string pbiFilePath, InspectionRules inspectionRules) : base(pbiFilePath, inspectionRules)
+        public Inspector(string fabricItemPath, InspectionRules inspectionRules) : base(fabricItemPath, inspectionRules)
         {
-            this._pbiFilePath = pbiFilePath;
+            this._fabricItemPath = fabricItemPath;
             this._inspectionRules = inspectionRules;
             AddCustomRulesToRegistry();
         }
@@ -49,11 +49,11 @@ namespace PBIRInspectorLibrary
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pbiFilePath">Local PBI file path</param>
+        /// <param name="fabricItemPath">Local PBI file path</param>
         /// <param name="rulesFilePath">Local rules json file path</param>
-        public Inspector(string pbiFilePath, string rulesFilePath) : base(pbiFilePath, rulesFilePath)
+        public Inspector(string fabricItemPath, string rulesFilePath) : base(fabricItemPath, rulesFilePath)
         {
-            this._pbiFilePath = pbiFilePath;
+            this._fabricItemPath = fabricItemPath;
             this._rulesFilePath = rulesFilePath;
 
             try
@@ -86,12 +86,41 @@ namespace PBIRInspectorLibrary
             var testResults = new List<TestResult>();
             var rules = this._inspectionRules.Rules.Where(_ => !_.Disabled);
 
+            //if _fabricItemPath is a folder, retrieve all the .plaform files recursively in a List
+            // if _fabricItemPath is a folder, retrieve all the .platform files recursively in a List
+            List<string> platformFiles = new();
+            if (!string.IsNullOrEmpty(_fabricItemPath) && Directory.Exists(_fabricItemPath))
+            {
+                platformFiles = Directory
+                    .GetFiles(_fabricItemPath, "*.platform", SearchOption.AllDirectories)
+                    .ToList();
 
-            //TODO: determine which flavour of IPBIPartQuery to instantiate.
-            IPBIPartQuery partQuery = new PBIRPartQuery(_pbiFilePath);
-            ContextService.GetInstance().PartQuery = partQuery;
+                foreach (var platformFile in platformFiles)
+                {
+                    JsonNode? platformNode = JsonNode.Parse(File.ReadAllBytes(platformFile));
+                    var type = BasePartQuery.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
+                    //TODO: determine which flavour of IPBIPartQuery to instantiate
+                    IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, _fabricItemPath);
+                    ContextService.GetInstance().PartQuery = partQuery;
 
+                    RunRules(testResults, rules.Where(_ => _.Type.Equals(type, StringComparison.InvariantCultureIgnoreCase)), partQuery);
+                }
+            }
+            else
+            {
+                //LEGACY: if _fabricItemPath is a file, assume we want to test a report's metadata
+                var type = "report";
+                IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, _fabricItemPath);
+                ContextService.GetInstance().PartQuery = partQuery;
 
+                RunRules(testResults, rules.Where(_ => _.Type.Equals(type, StringComparison.InvariantCultureIgnoreCase)), partQuery);
+            }
+
+            return testResults;
+        }
+
+        private void RunRules(List<TestResult> testResults, IEnumerable<Rule> rules, IPartQuery partQuery)
+        {
             foreach (var rule in rules)
             {
                 var ruleLogType = ConvertRuleLogType(rule.LogType);
@@ -158,7 +187,7 @@ namespace PBIRInspectorLibrary
 
                             var jruleresult = jrule.Apply(newdata);
                             result = rule.Test.Expected.IsEquivalentTo(jruleresult);
-                            
+
                             string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
                             testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
 
@@ -192,10 +221,9 @@ namespace PBIRInspectorLibrary
                 }
 
             }
-            return testResults;
         }
 
-        private void ApplyPatch(IPBIPartQuery partQuery, Rule? rule, Part.Part? partToPatch)
+        private void ApplyPatch(IPartQuery partQuery, Rule? rule, Part.Part? partToPatch)
         {
             var node = partQuery.ToJsonNode(partToPatch);
             var patchResult = rule.Patch.Ops.Apply(node);

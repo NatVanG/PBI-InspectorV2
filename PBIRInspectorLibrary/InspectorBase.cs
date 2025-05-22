@@ -11,15 +11,15 @@ namespace PBIRInspectorLibrary
 
         }
 
-        public InspectorBase(string pbiFilePath, InspectionRules inspectionRules)
+        public InspectorBase(string fabricItemPath, InspectionRules inspectionRules)
         {
-            if (string.IsNullOrEmpty(pbiFilePath)) throw new ArgumentNullException(nameof(pbiFilePath));
-            if (!File.Exists(pbiFilePath)) throw new FileNotFoundException();
+            if (string.IsNullOrEmpty(fabricItemPath)) throw new ArgumentNullException(nameof(fabricItemPath));
+            if (!File.Exists(fabricItemPath)) throw new FileNotFoundException();
         }
 
-        public InspectorBase(string pbiFilePath, string rulesFilePath)
+        public InspectorBase(string fabricItemPath, string rulesFilePath)
         {
-            if (string.IsNullOrEmpty(pbiFilePath)) throw new ArgumentNullException(nameof(pbiFilePath));
+            if (string.IsNullOrEmpty(fabricItemPath)) throw new ArgumentNullException(nameof(fabricItemPath));
         }
 
         public T? DeserialiseRulesFromFilePath<T>(string rulesFilePath)

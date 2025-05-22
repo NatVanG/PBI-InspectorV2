@@ -11,7 +11,7 @@ namespace PBIRInspectorLibrary.Part
     {
         private static ContextService instance = null;
 
-        internal IPBIPartQuery PartQuery { get; set; }
+        internal IPartQuery PartQuery { get; set; }
 
         internal Part Part { get; set; }
 

@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace PBIRInspectorLibrary.Part
 {
-    internal class Part
+    public class Part
     {
         public Part Parent { get; private set; }
 
