@@ -1,4 +1,4 @@
-# VisOps with PBI Inspector V2 (i.e. automated visual layer testing for Microsoft Power BI)
+# PBI Inspector V2 (i.e. automated JSON metadata testing for the Microsoft Power BI visual layer and other Fabric Items)
 
 <img src="DocsImages/pbiinspector.png" alt="PBI Inspector logo" height="150"/>
 
@@ -21,6 +21,10 @@ Special thanks also to [David Mitchell](https://www.linkedin.com/in/davidmitchel
 
 Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 
+## Release notes :scroll:
+
+**PBI Inspector v2.3**: PBI Inspectory V2 has become more generic in its capabilites so that it now supports the testing of any Fabric items' JSON metadata, not just Power BI reports! The CLI now supports the "-fabricitem" command line option to specify a folder containing one or more Fabric item definitions. The CLI will then run the rules against each item in the folder. The "-pbip" command line option is still available for testing PBIP files. The GUI has been updated to support both Fabric items and PBIP files too. Here's an example rules file that tests a CopyJob Fabric item's metadata: [CopyJob Rules](DocsExamples/Sample-CopyJob-Rules.json).  
+
 ## <a name="contents"></a>Contents
 
 - [Intro](#intro)
@@ -29,7 +33,7 @@ Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 - [Run from the Graphical user interface](#gui)
 - [Run from the Command line](#cli)
 - [Interpreting results](#results)
-- [Azure DevOps integration](#ado)
+- [Azure DevOps and GitHub integration](#ado)
 - [Running reports on reports](#reporting)
 - [Custom rules guide](#customerruleguide)
 - [Patching](#patching)
@@ -44,9 +48,11 @@ So we've DevOps, MLOps and DataOps... but why not VisOps? How can we ensure that
 
 With Microsoft Power BI, visuals are placed on a canvas and formatted as desired, images may be included and theme files referenced. Testing the consistency of the visuals output has thus far typically been a manual process. The [Power BI Project file format (.pbip) was introduced](https://powerbi.microsoft.com/en-us/blog/deep-dive-into-power-bi-desktop-developer-mode-preview/) then more recently [enhanced](https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report) to enable pro developer application lifecycle management and source control also known as CI/CD. PBI Inspector V2 contributes to CI/CD for Power BI reports by providing the ability to define fully configurable testing rules written in json. PBI Inspector V2 is powered by Greg Dennis's Json Logic .NET implementation, see https://json-everything.net/json-logic. 
 
+**Update for PBI Inspector v2.3**: PBI Inspectory V2 has become more generic in its capabilites so that it now supports the testing of any Fabric items' JSON metadata, not just Power BI reports! The CLI now supports the "-fabricitem" command line option to specify a folder containing one or more Fabric item definitions. The CLI will then run the rules against each item in the folder. The "-pbip" command line option is still available for testing PBIP files. The GUI has been updated to support both Fabric items and PBIP files too. Here's an example rules file that tests a CopyJob Fabric item's metadata: [CopyJob Rules](DocsExamples/Sample-CopyJob-Rules.json)  
+
 ## <a id="releases"></a>Releases
 
-See releases for the Windows application and Command Line interface (CLI) at: https://github.com/NatVanG/PBI-InspectorV2/releases
+See releases for the Windows application and Command Line interface (CLI) at: https://github.com/NatVanG/PBI-InspectorV2/releases.
 
 ## <a id="baserulesoverview"></a>Base rules
 
@@ -88,7 +94,11 @@ All command line parameters are as follows:
 
 ```-pbip filepath```: Required. The path to the *.pbip file.
 
+```-pbipreport filepath```: Deprecated. Use -pbip instead.
+
 ```-pbix filepath```: Not currently supported. 
+
+```-fabricitem folderpath```: Required if not using -pbip. The path to the folder containing one or more Fabric item(s) definitions.
 
 ```-rules filepath```: Required. The filepath to the rules file. Save a local copy of the [Base Rules](Rules/Base-rules.json) file and modify as required.
 
@@ -96,12 +106,13 @@ All command line parameters are as follows:
 
 ```-output directorypath```: Optional. If -formats is set to either JSON, HTML or PNG, writes results to the specified directory, any existing files will be overwritten. If not supplied then a temporary directory will be created in the user's temporary files folder. 
 
-```-formats CONSOLE,JSON,HTML,PNG,ADO```: Optional. Comma-separated list of output formats. 
+```-formats CONSOLE,JSON,HTML,PNG,ADO,GitHub```: Optional. Comma-separated list of output formats. 
 - **CONSOLE** (default) writes results to the console output. If "-formats" is not specified then "CONSOLE" will be used by default.
 - **JSON** writes results to a Json file.
 - **HTML** writes results to a formatted Html page. If no output directory is specified and the HTML format is specified, then a browser page will be opened to display the HTML results. When specifying "HTML" format, report page wireframe images will be created so there is no need to also include the "PNG" format. 
 - **PNG** draws report pages wireframes clearly showing any failing visuals. 
 - **ADO** outputs Azure DevOps compatible task commands for use in a deployment pipeline. Task commands issued are "task.logissue" and "task.complete", see https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#task-commands. PBI Inspector V2 rules definition can be given a "logType" attribute of either "warning" or "error" which will be passed to the Azure DevOps task command as follows: ```##vso[task.logissue type=warning|error]```. When specifying "ADO" all other output format types will be ignored.
+- **GitHub** similar to ADO but for use in GitHub Actions workflows.
 
 **Commmand line examples:**
 
@@ -127,11 +138,22 @@ Visuals with a dotted border are visuals hidden by default as the following exam
 
 ![Wireframe with hidden visual](DocsImages/WireframeWithHiddenVisual.png)
 
-## <a id="ado"></a>Azure DevOps integration
+## <a id="ado"></a>Azure DevOps and GitHub integration
+
+The PBI Inspector V2 CLI can be run as part of an Azure DevOps pipeline job. By specifying the "-formats ADO" command line option, the CLI will output Azure DevOps compatible task commands for use in a deployment pipeline. PBI Inspector V2 rules definition can be given a "logType" attribute of either "warning" or "error" which will be passed to the Azure DevOps task command as follows: ```##vso[task.logissue type=warning|error]```.
+
+Similarly, the PBI Inspector V2 CLI can be run as part of a GitHub Actions workflow by using the "-formats GitHub" command line option. 
+
+**Tutorials**
 
 For a tutorial on how to run PBI Inspector V2 as part of an Azure DevOps pipeline job (alongside Tabular Editor's BPA rules), see https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-build-pipelines. 
 
 :exclamation: Please note that to work with PBI Inspector V2 the YAML file referenced in the tutorial needs to be updated as follows [ContinuousIntegration-Rules-PBIR.yml](DocsExamples/ContinuousIntegration-Rules-PBIR.yml).
+
+For a tutorial on how to run PBI Inspector V2 as part of a GitHub Actions workflow using the Fabric CLI and GitHub see https://github.com/RuiRomano/fabric-cli-powerbi-cicd-sample.
+
+For a tutorial on how to run the PBI Inspector V2 CLI as part of a GitHub Actions workflow using the [fabric-cicd](https://microsoft.github.io/fabric-cicd/latest/) Python library, see https://github.com/RuiRomano/pbip-demo.
+
 
 ## <a id="customerruleguide"></a>Custom Rules Guide
 
@@ -154,6 +176,8 @@ Each rule object has the following properties:
     "id": "A unique identifier of your choice for the rule",
     "name": "A name that is shown in HTML results with wireframe images.",
     "description": "Details to help you and others understand what this rule does",
+    "logType": "Optional. error|warning(default)",
+    "type": "Optional. fabricitemtype|report(default). The Fabric item type the rule applies to, e.g. CopyJob, Lakehouse or Report."
     "disabled": true|false(default),
     "part": "Optional. One of Report|Pages|PagesHeader|AllPages|Visuals|AllVisuals|Bookmarks|BookmarksHeader|AllBookmarks. If the part specified is an array with multiple items (such as "Pages"), the rule will apply to each array item in sequence."
     "test": [
@@ -177,6 +201,8 @@ For example (without the optional patch logic), the following rule checks that, 
       "id": "SHOW_AXES_TITLES",
       "name": "Show visual axes titles",
       "description": "Check that certain charts have both axes title showing, returns an array of visual names that fail the test.",
+      "logType": "error",
+      "type": "report",
       "part": "Pages",
       "disabled": false,
       "test": [
@@ -425,6 +451,7 @@ For full rule file examples see:
 - [Base Rules](Rules/Base-rules.json) - The set of rules that ships with PBI Inspector V2
 - [Example Rules](DocsExamples/Examples-rules.json) - An ever growing library of example rules
 - [Example Rules with Patches](DocsExamples/Example-patches.json) - Examples of patches to fix issues
+- [CopyJob Rules](DocsExamples/Sample-CopyJob-Rules.json) - Rules to check for CopyJob settings/metadata. Yes you can now test any Fabric item's metadata!
 - [Rules Template](DocsExamples/RulesTemplate.json) - A simple rules file  template to get you started with your own rules
 
 ## <a id="wiki"></a>Wiki

@@ -4,8 +4,6 @@
       "id": "CHECK_COPYJOB_JOBMODE",
       "name": "Check the JobMode is Batch.",
       "type": "copyjob",
-      "disabled": false,
-      "description": "",
       "part": "copyjob-content.json",
       "test": [
         {
