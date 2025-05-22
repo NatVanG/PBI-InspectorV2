@@ -92,7 +92,7 @@ Running ```PBIRInspectorWinForm.exe``` presents the user with the following inte
 
 All command line parameters are as follows:
 
-```-pbip filepath```: Required. The path to the *.pbip file.
+```-pbip filepath```: Required if not using -fabricitem. The path to the *.pbip file.
 
 ```-pbipreport filepath```: Deprecated. Use -pbip instead.
 
@@ -127,6 +127,10 @@ All command line parameters are as follows:
 - Run "Base-rules.json" rule definitions against PBI report file at "Sales.Report and return results as Azure DevOps compatible log and tasks commands (see https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#task-commands):
 
 ``` PBIRInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json"  -formats "ADO"```
+
+- Run custom rules against CopyJob Fabric items, output as GitHub logging:
+
+``` PBIRInspectorCLI.exe -fabricitem "C:\Files\copyjob1.CopyJob" -rules "C:\Files\Sample-CopyJob-Rules.json" -formats GitHub```
 
 ## <a id="results"></a>Interpreting results
 
@@ -177,7 +181,7 @@ Each rule object has the following properties:
     "name": "A name that is shown in HTML results with wireframe images.",
     "description": "Details to help you and others understand what this rule does",
     "logType": "Optional. error|warning(default)",
-    "type": "Optional. fabricitemtype|report(default). The Fabric item type the rule applies to, e.g. CopyJob, Lakehouse or Report."
+    "type": "Optional. fabricitemtype|report(default). The Fabric item type that the rule applies to, e.g. CopyJob, Lakehouse or Report."
     "disabled": true|false(default),
     "part": "Optional. One of Report|Pages|PagesHeader|AllPages|Visuals|AllVisuals|Bookmarks|BookmarksHeader|AllBookmarks. If the part specified is an array with multiple items (such as "Pages"), the rule will apply to each array item in sequence."
     "test": [
