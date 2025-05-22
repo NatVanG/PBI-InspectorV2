@@ -24,7 +24,7 @@ namespace PBIRInspectorLibrary
         private const string CONTEXTNODE = ".";
         internal const char DRILLCHAR = '>';
 
-        private string? _fabricItemPath, _rulesFilePath;
+        private string? _fabricItemPath, _rulesPath;
         private InspectionRules? _inspectionRules;
 
         public event EventHandler<MessageIssuedEventArgs>? MessageIssued;
@@ -50,19 +50,19 @@ namespace PBIRInspectorLibrary
         /// 
         /// </summary>
         /// <param name="fabricItemPath">Local PBI file path</param>
-        /// <param name="rulesFilePath">Local rules json file path</param>
-        public Inspector(string fabricItemPath, string rulesFilePath) : base(fabricItemPath, rulesFilePath)
+        /// <param name="rulesPath">Local rules json file path</param>
+        public Inspector(string fabricItemPath, string rulesPath) : base(fabricItemPath, rulesPath)
         {
             this._fabricItemPath = fabricItemPath;
-            this._rulesFilePath = rulesFilePath;
+            this._rulesPath = rulesPath;
 
             try
             {
-                var inspectionRules = this.DeserialiseRulesFromFilePath<InspectionRules>(rulesFilePath);
+                var inspectionRules = this.DeserialiseRulesFromPath<InspectionRules>(rulesPath);
 
                 if (inspectionRules == null || inspectionRules.Rules == null || inspectionRules.Rules.Count == 0)
                 {
-                    throw new PBIRInspectorException(string.Format("No rule definitions were found within rules file at \"{0}\".", rulesFilePath));
+                    throw new PBIRInspectorException(string.Format("No rule definitions were found within rules file at \"{0}\".", rulesPath));
                 }
                 else
                 {
@@ -71,11 +71,11 @@ namespace PBIRInspectorLibrary
             }
             catch (System.IO.FileNotFoundException e)
             {
-                throw new PBIRInspectorException(string.Format("Rules file with path \"{0}\" not found.", rulesFilePath), e);
+                throw new PBIRInspectorException(string.Format("Rules file with path \"{0}\" not found.", rulesPath), e);
             }
             catch (System.Text.Json.JsonException e)
             {
-                throw new PBIRInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesFilePath), e);
+                throw new PBIRInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesPath), e);
             }
 
             AddCustomRulesToRegistry();

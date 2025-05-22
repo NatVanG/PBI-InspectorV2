@@ -5,10 +5,10 @@ namespace PBIRInspectorWinLibrary.Utils
     {
         public static Args ParseArgs(string[] args)
         {
-            const string PBIX = "-pbix", PBIP = "-pbip", PBIPREPORT = "-pbipreport", RULES = "-rules", OUTPUT = "-output", FORMATS = "-formats", VERBOSE = "-verbose";
+            const string PBIX = "-pbix", PBIP = "-pbip", PBIPREPORT = "-pbipreport", FABRICITEM = "-fabricitem", RULES = "-rules", OUTPUT = "-output", FORMATS = "-formats", VERBOSE = "-verbose";
             const string TRUE = "true";
             const string FALSE = "false";
-            string[] validOptions = { PBIX, PBIP, PBIPREPORT, RULES, OUTPUT, FORMATS, VERBOSE };
+            string[] validOptions = { PBIX, PBIP, PBIPREPORT, FABRICITEM, RULES, OUTPUT, FORMATS, VERBOSE };
 
             int index = 0;
             int maxindex = args.Length - 2;
@@ -29,11 +29,11 @@ namespace PBIRInspectorWinLibrary.Utils
             }
 
             if (dic.ContainsKey(PBIX)) { throw new ArgumentNullException("-pbix option is not currently supported use -pbip instead.");  }
-            if (!dic.ContainsKey(PBIPREPORT) && !dic.ContainsKey(PBIP)) { throw new ArgumentNullException("-pbipreport or -pbip must be defined."); }
+            if (!dic.ContainsKey(PBIPREPORT) && !dic.ContainsKey(PBIP) && !dic.ContainsKey(FABRICITEM)) { throw new ArgumentNullException("-pbipreport or -pbip or -fabricitem must be defined."); }
 
             if (!dic.ContainsKey(RULES)) { throw new ArgumentNullException("-rules must be defined"); }
 
-            var pbiFilePath = dic.ContainsKey(PBIPREPORT) ? dic[PBIPREPORT] : dic[PBIP];
+            var pbiFilePath = dic.ContainsKey(PBIPREPORT) ? dic[PBIPREPORT] : (dic.ContainsKey(PBIP) ? dic[PBIP] : dic[FABRICITEM]);
             var rulesPath = dic[RULES];
             var outputPath = dic.ContainsKey(OUTPUT) ? dic[OUTPUT] : string.Empty;
             var verboseString = dic.ContainsKey(VERBOSE) ? dic[VERBOSE] : FALSE;

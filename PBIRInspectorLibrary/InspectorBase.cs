@@ -17,16 +17,16 @@ namespace PBIRInspectorLibrary
             if (!File.Exists(fabricItemPath)) throw new FileNotFoundException();
         }
 
-        public InspectorBase(string fabricItemPath, string rulesFilePath)
+        public InspectorBase(string fabricItemPath, string rulesPath)
         {
             if (string.IsNullOrEmpty(fabricItemPath)) throw new ArgumentNullException(nameof(fabricItemPath));
         }
 
-        public T? DeserialiseRulesFromFilePath<T>(string rulesFilePath)
+        public T? DeserialiseRulesFromPath<T>(string rulesPath)
         {
-            if (!File.Exists(rulesFilePath)) throw new FileNotFoundException(string.Format("File with path \"{0}\" was not found", rulesFilePath));
+            if (!File.Exists(rulesPath)) throw new FileNotFoundException(string.Format("Rules with path \"{0}\" was not found", rulesPath));
 
-            string jsonString = File.ReadAllText(rulesFilePath);
+            string jsonString = File.ReadAllText(rulesPath);
 
             return DeserialiseRules<T>(jsonString);
 

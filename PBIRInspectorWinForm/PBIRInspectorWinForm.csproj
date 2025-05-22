@@ -6,9 +6,9 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <FileVersion>2.2.0.0</FileVersion>
-    <AssemblyVersion>2.2.0</AssemblyVersion>
-    <VersionPrefix>2.2.0</VersionPrefix>
+    <FileVersion>2.3.0.0</FileVersion>
+    <AssemblyVersion>2.3.0</AssemblyVersion>
+    <VersionPrefix>2.3.0</VersionPrefix>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>pbiinspector.png</PackageIcon>
     <PackageProjectUrl>https://github.com/NatVanG/PBIRInspector</PackageProjectUrl>
