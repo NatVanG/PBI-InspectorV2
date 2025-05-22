@@ -149,13 +149,18 @@ namespace PBIRInspectorLibrary
                     {
                         var part = partQuery.Invoke(rule.Part, ContextService.GetInstance().Part);
 
-                        if (part is List<Part.Part>)
+                        if (part != null && part is List<Part.Part>)
                         {
                             parts.AddRange((List<Part.Part>)part);
                         }
-                        else
+                        else if (part != null && part is Part.Part)
                         {
                             parts.Add((Part.Part)part);
+                        }
+                        else
+                        {
+                            OnMessageIssued(MessageTypeEnum.Error, (string.Format("Rule \"{0}\" - Part \"{1}\" not found, resuming to next rule.", rule.Name, rule.Part)));
+                            continue;
                         }
                     }
                     else

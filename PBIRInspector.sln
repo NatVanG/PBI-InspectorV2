@@ -49,6 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocsExamples", "DocsExample
 		DocsExamples\Examples-rules.json = DocsExamples\Examples-rules.json
 		DocsExamples\Reid-rules.json = DocsExamples\Reid-rules.json
 		RulesTemplate.json = RulesTemplate.json
+		Sample-CopyJob-Rules.json = Sample-CopyJob-Rules.json
 		DocsExamples\Themeable-properties-rules.json = DocsExamples\Themeable-properties-rules.json
 	EndProjectSection
 EndProject

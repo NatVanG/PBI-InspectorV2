@@ -177,8 +177,18 @@ namespace PBIRInspectorLibrary.Part
             return node;
         }
 
-        protected void SetParts(Part context)
+        public void SetParts()
         {
+            if (this.RootPart == null) throw new ArgumentNullException("RootPart is not set or.");
+            SetParts(this.RootPart);
+        }
+
+        public void SetParts(Part context)
+        {
+            if (this.RootPart == null)
+            {
+                this.RootPart = context;
+            }
             if (!Directory.Exists(context.FileSystemPath)) return;
 
             context.Parts = new List<Part>();
