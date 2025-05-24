@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace PBIRInspectorLibrary.Part
 {
@@ -28,11 +29,7 @@ namespace PBIRInspectorLibrary.Part
             }
             else
             {
-                mi = type.GetMethod(UNIQUEPARTMETHODNAME);
-                if (mi != null)
-                {
-                    result = mi.Invoke(this, new object?[] { query, context });
-                }
+                result = SearchParts(query, context);
             }
 
             return result;
@@ -110,13 +107,15 @@ namespace PBIRInspectorLibrary.Part
             return q.ToList();
         }
 
-        public Part? UniquePart(string query, Part context)
+        public List<Part>? SearchParts(string query, Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                  where p.FileSystemName.EndsWith(query, StringComparison.InvariantCultureIgnoreCase)
+                                  where Regex.IsMatch(p.FileSystemPath, query, RegexOptions.IgnoreCase)
                                   select p;
 
-            return q.SingleOrDefault();
+            if (q is null) return null;
+            
+            return q.ToList();
         }
 
         public JsonNode ToJsonNode(object? value)

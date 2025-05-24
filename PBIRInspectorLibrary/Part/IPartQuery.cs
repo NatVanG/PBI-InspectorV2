@@ -18,7 +18,7 @@ namespace PBIRInspectorLibrary.Part
 
         public abstract string PartDisplayName(Part context);
 
-        public abstract Part? UniquePart(string query, Part context);
+        public abstract List<Part>? SearchParts(string query, Part context);
 
         public abstract JsonNode? ToJsonNode(Part context);
 

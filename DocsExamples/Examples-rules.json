@@ -762,7 +762,7 @@
                       "part": ".platform"
                     },
                     {
-                      "var": "metadata.displayName"
+                      "var": "0.metadata.displayName"
                     }
                   ]
                 },

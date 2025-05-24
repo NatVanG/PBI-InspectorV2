@@ -83,40 +83,49 @@ namespace PBIRInspectorLibrary
 
         public List<TestResult> Inspect()
         {
-            var testResults = new List<TestResult>();
+            var fileSystemPath = _fabricItemPath;
             var rules = this._inspectionRules.Rules.Where(_ => !_.Disabled);
+            var testResults = new List<TestResult>();
 
-            //if _fabricItemPath is a folder, retrieve all the .plaform files recursively in a List
-            // if _fabricItemPath is a folder, retrieve all the .platform files recursively in a List
-            List<string> platformFiles = new();
-            if (!string.IsNullOrEmpty(_fabricItemPath) && Directory.Exists(_fabricItemPath))
+            if (!string.IsNullOrEmpty(fileSystemPath) && Directory.Exists(fileSystemPath))
             {
-                platformFiles = Directory
-                    .GetFiles(_fabricItemPath, "*.platform", SearchOption.AllDirectories)
+                //Run rules that apply across types ie. with attribute "type" set to "*"
+                RunRulesByType(testResults, rules, "*", fileSystemPath);
+
+                //Run rules that apply to specific types
+                var platformFiles = Directory
+                    .GetFiles(fileSystemPath, "*.platform", SearchOption.AllDirectories)
                     .ToList();
 
                 foreach (var platformFile in platformFiles)
                 {
                     JsonNode? platformNode = JsonNode.Parse(File.ReadAllBytes(platformFile));
-                    var type = BasePartQuery.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
-                    //TODO: determine which flavour of IPBIPartQuery to instantiate
-                    IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, _fabricItemPath);
-                    ContextService.GetInstance().PartQuery = partQuery;
+                    if (platformNode == null)
+                    {
+                        OnMessageIssued(MessageTypeEnum.Error, string.Format("Could not parse platform file at \"{0}\".", platformFile));
+                        continue;
+                    }
 
-                    RunRules(testResults, rules.Where(_ => _.Type.Equals(type, StringComparison.InvariantCultureIgnoreCase)), partQuery);
+                    var type = BasePartQuery.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
+
+                    RunRulesByType(testResults, rules, type, fileSystemPath);
                 }
             }
             else
             {
                 //LEGACY: if _fabricItemPath is a file, assume we want to test a report's metadata
-                var type = "report";
-                IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, _fabricItemPath);
-                ContextService.GetInstance().PartQuery = partQuery;
-
-                RunRules(testResults, rules.Where(_ => _.Type.Equals(type, StringComparison.InvariantCultureIgnoreCase)), partQuery);
+                RunRulesByType(testResults, rules, "report", fileSystemPath);
             }
 
             return testResults;
+        }
+
+        private void RunRulesByType(List<TestResult> testResults, IEnumerable<Rule> rules, string type, string fileSystemPath)
+        {
+            IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, fileSystemPath);
+            ContextService.GetInstance().PartQuery = partQuery;
+
+            RunRules(testResults, rules.Where(_ => _.Type.Equals(type, StringComparison.InvariantCultureIgnoreCase)), partQuery);
         }
 
         private void RunRules(List<TestResult> testResults, IEnumerable<Rule> rules, IPartQuery partQuery)
@@ -149,7 +158,8 @@ namespace PBIRInspectorLibrary
                     {
                         var part = partQuery.Invoke(rule.Part, ContextService.GetInstance().Part);
 
-                        if (part != null && part is List<Part.Part>)
+                        if (part != null && part 
+                            is List<Part.Part>)
                         {
                             parts.AddRange((List<Part.Part>)part);
                         }

@@ -1,0 +1,28 @@
+{
+  "rules": [
+    {
+      "id": "CHECK_LAKEHOUSE_SHORTCUT_TYPE",
+      "name": "Check the Shortcut type.",
+      "type": "Lakehouse",
+      "part": "shortcuts.metadata.json",
+      "test": [
+        {
+          "none": [
+            {
+              "var": ""
+            },
+            {
+              "==": [
+                {
+                  "var": "target.type"
+                },
+                "OneLake"
+              ]
+            }
+          ]
+        },
+        true
+      ]
+    }
+  ]
+}
