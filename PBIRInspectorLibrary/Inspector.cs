@@ -106,7 +106,7 @@ namespace PBIRInspectorLibrary
                         continue;
                     }
 
-                    var type = BasePartQuery.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
+                    var type = PartUtils.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
 
                     RunRulesByType(testResults, rules, type, fileSystemPath);
                 }
@@ -194,7 +194,7 @@ namespace PBIRInspectorLibrary
                         else
                         {
                             ContextService.GetInstance().Part = part;
-                            var node = partQuery.ToJsonNode(part);
+                            var node = PartUtils.ToJsonNode(part);
                             var newdata = MapRuleDataPointersToValues(node, rule);
 
                             var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null;
@@ -240,7 +240,7 @@ namespace PBIRInspectorLibrary
 
         private void ApplyPatch(IPartQuery partQuery, Rule? rule, Part.Part? partToPatch)
         {
-            var node = partQuery.ToJsonNode(partToPatch);
+            var node = PartUtils.ToJsonNode(partToPatch);
             var patchResult = rule.Patch.Ops.Apply(node);
             if (patchResult.IsSuccess)
             {

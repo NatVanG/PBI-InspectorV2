@@ -16,10 +16,7 @@ namespace PBIRInspectorLibrary.Part
                 case "report":
                     return new PBIRPartQuery(path);
                 default:
-                    var generic = new BasePartQuery(path);
-                    generic.SetParts(new Part("root", path, null, PartTypeEnum.Folder));
-                    return generic;
-
+                    return new GenericPartQuery(path);
             }
         }
     }

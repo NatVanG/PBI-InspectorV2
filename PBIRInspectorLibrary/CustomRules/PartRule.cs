@@ -42,7 +42,7 @@ public class PartRule : Json.Logic.Rule
 
         var contextPartQuery = ContextService.GetInstance().PartQuery;
         var contextPart = ContextService.GetInstance().Part;
-		result = contextPartQuery.ToJsonNode(contextPartQuery.Invoke(stringInput, contextPart));
+		result = PartUtils.ToJsonNode(contextPartQuery.Invoke(stringInput, contextPart));
 
         return result;
     }

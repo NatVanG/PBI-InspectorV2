@@ -52,14 +52,15 @@ namespace PBIRInspectorLibrary.Part
         //TODO: add support for pbir or folder.
         private string ReportPath(Part context)
         {
-            var node = ToJsonNode(context);
-            var val = TryGetJsonNodeStringValue(node, REPORTFOLDERPOINTER);
+            var node = PartUtils.ToJsonNode(context);
+            var val = PartUtils.TryGetJsonNodeStringValue(node, REPORTFOLDERPOINTER);
 
             val = Path.Combine(Path.GetDirectoryName(context.FileSystemPath), val);
 
             return val;
         }
 
+        #region Methods invokeable from rules
         public Part Report(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
@@ -157,7 +158,7 @@ namespace PBIRInspectorLibrary.Part
 
             return q.ToList();
         }
+        #endregion
 
-        
     }
 }

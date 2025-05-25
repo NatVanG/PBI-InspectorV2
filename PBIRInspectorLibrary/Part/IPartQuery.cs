@@ -17,13 +17,5 @@ namespace PBIRInspectorLibrary.Part
         public abstract string PartName(Part context);
 
         public abstract string PartDisplayName(Part context);
-
-        public abstract List<Part>? SearchParts(string query, Part context);
-
-        public abstract JsonNode? ToJsonNode(Part context);
-
-        public abstract JsonNode? ToJsonNode(object? value);
-
-        public abstract JsonArray ToJsonArray(List<Part> parts);
     }
 }
