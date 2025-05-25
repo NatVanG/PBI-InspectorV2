@@ -47,13 +47,13 @@ namespace PBIRInspectorLibrary.Part
             return q.ToList();
         }
 
-        protected void SetParts()
+        private protected void SetParts()
         {
             if (this.RootPart == null) throw new ArgumentNullException("RootPart is not set.");
             SetParts(this.RootPart);
         }
 
-        protected void SetParts(Part context)
+        private protected void SetParts(Part context)
         {
             if (this.RootPart == null)
             {

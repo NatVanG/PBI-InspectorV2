@@ -99,6 +99,7 @@ namespace PBIRInspectorLibrary
 
                 foreach (var platformFile in platformFiles)
                 {
+                   
                     JsonNode? platformNode = JsonNode.Parse(File.ReadAllBytes(platformFile));
                     if (platformNode == null)
                     {
@@ -108,7 +109,9 @@ namespace PBIRInspectorLibrary
 
                     var type = PartUtils.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
 
-                    RunRulesByType(testResults, rules, type, fileSystemPath);
+                    var fo = new FileInfo(platformFile);
+                    var dir = fo.DirectoryName;
+                    RunRulesByType(testResults, rules, type, dir);
                 }
             }
             else
