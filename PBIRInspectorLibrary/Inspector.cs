@@ -116,8 +116,26 @@ namespace PBIRInspectorLibrary
             }
             else
             {
-                //LEGACY: if _fabricItemPath is a file, assume we want to test a report's metadata
-                RunRulesByType(testResults, rules, "report", fileSystemPath);
+                //if _fabricItemPath is not a directory, check if it is a file
+                if (!File.Exists(fileSystemPath))
+                {
+                    throw new PBIRInspectorException(string.Format("File or folder with path \"{0}\" not found.", fileSystemPath));
+                }
+
+                var fileExtension = Path.GetExtension(fileSystemPath).ToLowerInvariant();
+                switch (fileExtension)
+                {
+                    case ".pbip":
+                        //LEGACY: if _fabricItemPath is a pbix file, assume we want to test a report's metadata
+                        RunRulesByType(testResults, rules, "report", fileSystemPath);
+                        break;
+                    case ".json":
+                        RunRulesByType(testResults, rules, "json", fileSystemPath);
+                        break;
+                    default:
+                        throw new PBIRInspectorException(string.Format("Unsupported file type \"{0}\" for path \"{1}\".", fileExtension, fileSystemPath));
+                }
+                
             }
 
             return testResults;

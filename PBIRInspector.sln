@@ -45,12 +45,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocsExamples", "DocsExample
 		DocsExamples\Example-pbir-rules.json = DocsExamples\Example-pbir-rules.json
 		DocsExamples\Example-ReportPageFieldMap.json = DocsExamples\Example-ReportPageFieldMap.json
 		DocsExamples\Example-StaticResources-rules.json = DocsExamples\Example-StaticResources-rules.json
+		Example-tenantSettings-rules.json = Example-tenantSettings-rules.json
+		DocsExamples\Example-tenantSettings-rules.json = DocsExamples\Example-tenantSettings-rules.json
 		DocsExamples\Example-theme-rules.json = DocsExamples\Example-theme-rules.json
 		DocsExamples\Examples-rules.json = DocsExamples\Examples-rules.json
 		DocsExamples\Reid-rules.json = DocsExamples\Reid-rules.json
 		DocsExamples\RulesTemplate.json = DocsExamples\RulesTemplate.json
 		DocsExamples\Sample-CopyJob-Rules.json = DocsExamples\Sample-CopyJob-Rules.json
 		DocsExamples\Sample-Lakehouse-Rules.json = DocsExamples\Sample-Lakehouse-Rules.json
+		Sample-TenantSettings.json = Sample-TenantSettings.json
+		DocsExamples\Sample-TenantSettings.json = DocsExamples\Sample-TenantSettings.json
 		DocsExamples\Sample-VariableLibrary-rules.json = DocsExamples\Sample-VariableLibrary-rules.json
 		DocsExamples\Themeable-properties-rules.json = DocsExamples\Themeable-properties-rules.json
 	EndProjectSection
