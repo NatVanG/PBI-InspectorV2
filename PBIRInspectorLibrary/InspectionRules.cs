@@ -16,7 +16,7 @@ namespace PBIRInspectorLibrary
     {
         public string Id { get; set; }
 
-        public string Type { get; set; } = "report";
+        public string ItemType { get; set; } = "report";
 
         public string Name { get; set; }
 

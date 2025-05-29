@@ -1,10 +1,9 @@
 {
   "rules": [
     {
-      "id": "QUERY_TENANTSETTINGS",
-      "name": "Query tenant settings.",
+      "id": "TEST_TENANTSETTINGS",
+      "name": "Test tenant settings.",
       "type":  "json",
-      "description": "",
       "test": [
         {
           "var": "tenantSettings.0.settingName"

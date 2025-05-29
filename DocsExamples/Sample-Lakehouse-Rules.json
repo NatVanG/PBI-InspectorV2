@@ -1,15 +1,42 @@
 {
   "rules": [
     {
-      "id": "CHECK_LAKEHOUSE_SHORTCUT_TYPE",
-      "name": "Check the Shortcut type.",
-      "type": "Lakehouse",
+      "id": "CHECK_LAKEHOUSE_SHORTCUT_TARGETTYPE",
+      "name": "Check Shortcuts target type.",
+      "itemType": "Lakehouse",
       "part": "shortcuts.metadata.json",
       "test": [
         {
-          "none": [
+          "all": [
             {
               "var": ""
+            },
+            {
+              "==": [
+                {
+                  "var": "target.type"
+                },
+                "OneLake"
+              ]
+            }
+          ]
+        },
+        true
+      ]
+    },
+    {
+      "id": "CHECK_LAKEHOUSE_SHORTCUT_TARGETTYPE2",
+      "name": "Check Shortcuts target type 2.",
+      "itemType": "Lakehouse",
+      "test": [
+        {
+          "all": [
+            {
+              "merge": [
+                {
+                  "part": "shortcuts.metadata.json"
+                }
+              ]
             },
             {
               "==": [

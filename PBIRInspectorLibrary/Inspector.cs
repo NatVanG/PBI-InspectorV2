@@ -89,10 +89,10 @@ namespace PBIRInspectorLibrary
 
             if (!string.IsNullOrEmpty(fileSystemPath) && Directory.Exists(fileSystemPath))
             {
-                //Run rules that apply across types ie. with attribute "type" set to "*"
-                RunRulesByType(testResults, rules, "*", fileSystemPath);
+                //Run rules that apply across types ie. with attribute "itemtype" set to "*"
+                RunRulesByItemType(testResults, rules, "*", fileSystemPath);
 
-                //Run rules that apply to specific types
+                //Run rules that apply to specific itemtypes
                 var platformFiles = Directory
                     .GetFiles(fileSystemPath, "*.platform", SearchOption.AllDirectories)
                     .ToList();
@@ -107,11 +107,11 @@ namespace PBIRInspectorLibrary
                         continue;
                     }
 
-                    var type = PartUtils.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
+                    var itemType = PartUtils.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
 
                     var fo = new FileInfo(platformFile);
                     var dir = fo.DirectoryName;
-                    RunRulesByType(testResults, rules, type, dir);
+                    RunRulesByItemType(testResults, rules, itemType, dir);
                 }
             }
             else
@@ -127,13 +127,13 @@ namespace PBIRInspectorLibrary
                 {
                     case ".pbip":
                         //LEGACY: if _fabricItemPath is a pbix file, assume we want to test a report's metadata
-                        RunRulesByType(testResults, rules, "report", fileSystemPath);
+                        RunRulesByItemType(testResults, rules, "report", fileSystemPath);
                         break;
                     case ".json":
-                        RunRulesByType(testResults, rules, "json", fileSystemPath);
+                        RunRulesByItemType(testResults, rules, "json", fileSystemPath);
                         break;
                     default:
-                        throw new PBIRInspectorException(string.Format("Unsupported file type \"{0}\" for path \"{1}\".", fileExtension, fileSystemPath));
+                        throw new PBIRInspectorException(string.Format("Unsupported file itemType \"{0}\" for path \"{1}\".", fileExtension, fileSystemPath));
                 }
                 
             }
@@ -141,12 +141,12 @@ namespace PBIRInspectorLibrary
             return testResults;
         }
 
-        private void RunRulesByType(List<TestResult> testResults, IEnumerable<Rule> rules, string type, string fileSystemPath)
+        private void RunRulesByItemType(List<TestResult> testResults, IEnumerable<Rule> rules, string type, string fileSystemPath)
         {
             IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, fileSystemPath);
             ContextService.GetInstance().PartQuery = partQuery;
 
-            RunRules(testResults, rules.Where(_ => _.Type.Equals(type, StringComparison.InvariantCultureIgnoreCase)), partQuery);
+            RunRules(testResults, rules.Where(_ => _.ItemType.Equals(type, StringComparison.InvariantCultureIgnoreCase)), partQuery);
         }
 
         private void RunRules(List<TestResult> testResults, IEnumerable<Rule> rules, IPartQuery partQuery)

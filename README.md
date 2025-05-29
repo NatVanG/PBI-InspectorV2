@@ -1,6 +1,6 @@
-# PBI Inspector V2 (i.e. automated JSON metadata testing for the Microsoft Power BI visual layer and other Fabric Items)
+# PBI Inspector V2 (i.e. rule-based JSON metadata testing for the Microsoft Power BI visual layer and other Fabric Items)
 
-<img src="DocsImages/pbiinspector.png" alt="PBI Inspector logo" height="150"/>
+<img src="DocsImages/pbiinspectoricons.png" alt="PBI Inspector logo" height="250"/>
 
 ## NOTE :pencil:
 
@@ -34,7 +34,6 @@ Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 - [Run from the Command line](#cli)
 - [Interpreting results](#results)
 - [Azure DevOps and GitHub integration](#ado)
-- [Running reports on reports](#reporting)
 - [Custom rules guide](#customerruleguide)
 - [Patching](#patching)
 - [Examples](#customrulesexamples)
@@ -181,7 +180,7 @@ Each rule object has the following properties:
     "name": "A name that is shown in HTML results with wireframe images.",
     "description": "Details to help you and others understand what this rule does",
     "logType": "Optional. error|warning(default)",
-    "type": "Optional. fabricitemtype|report(default). The Fabric item type that the rule applies to, e.g. CopyJob, Lakehouse or Report."
+    "itemType": "Optional. [fabricitemtype]|report(default). The Fabric item type that the rule applies to as referred to in the item's CI\CD ".platform"" file, e.g. CopyJob, Lakehouse, Report, etc. or specify "*" to define a cross-Fabric items rule or "json" to define a rule that applies to any JSON metadata file.",
     "disabled": true|false(default),
     "part": "Optional. One of Report|Pages|PagesHeader|AllPages|Visuals|AllVisuals|Bookmarks|BookmarksHeader|AllBookmarks. If the part specified is an array with multiple items (such as "Pages"), the rule will apply to each array item in sequence."
     "test": [
@@ -433,7 +432,7 @@ Although somewhat of an anti-pattern, it is possible to vary a rule's test based
                       "part": ".platform"
                     },
                     {
-                      "var": "metadata.displayName"
+                      "var": "0.metadata.displayName"
                     }
                   ]
                 },

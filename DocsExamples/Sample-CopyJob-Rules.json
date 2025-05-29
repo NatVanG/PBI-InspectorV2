@@ -3,7 +3,7 @@
     {
       "id": "CHECK_COPYJOB_JOBMODE",
       "name": "Check the JobMode is Batch.",
-      "type": "CopyJob",
+      "itemType": "CopyJob",
       "part": "copyjob-content.json",
       "test": [
         {
@@ -14,8 +14,8 @@
     },
     {
       "id": "CHECK_COPYJOB_JOBMODE2",
-      "name": "Check the JobMode is Batch.",
-      "type": "CopyJob",
+      "name": "Check that the first JobMode is Batch 2.",
+      "itemType": "CopyJob",
       "test": [
         {
           "query": [
@@ -28,6 +28,29 @@
           ]
         },
         "Batch"
+      ]
+    },
+    {
+      "id": "CHECK_COPYJOB_JOBMODE3",
+      "name": "Check that all JobMode is Batch 3.",
+      "itemType": "CopyJob",
+      "test": [
+        {
+          "all": [
+            {
+              "query": [
+                {
+                  "part": "copyjob-content.json"
+                },
+                {
+                  "path": "$.*.properties.jobMode"
+                }
+              ]
+            },
+            "Batch"
+          ]
+        },
+        true
       ]
     }
   ]
