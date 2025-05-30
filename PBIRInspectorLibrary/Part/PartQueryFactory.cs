@@ -15,6 +15,8 @@ namespace PBIRInspectorLibrary.Part
             {
                 case "report":
                     return new PBIRPartQuery(path);
+                case "report_deprecated":
+                    return new PBIRPartQuery_deprecated(path);
                 default:
                     return new GenericPartQuery(path);
             }

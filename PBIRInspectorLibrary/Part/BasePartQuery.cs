@@ -36,7 +36,7 @@ namespace PBIRInspectorLibrary.Part
             return result;
         }
 
-        private List<Part>? SearchParts(string query, Part context)
+        private protected virtual object? SearchParts(string query, Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
                                   where Regex.IsMatch(p.FileSystemPath, query, RegexOptions.IgnoreCase)

@@ -70,7 +70,7 @@ namespace PBIRInspectorWinForm
         private void UseSamplePBIFileStateCheck()
         {
             var enabled = !this.chckUseSamplePBIFile.Checked;
-            if (!enabled) { this.txtPBIDesktopFile.Text = Constants.SamplePBIPReportFilePath; } else { this.txtPBIDesktopFile.Clear(); };
+            if (!enabled) { this.txtPBIDesktopFile.Text = Constants.SamplePBIPReportFolderPath; } else { this.txtPBIDesktopFile.Clear(); };
             this.txtPBIDesktopFile.Enabled = enabled;
             this.btnBrowsePBIDesktopFile.Enabled = enabled;
             //this.chckVerbose.Checked = !enabled;

@@ -16,7 +16,7 @@ namespace PBIRInspectorLibrary
     {
         public string Id { get; set; }
 
-        public string ItemType { get; set; } = "report";
+        public string ItemType { get; set; } = "report_deprecated";
 
         public string Name { get; set; }
 

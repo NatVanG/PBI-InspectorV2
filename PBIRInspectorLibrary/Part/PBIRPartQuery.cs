@@ -12,6 +12,7 @@ using System.Reflection;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Json.More;
+using System.Text.RegularExpressions;
 
 namespace PBIRInspectorLibrary.Part
 {
@@ -28,10 +29,10 @@ namespace PBIRInspectorLibrary.Part
         public PBIRPartQuery(string path) : base(path)
         {
             if (path == null || path.Length == 0) throw new ArgumentNullException(nameof(path));
-            if (!File.Exists(path) && path.EndsWith(PBIPEXT)) throw new ArgumentException($"PBI Desktop file {path} does not exist");
-            if (path.ToLower().EndsWith(PBIXEXT)) throw new ArgumentException($"PBIX files are not currently supported, please specify a PBIP");
-            if (File.Exists(path) && !path.ToLower().EndsWith(PBIPEXT)) throw new ArgumentException($"PBI Desktop file {path} must have .pbip extension");
-            if (!File.Exists(path) && !Directory.Exists(path)) throw new ArgumentException($"{path} does not exist");
+            if (!File.Exists(path) && path.EndsWith(PBIPEXT)) throw new ArgumentException($"PBI Desktop file {path} does not exist.");
+            if (path.ToLower().EndsWith(PBIXEXT)) throw new ArgumentException($"PBIX files are not currently supported, please specify a PBIP or a Fabric items directory path.");
+            if (File.Exists(path) && !path.ToLower().EndsWith(PBIPEXT)) throw new ArgumentException($"PBI Desktop file {path} must have .pbip extension.");
+            if (!File.Exists(path) && !Directory.Exists(path)) throw new ArgumentException($"{path} does not exist.");
 
             string? reportFolderPath = null;
 

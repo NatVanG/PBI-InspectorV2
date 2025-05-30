@@ -28,7 +28,7 @@ namespace PBIRInspectorWinLibrary.Utils
         public static string About()
         {
             var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            var about = string.Format("VisOps with PBI Inspector v{0}", version);
+            var about = string.Format("PBI Inspector v{0}", version);
             return about;
         }
 

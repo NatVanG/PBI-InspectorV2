@@ -112,6 +112,7 @@ namespace PBIRInspectorLibrary
                     var fo = new FileInfo(platformFile);
                     var dir = fo.DirectoryName;
                     RunRulesByItemType(testResults, rules, itemType, dir);
+                    RunDeprecatedRulesByItemType(testResults, rules, itemType, dir);
                 }
             }
             else
@@ -126,8 +127,8 @@ namespace PBIRInspectorLibrary
                 switch (fileExtension)
                 {
                     case ".pbip":
-                        //LEGACY: if _fabricItemPath is a pbix file, assume we want to test a report's metadata
-                        RunRulesByItemType(testResults, rules, "report", fileSystemPath);
+                        //LEGACY: if _fabricItemPath is a pbip file, assume we want to test a report's metadata
+                        RunRulesByItemType(testResults, rules, "report_deprecated", fileSystemPath);
                         break;
                     case ".json":
                         RunRulesByItemType(testResults, rules, "json", fileSystemPath);
@@ -141,12 +142,93 @@ namespace PBIRInspectorLibrary
             return testResults;
         }
 
+        protected void OnMessageIssued(MessageTypeEnum messageType, string message)
+        {
+            var args = new MessageIssuedEventArgs(message, messageType);
+            OnMessageIssued(args);
+        }
+
+        protected virtual void OnMessageIssued(MessageIssuedEventArgs e)
+        {
+            EventHandler<MessageIssuedEventArgs>? handler = MessageIssued;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        #region private methods
+
+        private void AddCustomRulesToRegistry()
+        {
+            PBIRInspectorSerializerContext context = new PBIRInspectorSerializerContext();
+            Json.Logic.RuleRegistry.AddRule<CustomRules.IsNullOrEmptyRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.CountRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.StringContains>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.ToString>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.ToRecordRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.DrillVariableRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.RectOverlapRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetIntersectionRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetUnionRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetDifferenceRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.FileSizeRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.JsonataRule>(context);
+        }
+
+        private MessageTypeEnum ConvertRuleLogType(string ruleLogType)
+                {
+                    if (string.IsNullOrEmpty(ruleLogType)) return MessageTypeEnum.Warning;
+
+                    MessageTypeEnum logType;
+
+                    switch (ruleLogType.ToLower().Trim())
+                    {
+                        case "error":
+                            logType = MessageTypeEnum.Error;
+                            break;
+                        case "warning":
+                            logType = MessageTypeEnum.Warning;
+                            break;
+                        default:
+                            logType = MessageTypeEnum.Warning;
+                            break;
+                    }
+
+                    return logType;
+                }
+
         private void RunRulesByItemType(List<TestResult> testResults, IEnumerable<Rule> rules, string type, string fileSystemPath)
         {
+            var rulesFilteredByItemType = rules.Where(_ => _.ItemType.Equals(type, StringComparison.InvariantCultureIgnoreCase));
+
+            if (rulesFilteredByItemType == null || !rulesFilteredByItemType.Any())
+            {
+                OnMessageIssued(MessageTypeEnum.Information, string.Format("No rules found for item type \"{0}\".", type));
+                return;
+            }
+
             IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, fileSystemPath);
             ContextService.GetInstance().PartQuery = partQuery;
 
-            RunRules(testResults, rules.Where(_ => _.ItemType.Equals(type, StringComparison.InvariantCultureIgnoreCase)), partQuery);
+            RunRules(testResults, rulesFilteredByItemType, partQuery);
+        }
+
+        private void RunDeprecatedRulesByItemType(List<TestResult> testResults, IEnumerable<Rule> rules, string type, string fileSystemPath)
+        {
+            const string DEPRECATED_SUFFIX = "_deprecated";
+            var deprecatedRules = rules.Where(_ => _.ItemType.Contains(DEPRECATED_SUFFIX, StringComparison.InvariantCultureIgnoreCase));
+            var rulesFilteredByItemType = deprecatedRules.Where(_ => _.ItemType.Replace(DEPRECATED_SUFFIX, string.Empty).Equals(type, StringComparison.InvariantCultureIgnoreCase));
+
+            IPartQuery partQuery = PartQueryFactory.CreatePartQuery(string.Concat(type, DEPRECATED_SUFFIX), fileSystemPath);
+            ContextService.GetInstance().PartQuery = partQuery;
+
+            RunRules(testResults, rulesFilteredByItemType, partQuery);
         }
 
         private void RunRules(List<TestResult> testResults, IEnumerable<Rule> rules, IPartQuery partQuery)
@@ -179,7 +261,7 @@ namespace PBIRInspectorLibrary
                     {
                         var part = partQuery.Invoke(rule.Part, ContextService.GetInstance().Part);
 
-                        if (part != null && part 
+                        if (part != null && part
                             is List<Part.Part>)
                         {
                             parts.AddRange((List<Part.Part>)part);
@@ -273,68 +355,6 @@ namespace PBIRInspectorLibrary
                 OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Patch failed for part \"{1}\". Error: \"{2}\".", rule.Id, partToPatch.FileSystemPath, patchResult.Error));
             }
         }
-
-        protected void OnMessageIssued(MessageTypeEnum messageType, string message)
-        {
-            var args = new MessageIssuedEventArgs(message, messageType);
-            OnMessageIssued(args);
-        }
-
-        protected virtual void OnMessageIssued(MessageIssuedEventArgs e)
-        {
-            EventHandler<MessageIssuedEventArgs>? handler = MessageIssued;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        #region private methods
-
-        private void AddCustomRulesToRegistry()
-        {
-            PBIRInspectorSerializerContext context = new PBIRInspectorSerializerContext();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.IsNullOrEmptyRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.CountRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.StringContains>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.ToString>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.ToRecordRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.DrillVariableRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.RectOverlapRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetIntersectionRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetUnionRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetDifferenceRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.FileSizeRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.JsonataRule>(context);
-        }
-
-        private MessageTypeEnum ConvertRuleLogType(string ruleLogType)
-                {
-                    if (string.IsNullOrEmpty(ruleLogType)) return MessageTypeEnum.Warning;
-
-                    MessageTypeEnum logType;
-
-                    switch (ruleLogType.ToLower().Trim())
-                    {
-                        case "error":
-                            logType = MessageTypeEnum.Error;
-                            break;
-                        case "warning":
-                            logType = MessageTypeEnum.Warning;
-                            break;
-                        default:
-                            logType = MessageTypeEnum.Warning;
-                            break;
-                    }
-
-                    return logType;
-                }
-
         /// <summary>
         /// 
         /// </summary>

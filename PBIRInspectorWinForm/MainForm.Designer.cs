@@ -114,9 +114,9 @@
             label1.AutoSize = true;
             label1.Location = new Point(49, 60);
             label1.Name = "label1";
-            label1.Size = new Size(137, 25);
+            label1.Size = new Size(117, 25);
             label1.TabIndex = 6;
-            label1.Text = "PBI Desktop file";
+            label1.Text = "Fabric Item(s)";
             // 
             // chkUseBaseRules
             // 
@@ -374,7 +374,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "MainForm";
-            Text = "VisOps with PBI Inspector";
+            Text = "PBI Inspector";
             Load += Form1_Load;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();

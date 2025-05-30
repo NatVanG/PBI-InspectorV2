@@ -13,7 +13,7 @@ To support the new enhanced report format (PBIR), a new "part" custom command ha
 
 ## Thanks :pray:
 
-Thanks to [Michael Kovalsky](https://github.com/m-kovalsky) of [Semantic Link Labs](https://github.com/microsoft/semantic-link-labs) fame and [Rui Romano](https://github.com/ruiromano) for their feedback on this project. Thanks also to [Luke Young](https://www.linkedin.com/in/luke-young-2301/) for creating the PBI Inspector logo. 
+Thanks to [Michael Kovalsky](https://github.com/m-kovalsky) of [Semantic Link Labs](https://github.com/microsoft/semantic-link-labs) fame and [Rui Romano](https://github.com/ruiromano) for their feedback on this project. Thanks also to [Luke Young](https://www.linkedin.com/in/luke-young-2301/) for creating the original PBI Inspector logo and this new V2 version. 
 
 Special thanks also to [David Mitchell](https://www.linkedin.com/in/davidmitchell85) for his unwavering support and advocacy of PBI Inspector. Check out [David's Microsoft blog post and tooling](https://www.microsoft.com/en-us/microsoft-fabric/blog/2024/12/02/automate-your-migration-to-microsoft-fabric-capacities/) for automating the migration of workspaces from Power BI Premium to Microsoft Fabric capacities.
 
@@ -91,13 +91,13 @@ Running ```PBIRInspectorWinForm.exe``` presents the user with the following inte
 
 All command line parameters are as follows:
 
-```-pbip filepath```: Required if not using -fabricitem. The path to the *.pbip file.
+```-fabricitem folderpath```: Required. The path to the CI/CD folder containing one or more Fabric item(s) definitions. PBI Inspector V2 traverses subfolders so you can specify the root CI/CD folder or a specific subfolder.
 
-```-pbipreport filepath```: Deprecated. Use -pbip instead.
+```-pbip filepath```: Depreated, use -fabricitem instead. The path to the *.pbip file.
+
+```-pbipreport filepath```: Deprecated, use -fabricitem instead.
 
 ```-pbix filepath```: Not currently supported. 
-
-```-fabricitem folderpath```: Required if not using -pbip. The path to the folder containing one or more Fabric item(s) definitions.
 
 ```-rules filepath```: Required. The filepath to the rules file. Save a local copy of the [Base Rules](Rules/Base-rules.json) file and modify as required.
 
@@ -117,15 +117,15 @@ All command line parameters are as follows:
 
 - Run "Base-rules.json" rule definitions against PBI report file at "Sales.Report and return results in Json and HTML formats:
 
-``` PBIRInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json" -output "C:\Files\TestRun" -formats "JSON,HTML"```
+``` PBIRInspectorCLI.exe -fabricitem "C:\Files\Sales.Report" -rules ".\Files\Base-rules.json" -output "C:\Files\TestRun" -formats "JSON,HTML"```
 
 - Run "Base-rules.json" rule definitions against PBI report file at "Sales.Report and return results to the console only:
 
-``` PBIRInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json" -output "C:\Files\TestRun" -formats "Console"```
+``` PBIRInspectorCLI.exe -fabricitem "C:\Files\Sales.Report" -rules ".\Files\Base-rules.json" -output "C:\Files\TestRun" -formats "Console"```
 
 - Run "Base-rules.json" rule definitions against PBI report file at "Sales.Report and return results as Azure DevOps compatible log and tasks commands (see https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash#task-commands):
 
-``` PBIRInspectorCLI.exe -pbip "C:\Files\Sales.pbip" -rules ".\Files\Base-rules.json"  -formats "ADO"```
+``` PBIRInspectorCLI.exe -fabricitem "C:\Files\Sales.Report" -rules ".\Files\Base-rules.json"  -formats "ADO"```
 
 - Run custom rules against CopyJob Fabric items, output as GitHub logging:
 
@@ -180,9 +180,9 @@ Each rule object has the following properties:
     "name": "A name that is shown in HTML results with wireframe images.",
     "description": "Details to help you and others understand what this rule does",
     "logType": "Optional. error|warning(default)",
-    "itemType": "Optional. [fabricitemtype]|report(default). The Fabric item type that the rule applies to as referred to in the item's CI\CD ".platform"" file, e.g. CopyJob, Lakehouse, Report, etc. or specify "*" to define a cross-Fabric items rule or "json" to define a rule that applies to any JSON metadata file.",
+    "itemType": "[fabricitemtype]. The Fabric item type that the rule applies to as referred to in the item's CI\CD ".platform"" file, e.g. CopyJob, Lakehouse, Report, etc. or specify "*" to define a cross-Fabric items rule or "json" to define a rule that applies to any JSON metadata file.",
     "disabled": true|false(default),
-    "part": "Optional. One of Report|Pages|PagesHeader|AllPages|Visuals|AllVisuals|Bookmarks|BookmarksHeader|AllBookmarks. If the part specified is an array with multiple items (such as "Pages"), the rule will apply to each array item in sequence."
+    "part": "Optional. A Regex expression to match one or more Fabric item file or folder path. Or, if the itemType is Report, then one of Report|Pages|PagesHeader|AllPages|Visuals|AllVisuals|Bookmarks|BookmarksHeader|AllBookmarks. If an array of multiple items is returned (such as when specifying "Pages"), the rule will apply to each item iterativey."
     "test": [
     //test logic
     ,
@@ -205,7 +205,7 @@ For example (without the optional patch logic), the following rule checks that, 
       "name": "Show visual axes titles",
       "description": "Check that certain charts have both axes title showing, returns an array of visual names that fail the test.",
       "logType": "error",
-      "type": "report",
+      "itemType": "Report",
       "part": "Pages",
       "disabled": false,
       "test": [
