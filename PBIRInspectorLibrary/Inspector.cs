@@ -97,22 +97,29 @@ namespace PBIRInspectorLibrary
                     .GetFiles(fileSystemPath, "*.platform", SearchOption.AllDirectories)
                     .ToList();
 
-                foreach (var platformFile in platformFiles)
+                if (platformFiles != null && platformFiles.Count != 0)
                 {
-                   
-                    JsonNode? platformNode = JsonNode.Parse(File.ReadAllBytes(platformFile));
-                    if (platformNode == null)
+                    foreach (var platformFile in platformFiles)
                     {
-                        OnMessageIssued(MessageTypeEnum.Error, string.Format("Could not parse platform file at \"{0}\".", platformFile));
-                        continue;
+                        JsonNode? platformNode = JsonNode.Parse(File.ReadAllBytes(platformFile));
+                        if (platformNode == null)
+                        {
+                            OnMessageIssued(MessageTypeEnum.Error, string.Format("Could not parse platform file at \"{0}\".", platformFile));
+                            continue;
+                        }
+
+                        var itemType = PartUtils.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
+
+                        var fo = new FileInfo(platformFile);
+                        var dir = fo.DirectoryName;
+                        RunRulesByItemType(testResults, rules, itemType, dir);
+                        RunDeprecatedRulesByItemType(testResults, rules, itemType, dir);
                     }
-
-                    var itemType = PartUtils.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
-
-                    var fo = new FileInfo(platformFile);
-                    var dir = fo.DirectoryName;
-                    RunRulesByItemType(testResults, rules, itemType, dir);
-                    RunDeprecatedRulesByItemType(testResults, rules, itemType, dir);
+                }
+                else
+                {
+                    OnMessageIssued(MessageTypeEnum.Information, string.Format("No platform files found in directory \"{0}\". Running legacy behaviour to support file system path ending in '\\definition' and assuming fabric item type is report.", fileSystemPath));
+                    RunRulesByItemType(testResults, rules, "report_deprecated", fileSystemPath);
                 }
             }
             else
@@ -136,7 +143,7 @@ namespace PBIRInspectorLibrary
                     default:
                         throw new PBIRInspectorException(string.Format("Unsupported file itemType \"{0}\" for path \"{1}\".", fileExtension, fileSystemPath));
                 }
-                
+
             }
 
             return testResults;
@@ -291,7 +298,7 @@ namespace PBIRInspectorLibrary
 
                             if (rule.PathErrorWhenNoMatch)
                             {
-                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = null, ParentDisplayName = "N/A", Pass = false, Message = msg, Expected = rule.Test.Expected, Actual = null });
+                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, ItemPath = null, ParentName = null, ParentDisplayName = "N/A", Pass = false, Message = msg, Expected = rule.Test.Expected, Actual = null });
                             }
                         }
                         else
@@ -300,6 +307,7 @@ namespace PBIRInspectorLibrary
                             var node = PartUtils.ToJsonNode(part);
                             var newdata = MapRuleDataPointersToValues(node, rule);
 
+                            var itemPath = part.FileSystemPath.Substring(part.FileSystemPath.IndexOf(this._fabricItemPath) + this._fabricItemPath.Length);
                             var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null;
                             var parentPageDisplayName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartDisplayName(part) ?? partQuery.PartName(part) : "N/A";
 
@@ -307,7 +315,7 @@ namespace PBIRInspectorLibrary
                             result = rule.Test.Expected.IsEquivalentTo(jruleresult);
 
                             string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
-                            testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
+                            testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, ItemPath = itemPath, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
 
                             //PATCH
                             if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
@@ -334,7 +342,7 @@ namespace PBIRInspectorLibrary
                 }
                 catch (PBIRInspectorException e)
                 {
-                    testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
+                    testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, RuleItemType = rule.ItemType, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
                     continue;
                 }
 

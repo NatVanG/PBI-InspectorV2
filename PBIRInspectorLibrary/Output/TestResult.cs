@@ -14,6 +14,10 @@ namespace PBIRInspectorLibrary.Output
 
         public MessageTypeEnum LogType { get; set; }
 
+        public string? RuleItemType { get; set; }
+
+        public string? ItemPath { get; set; }
+
         public string? ParentName { get; set; }
 
         public string? ParentDisplayName { get; set; }
