@@ -20,6 +20,7 @@ namespace PBIRInspectorLibrary;
 [JsonSerializable(typeof(CustomRules.SetIntersectionRule))]
 [JsonSerializable(typeof(CustomRules.SetUnionRule))]
 [JsonSerializable(typeof(CustomRules.StringContains))]
+[JsonSerializable(typeof(CustomRules.FileTextSearchRule))]
 [JsonSerializable(typeof(CustomRules.ToRecordRule))]
 [JsonSerializable(typeof(CustomRules.ToString))]
 [JsonSerializable(typeof(CustomRules.FileSizeRule))]

@@ -128,6 +128,21 @@ namespace PBIRInspectorLibrary.Part
             return val ?? context.FileSystemName;
         }
 
+        public string PartFileSystemName(Part context)
+        {
+            return context.FileSystemName;
+        }
+
+        public string PartFileSystemPath(Part context)
+        {
+            return context.FileSystemPath;
+        }
+
+        public string PartFileExtension(Part context)
+        {
+            return Path.GetExtension(context.FileSystemPath);
+        }
+
         public List<Part> Files(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)

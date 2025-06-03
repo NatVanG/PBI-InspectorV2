@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.IO;
+using PBIRInspectorLibrary.Exceptions;
 
 namespace PBIRInspectorLibrary.CustomRules
 {
@@ -33,12 +34,16 @@ namespace PBIRInspectorLibrary.CustomRules
         public override JsonNode? Apply(JsonNode? data, JsonNode? contextData = null)
         {
             var inputString = InputString.Apply(data, contextData);
-            string? filePath = inputString?.ToString();
+            var filePath = inputString.Stringify();
             int? fileSize = null;
 
             if (File.Exists(filePath))
             {
                 fileSize = (int)new FileInfo(filePath).Length;
+            }
+            else
+            {
+                throw new JsonLogicException(string.Format("FileSizeRule - file not found at \"{0}\"." , filePath));
             }
 
             return fileSize;

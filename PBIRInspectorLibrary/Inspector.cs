@@ -186,6 +186,7 @@ namespace PBIRInspectorLibrary
             Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.FileSizeRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.JsonataRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.FileTextSearchRule>(context);
         }
 
         private MessageTypeEnum ConvertRuleLogType(string ruleLogType)

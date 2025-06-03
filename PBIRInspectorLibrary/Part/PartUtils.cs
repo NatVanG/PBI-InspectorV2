@@ -1,4 +1,6 @@
-﻿using Json.Pointer;
+﻿using Json.Path;
+using Json.Pointer;
+using Jsonata.Net.Native.Dom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +20,14 @@ namespace PBIRInspectorLibrary.Part
             {
                 return ToJsonArray(value as List<Part>);
             }
-            else
+            else if (value is Part)
             {
                 return ((Part)value).PartType == PartTypeEnum.File ? ToJsonNode((Part)value) : null;
+            }
+            else
+            {
+                //if the value is not a Part or List<Part>, we return it as a JsonValue
+                return JsonValue.Create(value);
             }
         }
 
@@ -38,32 +45,47 @@ namespace PBIRInspectorLibrary.Part
 
             JsonNode? node = null;
 
-            if (File.Exists(context.FileSystemPath))
+
+            try
             {
-                try
+                if (File.Exists(context.FileSystemPath))
                 {
                     node = JsonNode.Parse(File.ReadAllText(context.FileSystemPath));
                 }
-                catch (System.Text.Json.JsonException)
-                {
-                    //this is not a json file so add annotation with the file system path; this is so JsonLogic rules can still be applied
-                    node = new JsonObject();
 
-                    if (node is JsonObject jsonObject)
-                    {
-                        var annotations = new JsonArray
-                        {
-                            //TODO: rename to reflect fabric item instead of pbiri. Note breaking changes.
-                            new JsonObject { ["name"] = "pbiri_filesystempath", ["value"] =  context.FileSystemPath },
-                            new JsonObject { ["name"] = "pbiri_filesystemname", ["value"] =  context.FileSystemName }
-                        };
-                        jsonObject["annotations"] = annotations;
-                    }
-                }
-                finally
+                if (Directory.Exists(context.FileSystemPath))
                 {
-                    context.JsonContent = node;
+                    //if the path is a directory, we cannot parse it as JSON, so we return an annotation with the file system path
+                    node = FileSystemPathAnnotations(context.FileSystemPath, context.FileSystemName);
                 }
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                //this is not a json file or not a valid json file so add annotation with the file system path; this is so JsonLogic rules can still be applied
+                node = FileSystemPathAnnotations(context.FileSystemPath, context.FileSystemName);
+            }
+            finally
+            {
+                context.JsonContent = node;
+            }
+            
+
+            return node;
+        }
+
+        private static JsonNode FileSystemPathAnnotations(string fileSystemPath, string fileSystemName)
+        {
+            var node = new JsonObject();
+
+            if (node is JsonObject jsonObject)
+            {
+                var annotations = new JsonArray
+                        {
+                            //TODO: Legacy, deprecate.
+                            new JsonObject { ["name"] = "pbiri_filesystempath", ["value"] =  fileSystemPath },
+                            new JsonObject { ["name"] = "pbiri_filesystemname", ["value"] =  fileSystemName }
+                };
+                jsonObject["annotations"] = annotations;
             }
 
             return node;
