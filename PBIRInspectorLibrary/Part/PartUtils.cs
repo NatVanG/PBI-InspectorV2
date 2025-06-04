@@ -22,7 +22,7 @@ namespace PBIRInspectorLibrary.Part
             }
             else if (value is Part)
             {
-                return ((Part)value).PartType == PartTypeEnum.File ? ToJsonNode((Part)value) : null;
+                return ((Part)value).PartFileSystemType == PartFileSystemTypeEnum.File ? ToJsonNode((Part)value) : null;
             }
             else
             {

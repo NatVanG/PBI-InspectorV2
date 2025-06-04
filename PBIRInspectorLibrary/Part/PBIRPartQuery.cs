@@ -46,7 +46,7 @@ namespace PBIRInspectorLibrary.Part
                 reportFolderPath = path;
             }
 
-            this.RootPart = new Part("root", reportFolderPath!, null, PartTypeEnum.Folder);
+            this.RootPart = new Part("root", reportFolderPath!, null, PartFileSystemTypeEnum.Folder);
             SetParts(this.RootPart);
         }
 
@@ -65,7 +65,7 @@ namespace PBIRInspectorLibrary.Part
         public Part Report(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                          where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("report.json")
+                                          where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("report.json")
                                           select p;
 
             return q.Single();
@@ -75,7 +75,7 @@ namespace PBIRInspectorLibrary.Part
         public Part? ReportExtensions(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                  where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("reportExtensions.json")
+                                  where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("reportExtensions.json")
                                   select p;
 
             return q.SingleOrDefault();
@@ -84,7 +84,7 @@ namespace PBIRInspectorLibrary.Part
         public Part Version(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                          where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("version.json")
+                                          where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("version.json")
                                           select p;
 
             return q.Single();
@@ -93,7 +93,7 @@ namespace PBIRInspectorLibrary.Part
         public Part PagesHeader(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                          where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("pages.json")
+                                          where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("pages.json")
                                           select p;
 
             return q.Single();
@@ -101,8 +101,8 @@ namespace PBIRInspectorLibrary.Part
 
         public List<Part> Pages(Part context)
         {
-            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
-                                          where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("page.json")
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartFileSystemType == PartFileSystemTypeEnum.File ? context.Parent : context)
+                                          where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("page.json")
                                           select p;
 
             return q.ToList();
@@ -115,8 +115,8 @@ namespace PBIRInspectorLibrary.Part
 
         public List<Part> Visuals(Part context)
         {
-            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
-                                            where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("visual.json")
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartFileSystemType == PartFileSystemTypeEnum.File ? context.Parent : context)
+                                            where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("visual.json")
                                             select p;
 
             return q.ToList();
@@ -129,8 +129,8 @@ namespace PBIRInspectorLibrary.Part
 
         public List<Part> MobileVisuals(Part context)
         {
-            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
-                                            where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("mobile.json")
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartFileSystemType == PartFileSystemTypeEnum.File ? context.Parent : context)
+                                            where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("mobile.json")
                                             select p;
 
             return q.ToList();
@@ -139,7 +139,7 @@ namespace PBIRInspectorLibrary.Part
         public Part BookmarksHeader(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                            where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("bookmarks.json")
+                                            where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("bookmarks.json")
                                             select p;
 
             return q.Single();
@@ -153,8 +153,8 @@ namespace PBIRInspectorLibrary.Part
 
         public List<Part> Bookmarks(Part context)
         {
-            IEnumerable<Part> q = from p in Part.Flatten(context.PartType == PartTypeEnum.File ? context.Parent : context)
-                                            where p.PartType == PartTypeEnum.File && p.FileSystemName.EndsWith("bookmark.json")
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartFileSystemType == PartFileSystemTypeEnum.File ? context.Parent : context)
+                                            where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("bookmark.json")
                                             select p;
 
             return q.ToList();

@@ -10,16 +10,16 @@ using System.Text.RegularExpressions;
 namespace PBIRInspectorLibrary.CustomRules
 {
     /// <summary>
-    /// Handles the `FileTextSearch` operation. 
+    /// Handles the `FileTextSearchCount` operation. 
     /// </summary>
-    [Operator("filetextsearch")]
-    [JsonConverter(typeof(FileTextSearchRuleJsonConverter))]
-    public class FileTextSearchRule : Json.Logic.Rule
+    [Operator("filetextsearchcount")]
+    [JsonConverter(typeof(FileTextSearchCountRuleJsonConverter))]
+    public class FileTextSearchCountRule : Json.Logic.Rule
     {
         internal Json.Logic.Rule FilePath { get; }
         internal Json.Logic.Rule PatternString { get; }
 
-        public FileTextSearchRule(Json.Logic.Rule filePath, Json.Logic.Rule patternString)
+        public FileTextSearchCountRule(Json.Logic.Rule filePath, Json.Logic.Rule patternString)
         {
             FilePath = filePath;
             PatternString = patternString;
@@ -49,19 +49,19 @@ namespace PBIRInspectorLibrary.CustomRules
 
             if (!File.Exists(stringFilePath))
             {
-                throw new JsonLogicException($"FileTextSearchRule - file not found at \"{stringFilePath}\".");
+                throw new JsonLogicException($"FileTextSearchCountRule - file not found at \"{stringFilePath}\".");
             }
 
             if (string.IsNullOrEmpty(stringPatternString))
             {
-                throw new JsonLogicException("FileTextSearchRule - pattern string cannot be null or empty.");
+                throw new JsonLogicException("FileTextSearchCountRule - pattern string cannot be null or empty.");
             }
 
             // Read the file content and count matches of the regex pattern
             string fileContent = File.ReadAllText(stringFilePath);
             if (string.IsNullOrEmpty(fileContent))
             {
-                throw new JsonLogicException($"FileTextSearchRule - file at \"{stringFilePath}\" is empty.");
+                throw new JsonLogicException($"FileTextSearchCountRule - file at \"{stringFilePath}\" is empty.");
             }
 
             // Use Regex to count occurrences of the pattern in the file content
@@ -70,9 +70,9 @@ namespace PBIRInspectorLibrary.CustomRules
         }
     }
 
-    internal class FileTextSearchRuleJsonConverter : WeaklyTypedJsonConverter<FileTextSearchRule>
+    internal class FileTextSearchCountRuleJsonConverter : WeaklyTypedJsonConverter<FileTextSearchCountRule>
     {
-        public override FileTextSearchRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override FileTextSearchCountRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var parameters = reader.TokenType == JsonTokenType.StartArray
             ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
@@ -81,12 +81,12 @@ namespace PBIRInspectorLibrary.CustomRules
             if (parameters is not { Length: 2 })
                 throw new JsonException("The FileTextSearch rule needs an array with 2 parameters.");
 
-            if (parameters.Length == 2) return new FileTextSearchRule(parameters[0], parameters[1]);
+            if (parameters.Length == 2) return new FileTextSearchCountRule(parameters[0], parameters[1]);
 
-            return new FileTextSearchRule(parameters[0], parameters[1]);
+            return new FileTextSearchCountRule(parameters[0], parameters[1]);
         }
 
-        public override void Write(Utf8JsonWriter writer, FileTextSearchRule value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, FileTextSearchCountRule value, JsonSerializerOptions options)
         {
             throw new NotImplementedException();
         }

@@ -10,7 +10,7 @@ namespace PBIRInspectorLibrary.Part
     {
         public PBIRPartQuery_deprecated(string fileSystemPath) : base(fileSystemPath)
         {
-            SetParts(new Part("root", fileSystemPath, null, PartTypeEnum.Folder));
+            SetParts(new Part("root", fileSystemPath, null, PartFileSystemTypeEnum.Folder));
         }
 
         //TODO: deprecate this behaviour. Currently preserving the original behaviour of returning a single item instead of a list to maintain compatibility with any existing rules.

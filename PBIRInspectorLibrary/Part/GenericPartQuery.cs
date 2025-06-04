@@ -11,7 +11,7 @@ namespace PBIRInspectorLibrary.Part
     {
         public GenericPartQuery(string fileSystemPath) : base(fileSystemPath)
         {
-            SetParts(new Part("root", fileSystemPath, null, PartTypeEnum.Folder));
+            SetParts(new Part("root", fileSystemPath, null, PartFileSystemTypeEnum.Folder));
         }
     }
 }

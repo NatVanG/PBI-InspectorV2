@@ -1,4 +1,4 @@
-# PBI Inspector V2 (i.e. rule-based JSON metadata testing for the Microsoft Power BI visual layer and other Fabric Items)
+# PBI Inspector V2 (i.e. rule-based metadata testing for the Microsoft Power BI visual layer and other Fabric Items)
 
 <img src="DocsImages/pbiinspectoricons.png" alt="PBI Inspector logo" height="250"/>
 
@@ -6,7 +6,7 @@
 
 This is a community project that is not supported by Microsoft. 
 
-:exclamation: This version of PBI Inspector only supports the new enhanced metadata file format (PBIR), see https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report. For the older PBIR-legacy file format, please use the previous version of PBI Inspector available at https://github.com/NatVanG/PBI-Inspector :exclamation:
+:exclamation: Aside from Fabric items other than Power BI reports, this version of PBI Inspector is intended to support the new enhanced metadata file format (PBIR), see https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report?tabs=desktop#pbir-format. For the older PBIR-legacy file format (see https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report?tabs=desktop#report-files), please use the previous version of PBI Inspector available at https://github.com/NatVanG/PBI-Inspector :exclamation:
 
 ## Breaking changes :boom:
 To support the new enhanced report format (PBIR), a new "part" custom command has been introduced which helps to navigate to or iterate over the new metadata file format's parts such as "Pages", "Visuals", "Bookmarks" etc. Rules defined against the new format are not backward compatible with the older PBIR-legacy format and vice versa.

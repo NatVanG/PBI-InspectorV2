@@ -27,7 +27,7 @@
             user-select: none;
         }
     </style>
-
+    f
 </head>
 <body class="bg-body-tertiary">
 
@@ -151,7 +151,7 @@
                                     "width": "100%",
                                     "height": "100%",
                                     "fill": function () {
-                                        if (!this.Pass) { return "#ed135d" } else { return "#0cbaf4" }
+                                        if (this.Pass) { return "#0cbaf4" } else { if (this.LogType === 1) { return "#eda413" } else { return "#ed135d" } }
                                     }
                                 }
                             ]
@@ -192,6 +192,22 @@
                                                         },
                                                         {
                                                             "text": "${RuleDescription}"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "<>": "p",
+                                                    "class": "pb-3 mb-0 small lh-sm",
+                                                    "html": [
+                                                        {
+                                                            "<>": "strong",
+                                                            "class": "d-block text-gray-dark",
+                                                            "text": "Rule Log Type"
+                                                        },
+                                                        {
+                                                            "text": function () {
+                                                                if (this.LogType === 1) { return "Warning" } else { return "Error" }
+                                                            }
                                                         }
                                                     ]
                                                 },
