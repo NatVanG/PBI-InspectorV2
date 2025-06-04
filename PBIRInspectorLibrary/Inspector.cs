@@ -24,7 +24,7 @@ namespace PBIRInspectorLibrary
         private const string CONTEXTNODE = ".";
         internal const char DRILLCHAR = '>';
 
-        private string? _pbiFilePath, _rulesFilePath;
+        private string? _fabricItemPath, _rulesPath;
         private InspectionRules? _inspectionRules;
 
         public event EventHandler<MessageIssuedEventArgs>? MessageIssued;
@@ -37,11 +37,11 @@ namespace PBIRInspectorLibrary
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pbiFilePath"></param>
+        /// <param name="fabricItemPath"></param>
         /// <param name="inspectionRules"></param>
-        public Inspector(string pbiFilePath, InspectionRules inspectionRules) : base(pbiFilePath, inspectionRules)
+        public Inspector(string fabricItemPath, InspectionRules inspectionRules) : base(fabricItemPath, inspectionRules)
         {
-            this._pbiFilePath = pbiFilePath;
+            this._fabricItemPath = fabricItemPath;
             this._inspectionRules = inspectionRules;
             AddCustomRulesToRegistry();
         }
@@ -49,20 +49,20 @@ namespace PBIRInspectorLibrary
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pbiFilePath">Local PBI file path</param>
-        /// <param name="rulesFilePath">Local rules json file path</param>
-        public Inspector(string pbiFilePath, string rulesFilePath) : base(pbiFilePath, rulesFilePath)
+        /// <param name="fabricItemPath">Local PBI file path</param>
+        /// <param name="rulesPath">Local rules json file path</param>
+        public Inspector(string fabricItemPath, string rulesPath) : base(fabricItemPath, rulesPath)
         {
-            this._pbiFilePath = pbiFilePath;
-            this._rulesFilePath = rulesFilePath;
+            this._fabricItemPath = fabricItemPath;
+            this._rulesPath = rulesPath;
 
             try
             {
-                var inspectionRules = this.DeserialiseRulesFromFilePath<InspectionRules>(rulesFilePath);
+                var inspectionRules = this.DeserialiseRulesFromPath<InspectionRules>(rulesPath);
 
                 if (inspectionRules == null || inspectionRules.Rules == null || inspectionRules.Rules.Count == 0)
                 {
-                    throw new PBIRInspectorException(string.Format("No rule definitions were found within rules file at \"{0}\".", rulesFilePath));
+                    throw new PBIRInspectorException(string.Format("No rule definitions were found within rules file at \"{0}\".", rulesPath));
                 }
                 else
                 {
@@ -71,11 +71,11 @@ namespace PBIRInspectorLibrary
             }
             catch (System.IO.FileNotFoundException e)
             {
-                throw new PBIRInspectorException(string.Format("Rules file with path \"{0}\" not found.", rulesFilePath), e);
+                throw new PBIRInspectorException(string.Format("Rules file with path \"{0}\" not found.", rulesPath), e);
             }
             catch (System.Text.Json.JsonException e)
             {
-                throw new PBIRInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesFilePath), e);
+                throw new PBIRInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesPath), e);
             }
 
             AddCustomRulesToRegistry();
@@ -83,131 +83,70 @@ namespace PBIRInspectorLibrary
 
         public List<TestResult> Inspect()
         {
-            var testResults = new List<TestResult>();
+            var fileSystemPath = _fabricItemPath;
             var rules = this._inspectionRules.Rules.Where(_ => !_.Disabled);
+            var testResults = new List<TestResult>();
 
-
-            //TODO: determine which flavour of IPBIPartQuery to instantiate.
-            IPBIPartQuery partQuery = new PBIRPartQuery(_pbiFilePath);
-            ContextService.GetInstance().PartQuery = partQuery;
-
-
-            foreach (var rule in rules)
+            if (!string.IsNullOrEmpty(fileSystemPath) && Directory.Exists(fileSystemPath))
             {
-                var ruleLogType = ConvertRuleLogType(rule.LogType);
-                ContextService.GetInstance().Part = partQuery.RootPart;
+                //Run rules that apply across types ie. with attribute "itemtype" set to "*"
+                RunRulesByItemType(testResults, rules, "*", fileSystemPath);
 
-                OnMessageIssued(MessageTypeEnum.Information, string.Format("Running Rule \"{0}\".", rule.Name));
-                Json.Logic.Rule? jrule = null;
+                //Run rules that apply to specific itemtypes
+                var platformFiles = Directory
+                    .GetFiles(fileSystemPath, "*.platform", SearchOption.AllDirectories)
+                    .ToList();
 
-                try
+                if (platformFiles != null && platformFiles.Count != 0)
                 {
-                    jrule = System.Text.Json.JsonSerializer.Deserialize<Json.Logic.Rule>(rule.Test.Logic);
-                }
-                catch (System.Text.Json.JsonException e)
-                {
-                    OnMessageIssued(MessageTypeEnum.Error, string.Format("Parsing of logic for rule \"{0}\" failed, resuming to next rule.", rule.Name));
-                    continue;
-                }
-
-                bool result = false;
-
-                try
-                {
-                    var parts = new List<Part.Part>();
-
-                    if (!string.IsNullOrEmpty(rule.Part))
+                    foreach (var platformFile in platformFiles)
                     {
-                        var part = partQuery.Invoke(rule.Part, ContextService.GetInstance().Part);
-
-                        if (part is List<Part.Part>)
+                        JsonNode? platformNode = JsonNode.Parse(File.ReadAllBytes(platformFile));
+                        if (platformNode == null)
                         {
-                            parts.AddRange((List<Part.Part>)part);
+                            OnMessageIssued(MessageTypeEnum.Error, string.Format("Could not parse platform file at \"{0}\".", platformFile));
+                            continue;
                         }
-                        else
-                        {
-                            parts.Add((Part.Part)part);
-                        }
-                    }
-                    else
-                    {
-                        parts.Add(partQuery.RootPart);
-                    }
 
-                    foreach (var part in parts)
-                    {
-                        if (part == null)
-                        {
-                            MessageTypeEnum msgType = rule.PathErrorWhenNoMatch ? MessageTypeEnum.Error : MessageTypeEnum.Information;
-                            var msg = string.Format("Rule \"{0}\" - Part(s) \"{1}\" not found.", rule.Name, rule.Part);
-                            OnMessageIssued(msgType, msg);
+                        var itemType = PartUtils.TryGetJsonNodeStringValue(platformNode, "/metadata/type")!.ToLowerInvariant();
 
-                            if (rule.PathErrorWhenNoMatch)
-                            {
-                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = null, ParentDisplayName = "N/A", Pass = false, Message = msg, Expected = rule.Test.Expected, Actual = null });
-                            }
-                        }
-                        else
-                        {
-                            ContextService.GetInstance().Part = part;
-                            var node = partQuery.ToJsonNode(part);
-                            var newdata = MapRuleDataPointersToValues(node, rule);
-
-                            var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null;
-                            var parentPageDisplayName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartDisplayName(part) ?? partQuery.PartName(part) : "N/A";
-
-                            var jruleresult = jrule.Apply(newdata);
-                            result = rule.Test.Expected.IsEquivalentTo(jruleresult);
-                            
-                            string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
-                            testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
-
-                            //PATCH
-                            if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
-                            {
-                                if (jruleresult != null && jruleresult is JsonArray arr && arr.Count() > 0)
-                                {
-                                    var allPatchParts = (List<Part.Part>)partQuery.Invoke(rule.Patch.PartName, part);
-
-                                    //TODO: use another method to filter parts i.e. other than ToJSonString
-                                    var filteredPatchParts = allPatchParts.Where(_ => arr.ToJsonString().Contains(partQuery.PartName(_)));
-                                    foreach (var filteredPart in filteredPatchParts)
-                                    {
-                                        ApplyPatch(partQuery, rule, filteredPart);
-                                    }
-                                }
-                                else
-                                {
-                                    var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
-                                    ApplyPatch(partQuery, rule, patchPart);
-                                }
-                            }
-                        }
+                        var fo = new FileInfo(platformFile);
+                        var dir = fo.DirectoryName;
+                        RunRulesByItemType(testResults, rules, itemType, dir);
+                        RunDeprecatedRulesByItemType(testResults, rules, itemType, dir);
                     }
                 }
-                catch (PBIRInspectorException e)
+                else
                 {
-                    testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
-                    continue;
+                    OnMessageIssued(MessageTypeEnum.Information, string.Format("No platform files found in directory \"{0}\". Running legacy behaviour to support file system path ending in '\\definition' and assuming fabric item type is report.", fileSystemPath));
+                    RunRulesByItemType(testResults, rules, "report_deprecated", fileSystemPath);
                 }
-
-            }
-            return testResults;
-        }
-
-        private void ApplyPatch(IPBIPartQuery partQuery, Rule? rule, Part.Part? partToPatch)
-        {
-            var node = partQuery.ToJsonNode(partToPatch);
-            var patchResult = rule.Patch.Ops.Apply(node);
-            if (patchResult.IsSuccess)
-            {
-                partToPatch.JsonContent = patchResult.Result;
-                partToPatch.Save();
             }
             else
             {
-                OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Patch failed for part \"{1}\". Error: \"{2}\".", rule.Id, partToPatch.FileSystemPath, patchResult.Error));
+                //if _fabricItemPath is not a directory, check if it is a file
+                if (!File.Exists(fileSystemPath))
+                {
+                    throw new PBIRInspectorException(string.Format("File or folder with path \"{0}\" not found.", fileSystemPath));
+                }
+
+                var fileExtension = Path.GetExtension(fileSystemPath).ToLowerInvariant();
+                switch (fileExtension)
+                {
+                    case ".pbip":
+                        //LEGACY: if _fabricItemPath is a pbip file, assume we want to test a report's metadata
+                        RunRulesByItemType(testResults, rules, "report_deprecated", fileSystemPath);
+                        break;
+                    case ".json":
+                        RunRulesByItemType(testResults, rules, "json", fileSystemPath);
+                        break;
+                    default:
+                        throw new PBIRInspectorException(string.Format("Unsupported file itemType \"{0}\" for path \"{1}\".", fileExtension, fileSystemPath));
+                }
+
             }
+
+            return testResults;
         }
 
         protected void OnMessageIssued(MessageTypeEnum messageType, string message)
@@ -246,6 +185,8 @@ namespace PBIRInspectorLibrary
             Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.FileSizeRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.JsonataRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.FileTextSearchCountRule>(context);
         }
 
         private MessageTypeEnum ConvertRuleLogType(string ruleLogType)
@@ -270,6 +211,159 @@ namespace PBIRInspectorLibrary
                     return logType;
                 }
 
+        private void RunRulesByItemType(List<TestResult> testResults, IEnumerable<Rule> rules, string type, string fileSystemPath)
+        {
+            var rulesFilteredByItemType = rules.Where(_ => _.ItemType.Equals(type, StringComparison.InvariantCultureIgnoreCase));
+
+            if (rulesFilteredByItemType == null || !rulesFilteredByItemType.Any())
+            {
+                OnMessageIssued(MessageTypeEnum.Information, string.Format("No rules found for item type \"{0}\".", type));
+                return;
+            }
+
+            IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, fileSystemPath);
+            ContextService.GetInstance().PartQuery = partQuery;
+
+            RunRules(testResults, rulesFilteredByItemType, partQuery);
+        }
+
+        private void RunDeprecatedRulesByItemType(List<TestResult> testResults, IEnumerable<Rule> rules, string type, string fileSystemPath)
+        {
+            const string DEPRECATED_SUFFIX = "_deprecated";
+            var deprecatedRules = rules.Where(_ => _.ItemType.Contains(DEPRECATED_SUFFIX, StringComparison.InvariantCultureIgnoreCase));
+            var rulesFilteredByItemType = deprecatedRules.Where(_ => _.ItemType.Replace(DEPRECATED_SUFFIX, string.Empty).Equals(type, StringComparison.InvariantCultureIgnoreCase));
+
+            IPartQuery partQuery = PartQueryFactory.CreatePartQuery(string.Concat(type, DEPRECATED_SUFFIX), fileSystemPath);
+            ContextService.GetInstance().PartQuery = partQuery;
+
+            RunRules(testResults, rulesFilteredByItemType, partQuery);
+        }
+
+        private void RunRules(List<TestResult> testResults, IEnumerable<Rule> rules, IPartQuery partQuery)
+        {
+            foreach (var rule in rules)
+            {
+                var ruleLogType = ConvertRuleLogType(rule.LogType);
+                ContextService.GetInstance().Part = partQuery.RootPart;
+
+                OnMessageIssued(MessageTypeEnum.Information, string.Format("Running Rule \"{0}\".", rule.Name));
+                Json.Logic.Rule? jrule = null;
+
+                try
+                {
+                    jrule = System.Text.Json.JsonSerializer.Deserialize<Json.Logic.Rule>(rule.Test.Logic);
+                }
+                catch (System.Text.Json.JsonException e)
+                {
+                    OnMessageIssued(MessageTypeEnum.Error, string.Format("Parsing of logic for rule \"{0}\" failed, resuming to next rule.", rule.Name));
+                    continue;
+                }
+
+                bool result = false;
+
+                try
+                {
+                    var parts = new List<Part.Part>();
+
+                    if (!string.IsNullOrEmpty(rule.Part))
+                    {
+                        var part = partQuery.Invoke(rule.Part, ContextService.GetInstance().Part);
+
+                        if (part != null && part
+                            is List<Part.Part>)
+                        {
+                            parts.AddRange((List<Part.Part>)part);
+                        }
+                        else if (part != null && part is Part.Part)
+                        {
+                            parts.Add((Part.Part)part);
+                        }
+                        else
+                        {
+                            OnMessageIssued(MessageTypeEnum.Error, (string.Format("Rule \"{0}\" - Part \"{1}\" not found, resuming to next rule.", rule.Name, rule.Part)));
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        parts.Add(partQuery.RootPart);
+                    }
+
+                    foreach (var part in parts)
+                    {
+                        if (part == null)
+                        {
+                            MessageTypeEnum msgType = rule.PathErrorWhenNoMatch ? MessageTypeEnum.Error : MessageTypeEnum.Information;
+                            var msg = string.Format("Rule \"{0}\" - Part(s) \"{1}\" not found.", rule.Name, rule.Part);
+                            OnMessageIssued(msgType, msg);
+
+                            if (rule.PathErrorWhenNoMatch)
+                            {
+                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, ItemPath = null, ParentName = null, ParentDisplayName = "N/A", Pass = false, Message = msg, Expected = rule.Test.Expected, Actual = null });
+                            }
+                        }
+                        else
+                        {
+                            ContextService.GetInstance().Part = part;
+                            var node = PartUtils.ToJsonNode(part);
+                            var newdata = MapRuleDataPointersToValues(node, rule);
+
+                            var itemPath = part.FileSystemPath.Substring(part.FileSystemPath.IndexOf(this._fabricItemPath) + this._fabricItemPath.Length);
+                            var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null;
+                            var parentPageDisplayName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartDisplayName(part) ?? partQuery.PartName(part) : "N/A";
+
+                            var jruleresult = jrule.Apply(newdata);
+                            result = rule.Test.Expected.IsEquivalentTo(jruleresult);
+
+                            string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
+                            testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, ItemPath = itemPath, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
+
+                            //PATCH
+                            if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
+                            {
+                                if (jruleresult != null && jruleresult is JsonArray arr && arr.Count() > 0)
+                                {
+                                    var allPatchParts = (List<Part.Part>)partQuery.Invoke(rule.Patch.PartName, part);
+
+                                    //TODO: use another method to filter parts i.e. other than ToJSonString
+                                    var filteredPatchParts = allPatchParts.Where(_ => arr.ToJsonString().Contains(partQuery.PartName(_)));
+                                    foreach (var filteredPart in filteredPatchParts)
+                                    {
+                                        ApplyPatch(partQuery, rule, filteredPart);
+                                    }
+                                }
+                                else
+                                {
+                                    var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
+                                    ApplyPatch(partQuery, rule, patchPart);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (PBIRInspectorException e)
+                {
+                    testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, RuleItemType = rule.ItemType, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
+                    continue;
+                }
+
+            }
+        }
+
+        private void ApplyPatch(IPartQuery partQuery, Rule? rule, Part.Part? partToPatch)
+        {
+            var node = PartUtils.ToJsonNode(partToPatch);
+            var patchResult = rule.Patch.Ops.Apply(node);
+            if (patchResult.IsSuccess)
+            {
+                partToPatch.JsonContent = patchResult.Result;
+                partToPatch.Save();
+            }
+            else
+            {
+                OnMessageIssued(MessageTypeEnum.Error, string.Format("Rule \"{0}\" - Patch failed for part \"{1}\". Error: \"{2}\".", rule.Id, partToPatch.FileSystemPath, patchResult.Error));
+            }
+        }
         /// <summary>
         /// 
         /// </summary>

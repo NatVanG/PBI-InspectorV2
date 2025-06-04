@@ -6,17 +6,15 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace PBIRInspectorLibrary.Part
 {
-    internal class BasePartQuery
+    internal class BasePartQuery(string fileSystemPath) : IPartQuery
     {
         private const string UNIQUEPARTMETHODNAME = "UniquePart";
-
-        public BasePartQuery(string filePath)
-        {
-
-        }
+        private const string NAMEPOINTER = "/name";
+        private const string DISPLAYNAMEPOINTER = "/displayName";
 
         public Part RootPart { get; set; }
 
@@ -27,44 +25,141 @@ namespace PBIRInspectorLibrary.Part
             System.Reflection.MethodInfo? mi = type.GetMethod(query);
             if (mi != null)
             {
+                //TODO: retrict invokable methods to their own namespace?
                 result = mi.Invoke(this, new object?[] { context });
             }
             else
             {
-                mi = type.GetMethod(UNIQUEPARTMETHODNAME);
-                if (mi != null)
-                {
-                    result = mi.Invoke(this, new object?[] { query, context });
-                }
+                result = SearchParts(query, context);
             }
 
             return result;
         }
 
-        public static Part Parent(Part part)
+        private protected virtual object? SearchParts(string query, Part context)
         {
-            return part.Parent;
+            IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
+                                  where Regex.IsMatch(p.FileSystemPath, query, RegexOptions.IgnoreCase)
+                                  select p;
+
+            if (q is null) return null;
+            
+            return q.ToList();
         }
 
-        public static Part TopParent(Part part)
+        private protected void SetParts()
         {
-            if (part.Parent == null) return part;
-            return TopParent(part.Parent);
+            if (this.RootPart == null) throw new ArgumentNullException("RootPart is not set.");
+            SetParts(this.RootPart);
         }
 
-        protected static string? TryGetJsonNodeStringValue(JsonNode node, string query)
+        private protected void SetParts(Part context)
         {
-            JsonPointer pt = JsonPointer.Parse(query);
-
-            if (pt.TryEvaluate(node, out var result))
+            if (this.RootPart == null)
             {
-                if (result is JsonValue val)
-                {
-                    return val.ToString();
-                }
+                this.RootPart = context;
+            }
+            if (!Directory.Exists(context.FileSystemPath)) return;
+
+            context.Parts = new List<Part>();
+
+            foreach (string filePath in Directory.GetFiles(context.FileSystemPath))
+            {
+                FileInfo fileInfo = new FileInfo(filePath);
+                Part filePart = new Part(fileInfo.Name, fileInfo.FullName, context, PartFileSystemTypeEnum.File);
+                context.Parts.Add(filePart);
             }
 
-            return null;
+            foreach (string dirPath in Directory.GetDirectories(context.FileSystemPath))
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(dirPath);
+                Part dirPart = new Part(dirInfo.Name, dirInfo.FullName, context, PartFileSystemTypeEnum.Folder);
+                context.Parts.Add(dirPart);
+                SetParts(dirPart);
+            }
         }
+
+        #region Methods invokeable from rules 
+        public Part Parent(Part context)
+        {
+            return context.Parent;
+        }
+
+        public Part TopParent(Part context)
+        {
+            if (context.Parent == null) return context;
+            return TopParent(context.Parent);
+        }
+
+        public Part Platform(Part context)
+        {
+            IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
+                                  where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith(".platform")
+                                  select p;
+
+            return q.Single();
+        }
+
+        //TODO: implement for folders
+        public string PartName(Part context)
+        {
+            string? val = null;
+
+            if (context.PartFileSystemType == PartFileSystemTypeEnum.File && context.FileSystemName.EndsWith(".json"))
+            {
+                var node = PartUtils.ToJsonNode(context);
+                val = PartUtils.TryGetJsonNodeStringValue(node, NAMEPOINTER);
+            }
+
+            return val ?? context.FileSystemName;
+        }
+
+        //TODO: implement for folders
+        public string PartDisplayName(Part context)
+        {
+            string? val = null;
+
+            if (context.PartFileSystemType == PartFileSystemTypeEnum.File && context.FileSystemName.EndsWith(".json"))
+            {
+                var node = PartUtils.ToJsonNode(context);
+                val = PartUtils.TryGetJsonNodeStringValue(node, DISPLAYNAMEPOINTER);
+            }
+
+            return val ?? context.FileSystemName;
+        }
+
+        public string PartFileSystemName(Part context)
+        {
+            return context.FileSystemName;
+        }
+
+        public string PartFileSystemPath(Part context)
+        {
+            return context.FileSystemPath;
+        }
+
+        public string PartFileExtension(Part context)
+        {
+            if (context.PartFileSystemType != PartFileSystemTypeEnum.File)
+            {
+                return null;
+            }
+            return Path.GetExtension(context.FileSystemName);
+        }
+
+        public string PartFileSystemType(Part context)
+        {
+            return context.PartFileSystemType.ToString();
+        }
+
+        public List<Part> Files(Part context)
+        {
+            IEnumerable<Part> q = from p in Part.Flatten(context.PartFileSystemType == PartFileSystemTypeEnum.File ? context.Parent : context)
+                                  where p.PartFileSystemType == PartFileSystemTypeEnum.File
+                                  select p;
+
+            return q.ToList();
+        }
+        #endregion
     }
 }

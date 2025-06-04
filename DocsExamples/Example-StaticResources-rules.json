@@ -4,6 +4,7 @@
       "id": "LIST_STATICRESOURCES",
       "name": "List staticresources.",
       "description": "",
+      "disabled": true,
       "part": "RegisteredResources",
       "test": [
         {
@@ -23,7 +24,7 @@
       "id": "LIST_STATICRESOURCES_V2",
       "name": "List staticresources v2.",
       "description": "list png files only",
-      "disabled": false,
+      "disabled": true,
       "part": "StaticResources",
       "test": [
         {
@@ -55,7 +56,7 @@
       "id": "LIST_STATICRESOURCES_FILESIZE",
       "name": "List staticresources file sizes.",
       "description": "list sizes of png files only",
-      "disabled": false,
+      "disabled": true,
       "part": "StaticResources",
       "test": [
         {
@@ -91,7 +92,7 @@
       "id": "LIST_STATICRESOURCES_V3",
       "name": "List staticresources v3.",
       "description": "list png files only",
-      "disabled": false,
+      "disabled": true,
       "part": "StaticResources",
       "test": [
         {
@@ -109,6 +110,29 @@
           ]
         },
         []
+      ]
+    },
+    {
+      "id": "LIST_STATICRESOURCES_V4",
+      "name": "List staticresources v4.",
+      "description": "list png files only",
+      "disabled": false,
+      "part": "StaticResources",
+      "test": [
+        {
+          "cat": [
+            {
+              "part": "PartFileSystemName"
+            },
+            {
+              "part": "PartFileExtension"
+            },
+            {
+              "part": "PartFileSystemType"
+            }
+          ]
+        },
+        ""
       ]
     }
   ]

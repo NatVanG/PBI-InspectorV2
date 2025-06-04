@@ -20,9 +20,11 @@ namespace PBIRInspectorLibrary;
 [JsonSerializable(typeof(CustomRules.SetIntersectionRule))]
 [JsonSerializable(typeof(CustomRules.SetUnionRule))]
 [JsonSerializable(typeof(CustomRules.StringContains))]
+[JsonSerializable(typeof(CustomRules.FileTextSearchCountRule))]
 [JsonSerializable(typeof(CustomRules.ToRecordRule))]
 [JsonSerializable(typeof(CustomRules.ToString))]
 [JsonSerializable(typeof(CustomRules.FileSizeRule))]
+[JsonSerializable(typeof(CustomRules.JsonataRule))]
 [JsonSerializable(typeof(JsonPatch))]
 [JsonSerializable(typeof(PatchResult))]
 internal partial class PBIRInspectorSerializerContext : JsonSerializerContext;

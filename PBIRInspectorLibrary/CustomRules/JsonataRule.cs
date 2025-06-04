@@ -1,26 +1,34 @@
-﻿using Json.Logic;
-using Json.More;
-using Json.Path;
-using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Json.Logic;
+using Json.More;
+using Json.Path;
+using Jsonata.Net.Native;
+using System.Collections;
+using System.Linq.Expressions;
 
 namespace PBIRInspectorLibrary.CustomRules
 {
     /// <summary>
     /// Handles the `path` operation.
     /// </summary>
-    [Operator("path")]
-    [JsonConverter(typeof(PathRuleJsonConverter))]
-    public class PathRule : Json.Logic.Rule
+    [Operator("jsonata")]
+    [JsonConverter(typeof(JsonataRuleJsonConverter))]
+    public class JsonataRule : Json.Logic.Rule
     {
         internal Json.Logic.Rule? Path { get; }
         internal Json.Logic.Rule? DefaultValue { get; }
 
-        internal PathRule()
+        internal JsonataRule()
         {
         }
-        internal PathRule(Json.Logic.Rule path)
+        internal JsonataRule(Json.Logic.Rule path)
         {
             Path = path;
         }
@@ -42,25 +50,16 @@ namespace PBIRInspectorLibrary.CustomRules
             var pathString = path.Stringify()!;
             if (pathString == string.Empty) return contextData ?? data;
 
-            var jpath = JsonPath.Parse(pathString);
-         
-            var result = jpath.Evaluate(contextData ?? data); 
+            var query = new JsonataQuery(pathString);
+            var result = JsonNode.Parse(query.Eval((contextData ?? data).AsJsonString()));
 
-            return ToJsonArray(result.Matches);
-
-            //return DefaultValue?.Apply(data, contextData) ?? null;
-        }
-
-        private JsonArray ToJsonArray(NodeList? nodes)
-        {
-            if (nodes == null || nodes.Count == 0) return new JsonArray();
-            return new JsonArray(nodes.Select(_ => _.Value?.DeepClone()).ToArray());
+            return result;
         }
     }
 
-    internal class PathRuleJsonConverter : WeaklyTypedJsonConverter<PathRule>
+    internal class JsonataRuleJsonConverter : WeaklyTypedJsonConverter<JsonataRule>
     {
-        public override PathRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override JsonataRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var parameters = reader.TokenType == JsonTokenType.StartArray
            ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
@@ -69,25 +68,13 @@ namespace PBIRInspectorLibrary.CustomRules
             if (parameters is not ({ Length: 1 }))
                 throw new JsonException("The path rule needs an array with 1 parameter.");
 
-            return new PathRule(parameters[0]);
+            return new JsonataRule(parameters[0]);
         }
 
-        public override void Write(Utf8JsonWriter writer, PathRule value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, JsonataRule value, JsonSerializerOptions options)
         {
             throw new NotImplementedException();
-            //writer.WriteStartObject();
-            //writer.WritePropertyName("path");
-            //if (value.DefaultValue != null)
-            //{
-            //    writer.WriteStartArray();
-            //    writer.WriteRule(value.Path, options);
-            //    writer.WriteRule(value.DefaultValue, options);
-            //    writer.WriteEndArray();
-            //}
-            //else
-            //    writer.WriteRule(value.Path, options);
 
-            //writer.WriteEndObject();
         }
     }
 }

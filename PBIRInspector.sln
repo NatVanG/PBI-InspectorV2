@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocsImages", "DocsImages", 
 		DocsImages\diff.svg = DocsImages\diff.svg
 		DocsImages\intersection.svg = DocsImages\intersection.svg
 		DocsImages\pbiinspector.png = DocsImages\pbiinspector.png
+		DocsImages\pbiinspectoricons.png = DocsImages\pbiinspectoricons.png
 		DocsImages\ReidSession.png = DocsImages\ReidSession.png
 		DocsImages\RunReportFromWinForm.png = DocsImages\RunReportFromWinForm.png
 		DocsImages\SampleReportOverReport.png = DocsImages\SampleReportOverReport.png
@@ -45,16 +46,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocsExamples", "DocsExample
 		DocsExamples\Example-pbir-rules.json = DocsExamples\Example-pbir-rules.json
 		DocsExamples\Example-ReportPageFieldMap.json = DocsExamples\Example-ReportPageFieldMap.json
 		DocsExamples\Example-StaticResources-rules.json = DocsExamples\Example-StaticResources-rules.json
+		DocsExamples\Example-tenantSettings-rules.json = DocsExamples\Example-tenantSettings-rules.json
 		DocsExamples\Example-theme-rules.json = DocsExamples\Example-theme-rules.json
+		DocsExamples\Example-VaryRuleByFabricItemName-rules.json = DocsExamples\Example-VaryRuleByFabricItemName-rules.json
 		DocsExamples\Examples-rules.json = DocsExamples\Examples-rules.json
 		DocsExamples\Reid-rules.json = DocsExamples\Reid-rules.json
-		RulesTemplate.json = RulesTemplate.json
+		DocsExamples\RulesTemplate.json = DocsExamples\RulesTemplate.json
+		DocsExamples\Sample-CopyJob-Rules.json = DocsExamples\Sample-CopyJob-Rules.json
+		DocsExamples\Sample-Lakehouse-Rules.json = DocsExamples\Sample-Lakehouse-Rules.json
+		DocsExamples\Sample-TenantSettings.json = DocsExamples\Sample-TenantSettings.json
+		DocsExamples\Sample-VariableLibrary-rules.json = DocsExamples\Sample-VariableLibrary-rules.json
 		DocsExamples\Themeable-properties-rules.json = DocsExamples\Themeable-properties-rules.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rules", "Rules", "{BB86A63C-BBD5-48DA-9481-343165781823}"
 	ProjectSection(SolutionItems) = preProject
 		Rules\Base-rules.json = Rules\Base-rules.json
+		Rules\Base-rules_deprecated.json = Rules\Base-rules_deprecated.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReportExample", "ReportExample", "{3A0CE8CE-A7CB-4288-B9EF-06056779A0D1}"

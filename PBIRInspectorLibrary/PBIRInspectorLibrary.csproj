@@ -5,13 +5,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <SignAssembly>False</SignAssembly>
-    <Version>2.1.0</Version>
+    <Version>2.3.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Jsonata.Net.Native" Version="2.10.0" />
     <PackageReference Include="JsonLogic" Version="5.4.0" />
     <PackageReference Include="JsonPatch.Net" Version="3.3.0" />
-    <PackageReference Include="JsonPath.Net" Version="2.1.0" />
+    <PackageReference Include="JsonPath.Net" Version="2.1.1" />
   </ItemGroup>
 
 </Project>

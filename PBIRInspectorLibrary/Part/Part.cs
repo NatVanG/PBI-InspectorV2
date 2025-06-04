@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace PBIRInspectorLibrary.Part
 {
-    internal class Part
+    public class Part
     {
         public Part Parent { get; private set; }
 
@@ -16,16 +16,16 @@ namespace PBIRInspectorLibrary.Part
         public string FileSystemPath { get; private set; }
 
         // The type of the part i.e. File or Folder
-        public PartTypeEnum PartType { get; private set; }
+        public PartFileSystemTypeEnum PartFileSystemType { get; private set; }
 
         public JsonNode? JsonContent { get; set; }
 
-        public Part(string fileSystemName, string fileSystemPath, Part parent = null, PartTypeEnum partType = default)
+        public Part(string fileSystemName, string fileSystemPath, Part parent = null, PartFileSystemTypeEnum partType = default)
         {
             Parent = parent;
             FileSystemName = fileSystemName;
             FileSystemPath = fileSystemPath;
-            PartType = partType;
+            PartFileSystemType = partType;
         }
 
         public List<Part> Parts { get; set; }

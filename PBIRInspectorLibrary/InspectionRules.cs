@@ -1,4 +1,6 @@
-﻿using System.Runtime;
+﻿using System.ComponentModel;
+using System.Runtime;
+using System.Text.Json.Serialization;
 
 namespace PBIRInspectorLibrary
 {
@@ -13,6 +15,8 @@ namespace PBIRInspectorLibrary
     public class Rule
     {
         public string Id { get; set; }
+
+        public string ItemType { get; set; } = "report_deprecated";
 
         public string Name { get; set; }
 
