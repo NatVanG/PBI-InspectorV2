@@ -182,6 +182,7 @@ namespace PBIRInspectorLibrary
             Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>(context);
+            Json.Logic.RuleRegistry.AddRule<CustomRules.PartInfoRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
             Json.Logic.RuleRegistry.AddRule<CustomRules.FileSizeRule>(context);

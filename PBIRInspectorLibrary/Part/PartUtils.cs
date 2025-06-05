@@ -22,7 +22,7 @@ namespace PBIRInspectorLibrary.Part
             }
             else if (value is Part)
             {
-                return ((Part)value).PartFileSystemType == PartFileSystemTypeEnum.File ? ToJsonNode((Part)value) : null;
+                return ToJsonNode((Part)value);
             }
             else
             {
@@ -56,13 +56,13 @@ namespace PBIRInspectorLibrary.Part
                 if (Directory.Exists(context.FileSystemPath))
                 {
                     //if the path is a directory, we cannot parse it as JSON, so we return an annotation with the file system path
-                    node = FileSystemPathAnnotations(context.FileSystemPath, context.FileSystemName);
+                    node = Annotations(context);
                 }
             }
             catch (System.Text.Json.JsonException)
             {
                 //this is not a json file or not a valid json file so add annotation with the file system path; this is so JsonLogic rules can still be applied
-                node = FileSystemPathAnnotations(context.FileSystemPath, context.FileSystemName);
+                node = Annotations(context);
             }
             finally
             {
@@ -73,8 +73,12 @@ namespace PBIRInspectorLibrary.Part
             return node;
         }
 
-        private static JsonNode FileSystemPathAnnotations(string fileSystemPath, string fileSystemName)
+        private static JsonNode Annotations(Part part)
         {
+            const string deprecated_AnnotationPrefix = "pbiri_";
+            const string annotationPrefix = "part_";
+            PartInfo partInfo = new PartInfo(part);
+
             var node = new JsonObject();
 
             if (node is JsonObject jsonObject)
@@ -82,9 +86,15 @@ namespace PBIRInspectorLibrary.Part
                 var annotations = new JsonArray
                         {
                             //TODO: Legacy, deprecate.
-                            new JsonObject { ["name"] = "pbiri_filesystempath", ["value"] =  fileSystemPath },
-                            new JsonObject { ["name"] = "pbiri_filesystemname", ["value"] =  fileSystemName }
+                            new JsonObject { ["name"] = deprecated_AnnotationPrefix + "filesystempath", ["value"] =  partInfo.FileSystemPath },
+                            new JsonObject { ["name"] = deprecated_AnnotationPrefix + "filesystemname", ["value"] =  partInfo.FileSystemName },
+                            new JsonObject { ["name"] = annotationPrefix + "filesystempath", ["value"] =  partInfo.FileSystemPath },
+                            new JsonObject { ["name"] = annotationPrefix + "filesystemname", ["value"] =  partInfo.FileSystemName },
+                            new JsonObject { ["name"] = annotationPrefix + "partfilesystemtype", ["value"] =  partInfo.PartFileSystemType.ToString() },
+                            new JsonObject { ["name"] = annotationPrefix + "filesize", ["value"] =  partInfo.FileSize.ToString() },
+                            new JsonObject { ["name"] = annotationPrefix + "filecount", ["value"] =  partInfo.FileCount.ToString() }
                 };
+
                 jsonObject["annotations"] = annotations;
             }
 
@@ -105,5 +115,52 @@ namespace PBIRInspectorLibrary.Part
 
             return null;
         }
+
+        #region partInfo
+        public static JsonNode PartInfoToJsonNode(object? value)
+        {
+            if (value == null) return null;
+
+            if (value is List<Part>)
+            {
+                return PartInfoToJsonNode(value as List<Part>);
+            }
+            else if (value is Part)
+            {
+                return PartInfoToJsonNode(value as Part);
+            }
+
+            return null;
+        }
+
+        private static JsonNode PartInfoToJsonNode(List<Part> parts)
+        {
+            if (parts == null || parts.Count == 0) return new JsonArray();
+            return new JsonArray(parts.Select(PartInfoToJsonNode).ToArray());
+        }
+
+        private static JsonNode PartInfoToJsonNode(Part part)
+        {
+            if (part == null) return null;
+
+            var partInfo = new PartInfo(part);
+            return PartInfoToJsonNode(partInfo);
+
+        }
+
+        private static JsonNode PartInfoToJsonNode(PartInfo partInfo)
+        {
+            if (partInfo == null) return null;
+            var jsonObject = new JsonObject
+            {
+                ["fileSystemName"] = partInfo.FileSystemName,
+                ["fileSystemPath"] = partInfo.FileSystemPath,
+                ["partFileSystemType"] = partInfo.PartFileSystemType.ToString(),
+                ["fileSize"] = partInfo.FileSize,
+                ["fileCount"] = partInfo.FileCount
+            };
+            return jsonObject;
+        }
+        #endregion
     }
 }

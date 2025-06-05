@@ -21,6 +21,8 @@ namespace PBIRInspectorLibrary.Part
         public object? Invoke(string query, Part context)
         {
             object? result = null;
+            if (string.IsNullOrEmpty(query)) return context;
+
             var type = this.GetType();
             System.Reflection.MethodInfo? mi = type.GetMethod(query);
             if (mi != null)
