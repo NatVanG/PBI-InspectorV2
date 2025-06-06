@@ -313,31 +313,39 @@ namespace PBIRInspectorLibrary
                             var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null;
                             var parentPageDisplayName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartDisplayName(part) ?? partQuery.PartName(part) : "N/A";
 
-                            var jruleresult = jrule.Apply(newdata);
-                            result = rule.Test.Expected.IsEquivalentTo(jruleresult);
-
-                            string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
-                            testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, ItemPath = itemPath, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
-
-                            //PATCH
-                            if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
+                            try
                             {
-                                if (jruleresult != null && jruleresult is JsonArray arr && arr.Count() > 0)
-                                {
-                                    var allPatchParts = (List<Part.Part>)partQuery.Invoke(rule.Patch.PartName, part);
+                                var jruleresult = jrule.Apply(newdata);
+                                result = rule.Test.Expected.IsEquivalentTo(jruleresult);
 
-                                    //TODO: use another method to filter parts i.e. other than ToJSonString
-                                    var filteredPatchParts = allPatchParts.Where(_ => arr.ToJsonString().Contains(partQuery.PartName(_)));
-                                    foreach (var filteredPart in filteredPatchParts)
+                                string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}.", rule != null ? rule.Name : string.Empty, result ? "PASSED" : "FAILED", jruleresult != null ? jruleresult.ToString() : string.Empty, rule.Test.Expected != null ? rule.Test.Expected.ToString() : string.Empty);
+                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, ItemPath = itemPath, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = rule.Test.Expected, Actual = jruleresult });
+
+                                //PATCH
+                                if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
+                                {
+                                    if (jruleresult != null && jruleresult is JsonArray arr && arr.Count() > 0)
                                     {
-                                        ApplyPatch(partQuery, rule, filteredPart);
+                                        var allPatchParts = (List<Part.Part>)partQuery.Invoke(rule.Patch.PartName, part);
+
+                                        //TODO: use another method to filter parts i.e. other than ToJSonString
+                                        var filteredPatchParts = allPatchParts.Where(_ => arr.ToJsonString().Contains(partQuery.PartName(_)));
+                                        foreach (var filteredPart in filteredPatchParts)
+                                        {
+                                            ApplyPatch(partQuery, rule, filteredPart);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
+                                        ApplyPatch(partQuery, rule, patchPart);
                                     }
                                 }
-                                else
-                                {
-                                    var patchPart = (Part.Part)partQuery.Invoke(rule.Patch.PartName, part);
-                                    ApplyPatch(partQuery, rule, patchPart);
-                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                OnMessageIssued(MessageTypeEnum.Error, (string.Format("Rule \"{0}\" - Part \"{1}\" execution failed. Inner exception: {2}", rule.Name, part.FileSystemName, ex.Message)));
+                                continue;
                             }
                         }
                     }

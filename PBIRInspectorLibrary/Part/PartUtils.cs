@@ -7,11 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace PBIRInspectorLibrary.Part
 {
     public class PartUtils
     {
+        const string PROP_FILESYSTEMNAME = "filesystemname";
+        const string PROP_FILESYSTEMPATH = "filesystempath";
+        const string PROP_FILESYSTEMTYPE = "partfilesystemtype";
+        const string PROP_FILESIZE = "filesize";
+        const string PROP_FILECOUNT = "filecount";
+
         public static JsonNode ToJsonNode(object? value)
         {
             if (value == null) return null;
@@ -86,19 +93,86 @@ namespace PBIRInspectorLibrary.Part
                 var annotations = new JsonArray
                         {
                             //TODO: Legacy, deprecate.
-                            new JsonObject { ["name"] = deprecated_AnnotationPrefix + "filesystempath", ["value"] =  partInfo.FileSystemPath },
-                            new JsonObject { ["name"] = deprecated_AnnotationPrefix + "filesystemname", ["value"] =  partInfo.FileSystemName },
-                            new JsonObject { ["name"] = annotationPrefix + "filesystempath", ["value"] =  partInfo.FileSystemPath },
-                            new JsonObject { ["name"] = annotationPrefix + "filesystemname", ["value"] =  partInfo.FileSystemName },
-                            new JsonObject { ["name"] = annotationPrefix + "partfilesystemtype", ["value"] =  partInfo.PartFileSystemType.ToString() },
-                            new JsonObject { ["name"] = annotationPrefix + "filesize", ["value"] =  partInfo.FileSize.ToString() },
-                            new JsonObject { ["name"] = annotationPrefix + "filecount", ["value"] =  partInfo.FileCount.ToString() }
+                            new JsonObject { ["name"] = deprecated_AnnotationPrefix + PROP_FILESYSTEMPATH, ["value"] =  partInfo.FileSystemPath },
+                            new JsonObject { ["name"] = deprecated_AnnotationPrefix + PROP_FILESYSTEMNAME, ["value"] =  partInfo.FileSystemName },
+                            new JsonObject { ["name"] = annotationPrefix + PROP_FILESYSTEMPATH, ["value"] =  partInfo.FileSystemPath },
+                            new JsonObject { ["name"] = annotationPrefix + PROP_FILESYSTEMNAME, ["value"] =  partInfo.FileSystemName },
+                            new JsonObject { ["name"] = annotationPrefix + PROP_FILESYSTEMTYPE, ["value"] =  partInfo.PartFileSystemType.ToString() },
+                            new JsonObject { ["name"] = annotationPrefix + PROP_FILESIZE, ["value"] =  partInfo.FileSize.ToString() },
+                            new JsonObject { ["name"] = annotationPrefix + PROP_FILECOUNT, ["value"] =  partInfo.FileCount.ToString() }
                 };
 
                 jsonObject["annotations"] = annotations;
             }
 
             return node;
+        }
+
+        public static PartInfo? TryGetPartInfo(JsonNode node, bool setAdvancedProperties = false)
+        {
+            var fileSystemPath = TryGetFileSystemPath(node);
+            if (fileSystemPath != null)
+            {
+                return new PartInfo(fileSystemPath, setAdvancedProperties);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static string? TryGetFileSystemPath(JsonNode node)
+        {            
+            if (node is JsonValue filePathValue && filePathValue.TryGetValue(out string? stringFilePath) && File.Exists(stringFilePath))
+            {
+                return stringFilePath;
+            }
+            else
+            {
+                return TryGetFilePropertyValue(node, PROP_FILESYSTEMPATH);
+            }       
+        }
+
+        private static string? TryGetFilePropertyValue(JsonNode node, string propertyName)
+        {
+            //TODO: allow getting file properties via annotations?
+            //return TryGetAnnotationValue(node, propertyName) ?? TryGetPartInfoPropertyValue(node, propertyName);
+            return TryGetPartInfoPropertyValue(node, propertyName);
+        }
+
+        private static string? TryGetAnnotationValue(JsonNode node, string annotationKey)
+        {
+            const string annotationPrefix = "part_";
+
+            annotationKey = annotationKey.ToLowerInvariant();
+
+            if (!annotationKey.StartsWith(annotationPrefix))
+            {
+                annotationKey = annotationPrefix + annotationKey;
+            }
+
+            var jsonPathString = string.Format("$.annotations[?@.name == '{0}'].value", annotationKey);
+
+            JsonPath pa = JsonPath.Parse(jsonPathString);
+
+            var result = pa.Evaluate(node);
+            if (result.Matches != null && result.Matches.Count > 0)
+            {
+                //TODO: return array?
+                var resultNode = result.Matches.SingleOrDefault()!.Value;
+                return resultNode!.ToString();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static string? TryGetPartInfoPropertyValue(JsonNode node, string propertyName)
+        {
+            propertyName = propertyName.ToLowerInvariant();
+            var jsonPointerStr = !propertyName.StartsWith("/") ? "/" + propertyName : propertyName;
+            return TryGetJsonNodeStringValue(node, jsonPointerStr);
         }
 
         public static string? TryGetJsonNodeStringValue(JsonNode node, string query)
@@ -153,11 +227,11 @@ namespace PBIRInspectorLibrary.Part
             if (partInfo == null) return null;
             var jsonObject = new JsonObject
             {
-                ["fileSystemName"] = partInfo.FileSystemName,
-                ["fileSystemPath"] = partInfo.FileSystemPath,
-                ["partFileSystemType"] = partInfo.PartFileSystemType.ToString(),
-                ["fileSize"] = partInfo.FileSize,
-                ["fileCount"] = partInfo.FileCount
+                [PROP_FILESYSTEMNAME] = partInfo.FileSystemName,
+                [PROP_FILESYSTEMPATH] = partInfo.FileSystemPath,
+                [PROP_FILESYSTEMTYPE] = partInfo.PartFileSystemType.ToString(),
+                [PROP_FILESIZE] = partInfo.FileSize,
+                [PROP_FILECOUNT] = partInfo.FileCount
             };
             return jsonObject;
         }
