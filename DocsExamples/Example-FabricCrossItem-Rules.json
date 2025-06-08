@@ -1,0 +1,36 @@
+{
+    "rules": [
+        {
+            "id": "VARLIBRARY_MISSINGREFERENCES",
+            "name": "Check that all Pipeline variable library references exist in a Variable Library.",
+            "itemtype": "*",
+            "test": [
+                {
+                    "diff": [
+                        {
+                            "query": [
+                                {
+                                    "part": "pipeline-content.json"
+                                },
+                                {
+                                    "path": "$.*.properties.libraryVariables.*.variableName"
+                                }
+                            ]
+                        },
+                        {
+                            "query": [
+                                {
+                                    "part": "variables.json"
+                                },
+                                {
+                                    "path": "$.*.variables[*].name"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                []
+            ]
+        }
+    ]
+}
