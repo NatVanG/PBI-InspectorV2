@@ -1,6 +1,5 @@
 ﻿using Json.Path;
 using Json.Pointer;
-using Jsonata.Net.Native.Dom;
 using System;
 using System.Collections.Generic;
 using System.Linq;

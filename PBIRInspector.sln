@@ -42,6 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocsExamples", "DocsExample
 	ProjectSection(SolutionItems) = preProject
 		DocsExamples\ContinuousIntegration-CustomRules-PBIR.yml = DocsExamples\ContinuousIntegration-CustomRules-PBIR.yml
 		DocsExamples\ContinuousIntegration-Rules-PBIR.yml = DocsExamples\ContinuousIntegration-Rules-PBIR.yml
+		DocsExamples\Example-FabricCrossItem-Rules.json = DocsExamples\Example-FabricCrossItem-Rules.json
 		DocsExamples\Example-patches.json = DocsExamples\Example-patches.json
 		DocsExamples\Example-pbir-rules.json = DocsExamples\Example-pbir-rules.json
 		DocsExamples\Example-ReportPageFieldMap.json = DocsExamples\Example-ReportPageFieldMap.json
