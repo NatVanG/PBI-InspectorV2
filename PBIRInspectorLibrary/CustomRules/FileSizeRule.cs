@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.IO;
 using PBIRInspectorLibrary.Exceptions;
+using PBIRInspectorLibrary.Part;
 
 namespace PBIRInspectorLibrary.CustomRules
 {
@@ -33,20 +34,18 @@ namespace PBIRInspectorLibrary.CustomRules
         /// <returns>The result of the rule.</returns>
         public override JsonNode? Apply(JsonNode? data, JsonNode? contextData = null)
         {
-            var inputString = InputString.Apply(data, contextData);
-            var filePath = inputString.Stringify();
+            var node = InputString.Apply(data, contextData);
+
+            if (node is JsonArray) throw new JsonException("The FileSizeRule filePath parameter cannot be an array.");
+
+            //var filePath = node.Stringify();
             int? fileSize = null;
 
-            if (File.Exists(filePath))
-            {
-                fileSize = (int)new FileInfo(filePath).Length;
-            }
-            else
-            {
-                throw new JsonLogicException(string.Format("FileSizeRule - file not found at \"{0}\"." , filePath));
-            }
+            var partInfo = PartUtils.TryGetPartInfo(node, setAdvancedProperties: true);
 
-            return fileSize;
+            if (partInfo == null || !partInfo.Exists || partInfo.PartFileSystemType != PartFileSystemTypeEnum.File) { throw new JsonLogicException($"FileSizeRule - file not found. Try using in conjunction with partinfo rule, instead of the part rule."); }
+
+            return partInfo.FileSize;
         }
     }
 

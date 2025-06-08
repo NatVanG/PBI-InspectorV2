@@ -136,13 +136,13 @@ namespace PBIRInspectorLibrary.Part
             return q.ToList();
         }
 
-        public Part BookmarksHeader(Part context)
+        public Part? BookmarksHeader(Part context)
         {
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
                                             where p.PartFileSystemType == PartFileSystemTypeEnum.File && p.FileSystemName.EndsWith("bookmarks.json")
                                             select p;
 
-            return q.Single();
+            return q.SingleOrDefault();
         }
 
 

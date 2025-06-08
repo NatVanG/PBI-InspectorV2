@@ -10,6 +10,7 @@ namespace PBIRInspectorLibrary;
 [JsonSerializable(typeof(CustomRules.DrillVariableRule))]
 [JsonSerializable(typeof(CustomRules.IsNullOrEmptyRule))]
 [JsonSerializable(typeof(CustomRules.PartRule))]
+[JsonSerializable(typeof(CustomRules.PartInfoRule))]
 [JsonSerializable(typeof(CustomRules.PathRule))]
 [JsonSerializable(typeof(CustomRules.QueryRule))]
 [JsonSerializable(typeof(CustomRules.RectOverlapRule))]

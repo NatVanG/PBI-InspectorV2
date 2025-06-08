@@ -10,6 +10,6 @@ namespace PBIRInspectorLibrary.Part
     {
         Folder,
         File,
-        Node = default
+        None = default
     }
 }

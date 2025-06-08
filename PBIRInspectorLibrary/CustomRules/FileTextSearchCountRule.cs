@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using System.IO;
 using PBIRInspectorLibrary.Exceptions;
 using System.Text.RegularExpressions;
+using PBIRInspectorLibrary.Part;
 
 namespace PBIRInspectorLibrary.CustomRules
 {
@@ -36,21 +37,20 @@ namespace PBIRInspectorLibrary.CustomRules
         /// <returns>The result of the rule.</returns>
         public override JsonNode? Apply(JsonNode? data, JsonNode? contextData = null)
         { 
-            var filePath = FilePath.Apply(data, contextData);
+            var filePathNode = FilePath.Apply(data, contextData);
+
+            if (filePathNode is JsonArray) throw new JsonException("The FileTestSearchCountRule filePath parameter cannot be an array.");
+
             var patternString = PatternString.Apply(data, contextData);
 
-            if (filePath == null) return 0;
+            var partInfo = PartUtils.TryGetPartInfo(filePathNode);
 
-            if (filePath is not JsonValue filePathValue || !filePathValue.TryGetValue(out string? stringFilePath))
-                throw new JsonLogicException($"filetextsearch rule: filePath parameter value is not a string.");
+            if (partInfo == null || !partInfo.Exists || partInfo.PartFileSystemType != PartFileSystemTypeEnum.File) { throw new JsonLogicException($"FileTextSearchCountRule - file not found"); }
+
 
             if (patternString is not JsonValue regexStringValue || !regexStringValue.TryGetValue(out string? stringPatternString))
                 throw new JsonLogicException($"filetextsearch rule: patternString parameter value is not a string.");
 
-            if (!File.Exists(stringFilePath))
-            {
-                throw new JsonLogicException($"FileTextSearchCountRule - file not found at \"{stringFilePath}\".");
-            }
 
             if (string.IsNullOrEmpty(stringPatternString))
             {
@@ -58,10 +58,10 @@ namespace PBIRInspectorLibrary.CustomRules
             }
 
             // Read the file content and count matches of the regex pattern
-            string fileContent = File.ReadAllText(stringFilePath);
+            string fileContent = File.ReadAllText(partInfo.FileSystemPath);
             if (string.IsNullOrEmpty(fileContent))
             {
-                throw new JsonLogicException($"FileTextSearchCountRule - file at \"{stringFilePath}\" is empty.");
+                throw new JsonLogicException($"FileTextSearchCountRule - file at \"{partInfo.FileSystemPath}\" is empty.");
             }
 
             // Use Regex to count occurrences of the pattern in the file content
