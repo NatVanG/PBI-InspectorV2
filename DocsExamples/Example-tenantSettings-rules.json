@@ -3,7 +3,7 @@
     {
       "id": "TEST_TENANTSETTINGS",
       "name": "Test tenant settings.",
-      "type":  "json",
+      "itemtype":  "json",
       "test": [
         {
           "var": "tenantSettings.0.settingName"

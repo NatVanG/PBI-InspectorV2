@@ -118,6 +118,7 @@ namespace PBIRInspectorLibrary
                 }
                 else
                 {
+                    //LEGACY: support for report definition folder paths.
                     OnMessageIssued(MessageTypeEnum.Information, string.Format("No platform files found in directory \"{0}\". Running legacy behaviour to support file system path ending in '\\definition' and assuming fabric item type is report.", fileSystemPath));
                     RunRulesByItemType(testResults, rules, "report_deprecated", fileSystemPath);
                 }
@@ -280,9 +281,11 @@ namespace PBIRInspectorLibrary
                             parts.Add((Part.Part)part);
                         }
                         else
-                        {
-                            OnMessageIssued(MessageTypeEnum.Error, (string.Format("Rule \"{0}\" - Part \"{1}\" not found, resuming to next rule.", rule.Name, rule.Part)));
-                            continue;
+                        { 
+                            var msgType = rule.PathErrorWhenNoMatch ? MessageTypeEnum.Error : MessageTypeEnum.Warning;
+                            OnMessageIssued(msgType, (string.Format("Rule \"{0}\" - Part \"{1}\" not found.", rule.Name, rule.Part)));
+                            //OnMessageIssued(MessageTypeEnum.Error, (string.Format("Rule \"{0}\" - Part \"{1}\" not found, resuming to next rule.", rule.Name, rule.Part)));
+                            //continue;
                         }
                     }
                     else
