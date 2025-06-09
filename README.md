@@ -1,4 +1,4 @@
-# PBI Inspector V2 (i.e. rule-based metadata testing for the Microsoft Power BI visual layer and other Fabric Items)
+# PBI Inspector V2 (i.e. rules-based CI/CD metadata testing for the Microsoft Power BI visual layer and other Fabric Items)
 
 <img src="DocsImages/pbiinspectoricons.png" alt="PBI Inspector logo" height="250"/>
 
@@ -23,7 +23,7 @@ Please report issues [here](https://github.com/NatVanG/PBI-InspectorV2/issues).
 
 ## Release notes :scroll:
 
-**PBI Inspector v2.3**: PBI Inspectory V2 has become more generic in its capabilites so that it now supports the testing of any Fabric items' CI/CD metadata, not just Power BI reports! Use either the Windows Forms desktop application or the CLI which now supports the "-fabricitem" command line option and point to a CI/CD folder containing one or more Fabric item definitions. The CLI will then run your rules against each item in the folder. The "-pbip" command line option is still available for testing PBIP files. The GUI has been updated to support both Fabric items and PBIP files too. Here's an example rules file that tests a CopyJob Fabric item's metadata: [CopyJob Rules](DocsExamples/Sample-CopyJob-Rules.json). Here's another example that tests metadata across Fabric item types: [Cross-Fabric Items Rule](DocsExamples/Example-FabricCrossItem-Rules.json).  
+**PBI Inspector v2.3**: PBI Inspectory V2 is evolving to support testing any Fabric items' CI/CD metadata, not just Power BI reports! Use either the Windows Forms desktop application or the CLI which now includes the "-fabricitem" command line option and point to a CI/CD folder containing one or more Fabric item definitions. Here's an example rules file that tests a CopyJob Fabric item's metadata: [CopyJob Rules](DocsExamples/Sample-CopyJob-Rules.json). Here's another example that tests metadata across Fabric item types: [Cross-Fabric Items Rule](DocsExamples/Example-FabricCrossItem-Rules.json).  
 
 ## <a name="contents"></a>Contents
 
@@ -47,7 +47,7 @@ So we've DevOps, MLOps and DataOps... but why not VisOps? How can we ensure that
 
 With Microsoft Power BI, visuals are placed on a canvas and formatted as desired, images may be included and theme files referenced. Testing the consistency of the visuals output has thus far typically been a manual process. The [Power BI Project file format (.pbip) was introduced](https://powerbi.microsoft.com/en-us/blog/deep-dive-into-power-bi-desktop-developer-mode-preview/) then more recently [enhanced](https://learn.microsoft.com/en-gb/power-bi/developer/projects/projects-report) to enable pro developer application lifecycle management and source control also known as CI/CD. PBI Inspector V2 contributes to CI/CD for Power BI reports by providing the ability to define fully configurable testing rules written in json. PBI Inspector V2 is powered by Greg Dennis's Json Logic .NET implementation, see https://json-everything.net/json-logic. 
 
-**Update for PBI Inspector v2.3**: PBI Inspectory V2 has become more generic in its capabilites so that it now supports the testing of any Fabric items' JSON metadata, not just Power BI reports! The CLI now supports the "-fabricitem" command line option to specify a folder containing one or more Fabric item definitions. The CLI will then run the rules against each item in the folder. The "-pbip" command line option is still available for testing PBIP files. The GUI has been updated to support both Fabric items and PBIP files too. Here's an example rules file that tests a CopyJob Fabric item's metadata: [CopyJob Rules](DocsExamples/Sample-CopyJob-Rules.json)  
+**PBI Inspector v2.3**: PBI Inspectory V2 is evolving to support testing any Fabric items' CI/CD metadata, not just Power BI reports! Use either the Windows Forms desktop application or the CLI which now includes the "-fabricitem" command line option and point to a CI/CD folder containing one or more Fabric item definitions. Here's an example rules file that tests a CopyJob Fabric item's metadata: [CopyJob Rules](DocsExamples/Sample-CopyJob-Rules.json). Here's another example that tests metadata across Fabric item types: [Cross-Fabric Items Rule](DocsExamples/Example-FabricCrossItem-Rules.json).
 
 ## <a id="releases"></a>Releases
 
@@ -79,8 +79,8 @@ Running ```PBIRInspectorWinForm.exe``` presents the user with the following inte
 
 ![WinForm 1](DocsImages/WinForm1.png)
 
-1. Browse to your local PBI Desktop File, either the *.pbip file or its parent folder. :pencil: Support for .PBIX file using the enhanced report metadata will be added in a subsequent release.
-2. Either use the base rules file included in the application or select your own.
+1. Browse to your local Fabric CI/CD folder or a PBI Desktop File (either the *.pbip file or its parent folder).
+2. Either use the base (Power BI) rules file included in the application or select your own.
 3. Use the "Browse" button to select an output directory to which the results will be written. Alternatively, select the "Use temp files" check box to write the resuls to a temporary folder that will be deleted upon exiting the application.
 4. Select output formats, either JSON or HTML or both. To simply view the test results in a formatted page select the HTML output.
 5. Select "Verbose" to output both test passes and fails, if left unselected then only failed test results will be reported.  
