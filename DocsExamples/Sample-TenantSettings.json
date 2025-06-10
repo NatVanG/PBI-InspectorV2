@@ -108,6 +108,13 @@
       "tenantSettingGroup": "Copilot and Azure OpenAI Service"
     },
     {
+      "settingName": "ImmersiveTenantAdminSwitch",
+      "title": "Users can access a standalone, cross-item Power BI Copilot experience (preview)",
+      "enabled": false,
+      "canSpecifySecurityGroups": true,
+      "tenantSettingGroup": "Copilot and Azure OpenAI Service"
+    },
+    {
       "delegateToCapacity": false,
       "settingName": "AllowSendAOAIDataToOtherRegions",
       "title": "Data sent to Azure OpenAI can be processed outside your capacity's geographic region, compliance boundary, or national cloud instance",
@@ -209,7 +216,7 @@
     {
       "settingName": "AdminDataExploreViewPermission",
       "title": "Users with view permission can launch Explore",
-      "enabled": false,
+      "enabled": true,
       "canSpecifySecurityGroups": false,
       "tenantSettingGroup": "Explore settings (preview)"
     },
@@ -242,8 +249,21 @@
       "tenantSettingGroup": "Developer settings"
     },
     {
-      "settingName": "ServicePrincipalAccess",
-      "title": "Service principals can use Fabric APIs",
+      "settingName": "ServicePrincipalAccessGlobalAPIs",
+      "title": "Service principals can create workspaces, connections, and deployment pipelines",
+      "enabled": true,
+      "canSpecifySecurityGroups": true,
+      "enabledSecurityGroups": [
+        {
+          "graphId": "2e370dca-7e75-43d7-9496-9269dceb65f7",
+          "name": "Power BI Apps"
+        }
+      ],
+      "tenantSettingGroup": "Developer settings"
+    },
+    {
+      "settingName": "ServicePrincipalAccessPermissionAPIs",
+      "title": "Service principals can call Fabric public APIs",
       "enabled": true,
       "canSpecifySecurityGroups": true,
       "enabledSecurityGroups": [
@@ -1207,6 +1227,13 @@
       "tenantSettingGroup": "Copilot and Azure OpenAI Service"
     },
     {
+      "settingName": "ImmersiveTenantAdminSwitch",
+      "title": "Users can access a standalone, cross-item Power BI Copilot experience (preview)",
+      "enabled": false,
+      "canSpecifySecurityGroups": true,
+      "tenantSettingGroup": "Copilot and Azure OpenAI Service"
+    },
+    {
       "delegateToCapacity": false,
       "settingName": "AllowSendAOAIDataToOtherRegions",
       "title": "Data sent to Azure OpenAI can be processed outside your capacity's geographic region, compliance boundary, or national cloud instance",
@@ -1308,7 +1335,7 @@
     {
       "settingName": "AdminDataExploreViewPermission",
       "title": "Users with view permission can launch Explore",
-      "enabled": false,
+      "enabled": true,
       "canSpecifySecurityGroups": false,
       "tenantSettingGroup": "Explore settings (preview)"
     },
@@ -1341,8 +1368,21 @@
       "tenantSettingGroup": "Developer settings"
     },
     {
-      "settingName": "ServicePrincipalAccess",
-      "title": "Service principals can use Fabric APIs",
+      "settingName": "ServicePrincipalAccessGlobalAPIs",
+      "title": "Service principals can create workspaces, connections, and deployment pipelines",
+      "enabled": true,
+      "canSpecifySecurityGroups": true,
+      "enabledSecurityGroups": [
+        {
+          "graphId": "2e370dca-7e75-43d7-9496-9269dceb65f7",
+          "name": "Power BI Apps"
+        }
+      ],
+      "tenantSettingGroup": "Developer settings"
+    },
+    {
+      "settingName": "ServicePrincipalAccessPermissionAPIs",
+      "title": "Service principals can call Fabric public APIs",
       "enabled": true,
       "canSpecifySecurityGroups": true,
       "enabledSecurityGroups": [

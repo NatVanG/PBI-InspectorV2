@@ -13,6 +13,8 @@ namespace PBIRInspectorLibrary.Part
         {
             switch (type.ToLowerInvariant())
             {
+                case "*":
+                    return new CrossItemPartQuery(path);
                 case "report":
                     return new PBIRPartQuery(path);
                 case "report_deprecated":
