@@ -55,7 +55,7 @@ See releases for the Windows application and Command Line interface (CLI) at: ht
 
 ## <a id="baserulesoverview"></a>Base rules
 
-While PBI Inspector V2 supports custom rules, it also includes the following base rules defined at https://github.com/NatVanG/PBI-InspectorV2/blob/main/Rules/Base-rules.json, some rules allow for user parameters:
+While PBI Inspector V2 supports custom rules, it also includes the following base rules defined at https://github.com/NatVanG/PBI-InspectorV2/blob/main/Rules/Base-rules.json. Currently the base rules only test the visual layer of Power BI reports as opposed to other Fabric CI/CD items. Some base rules allow for user parameters as shown below:
 
 1. Remove custom visuals which are not used in the report (no user parameters)
 2. Reduce the number of visible visuals on the page (set parameter ```paramMaxVisualsPerPage``` to the maximum number of allowed visible visuals on the page)
@@ -79,7 +79,7 @@ Running ```PBIRInspectorWinForm.exe``` presents the user with the following inte
 
 ![WinForm 1](DocsImages/WinForm1.png)
 
-1. Browse to your local Fabric CI/CD folder or a PBI Desktop File (either the *.pbip file or its parent folder).
+1. Browse to a local Fabric CI/CD folder containing one or more Fabric CI/CD item definitions or paste the folder path.
 2. Either use the base (Power BI) rules file included in the application or select your own.
 3. Use the "Browse" button to select an output directory to which the results will be written. Alternatively, select the "Use temp files" check box to write the resuls to a temporary folder that will be deleted upon exiting the application.
 4. Select output formats, either JSON or HTML or both. To simply view the test results in a formatted page select the HTML output.
@@ -133,7 +133,7 @@ All command line parameters are as follows:
 
 ## <a id="results"></a>Interpreting results
 
- If a verbose output was requested, then results for both test passes and failures will be reported. The JSON output is intended to be consumed by a subsequent process, for example a Power BI report may be created that uses the JSON file as a data source and visualises the PBI Inspector V2 test results. The HTML page is a more readable format for humans which also includes report page wireframe images when tests are at the report page level. These images are intended to help the user identify visuals that have failed the test such as in the example image below. The PBI Inspector V2 logo is also displayed at the centre of each failing visuals as an additional identification aid when the wireframe is busy. 
+ If a verbose output was requested, then results for both test passes and failures will be reported. The JSON output is intended to be consumed by a subsequent process, for example a Power BI report may be created that uses the JSON file as a data source to visualise the PBI Inspector V2 test results. The HTML page is a more readable format for humans and also includes report page wireframe images when tests are at the report page level. These images are intended to help the user identify visuals that have failed the test such as in the example image below. The PBI Inspector V2 logo is also displayed at the centre of each failing visuals as an additional identification aid when the wireframe is busy. 
 
 ![Wireframe with failures](DocsImages/WireframeWithFailures.png)
 
@@ -147,15 +147,13 @@ The PBI Inspector V2 CLI can be run as part of an Azure DevOps pipeline job. By 
 
 Similarly, the PBI Inspector V2 CLI can be run as part of a GitHub Actions workflow by using the "-formats GitHub" command line option. 
 
-**Tutorials**
+### Tutorials
 
-For a tutorial on how to run PBI Inspector V2 as part of an Azure DevOps pipeline job (alongside Tabular Editor's BPA rules), see https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-build-pipelines. 
+For a tutorial on how to run PBI Inspector V2 as part of an **Azure DevOps** pipeline job (alongside Tabular Editor's BPA rules), see https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-build-pipelines.  ( :exclamation: Please note that to work with PBI Inspector V2 in Azure DevOps the YAML file referenced in the tutorial needs to be updated as follows: [ContinuousIntegration-Rules-PBIR.yml](DocsExamples/ContinuousIntegration-Rules-PBIR.yml)).
 
-:exclamation: Please note that to work with PBI Inspector V2 the YAML file referenced in the tutorial needs to be updated as follows [ContinuousIntegration-Rules-PBIR.yml](DocsExamples/ContinuousIntegration-Rules-PBIR.yml).
+For a tutorial on how to run PBI Inspector V2 as part of a **GitHub Actions** workflow using the **Fabric CLI** see https://github.com/RuiRomano/fabric-cli-powerbi-cicd-sample.
 
-For a tutorial on how to run PBI Inspector V2 as part of a GitHub Actions workflow using the Fabric CLI and GitHub see https://github.com/RuiRomano/fabric-cli-powerbi-cicd-sample.
-
-For a tutorial on how to run the PBI Inspector V2 CLI as part of a GitHub Actions workflow using the [fabric-cicd](https://microsoft.github.io/fabric-cicd/latest/) Python library, see https://github.com/RuiRomano/pbip-demo.
+For a tutorial on how to run the PBI Inspector V2 CLI as part of a **GitHub Actions** workflow using the **[fabric-cicd](https://microsoft.github.io/fabric-cicd/latest/)** Python library, see https://github.com/RuiRomano/pbip-demo.
 
 
 ## <a id="customerruleguide"></a>Custom Rules Guide
@@ -182,11 +180,11 @@ Each rule object has the following properties:
     "logType": "Optional. error|warning(default)",
     "itemType": "[fabricitemtype]. The Fabric item type that the rule applies to as referred to in the item's CI\CD ".platform"" file, e.g. CopyJob, Lakehouse, Report, etc. or specify "*" to define a cross-Fabric items rule or "json" to define a rule that applies to any JSON metadata file.",
     "disabled": true|false(default),
-    "part": "Optional. A Regex expression to match one or more Fabric item file or folder path. Or, if the itemType is Report, then one of Report|Pages|PagesHeader|AllPages|Visuals|AllVisuals|Bookmarks|BookmarksHeader|AllBookmarks. If an array of multiple items is returned (such as when specifying "Pages"), the rule will apply to each item iterativey."
+    "part": "Optional iterator. A Regex expression to match one or more Fabric item file or folder path. Or, if the itemType is Report, then one of Report|ReportExtensions|Pages|PagesHeader|AllPages|Visuals|AllVisuals|MobileVisuals|AllMobileVisuals|Bookmarks|BookmarksHeader|AllBookmarks. If an array of multiple items is returned (such as when specifying "Pages"), the rule will apply to each item iterativey."
     "test": [
     //test logic
     ,
-    //optional data variables
+    //data variables (optional)
     ,
     //expected result
     ],
