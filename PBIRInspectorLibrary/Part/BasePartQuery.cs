@@ -18,7 +18,7 @@ namespace PBIRInspectorLibrary.Part
 
         public Part RootPart { get; set; }
 
-        public object? Invoke(string query, Part context)
+        public virtual object? Invoke(string query, Part context)
         {
             object? result = null;
             if (string.IsNullOrEmpty(query)) return context;
