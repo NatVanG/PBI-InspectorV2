@@ -1,5 +1,5 @@
 ﻿
-namespace PBIRInspectorWinLibrary
+namespace PBIRInspectorClientLibrary
 {
     public static class Constants
     {

@@ -1,4 +1,4 @@
-﻿using PBIRInspectorWinLibrary.Utils;
+﻿using PBIRInspectorClientLibrary.Utils;
 
 #pragma warning disable CS8602 
 namespace PBIRInspectorTests

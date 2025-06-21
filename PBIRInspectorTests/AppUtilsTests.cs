@@ -1,4 +1,4 @@
-﻿using PBIRInspectorWinLibrary.Utils;
+﻿using PBIRInspectorClientLibrary.Utils;
 
 namespace PBIRInspectorTests
 {

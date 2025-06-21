@@ -2,7 +2,7 @@
 using PBIRInspectorLibrary.Exceptions;
 using System.Diagnostics;
 
-namespace PBIRInspectorWinLibrary.Utils
+namespace PBIRInspectorClientLibrary.Utils
 {
     public class AppUtils
     {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PBIRInspectorImageLibrary;
+using PBIRInspectorWinImageLibrary;
 using PBIRInspectorLibrary;
 using PBIRInspectorLibrary.Output;
 using System;
@@ -7,7 +7,7 @@ using System;
 namespace PBIRInspectorTests
 {
     [TestFixture]
-    internal class ImageUtilsTest
+    internal class WinImageUtilsTest
     {
         private ServiceProvider _serviceProvider;
         private IReportPageWireframeRenderer _pageRenderer;

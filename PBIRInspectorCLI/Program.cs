@@ -1,6 +1,8 @@
-﻿using PBIRInspectorLibrary;
-using PBIRInspectorWinLibrary;
-using PBIRInspectorWinLibrary.Utils;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using PBIRInspectorClientLibrary;
+using PBIRInspectorClientLibrary.Utils;
+using PBIRInspectorLibrary;
 
 internal partial class Program
 {
@@ -12,6 +14,8 @@ internal partial class Program
         Console.WriteLine("Attach debugger to process? Press any key to continue.");
         Console.ReadLine();
 #endif
+        var serviceProvider = InitServiceProvider();
+        var pageRenderer = serviceProvider.GetRequiredService<IReportPageWireframeRenderer>();
 
         try
         {
@@ -19,8 +23,8 @@ internal partial class Program
 
             Welcome();
 
-            PBIRInspectorWinLibrary.Main.WinMessageIssued += Main_MessageIssued;
-            PBIRInspectorWinLibrary.Main.Run(_parsedArgs);
+            PBIRInspectorClientLibrary.Main.WinMessageIssued += Main_MessageIssued;
+            PBIRInspectorClientLibrary.Main.Run(_parsedArgs, pageRenderer);
 
             Exit();
         }
@@ -30,9 +34,46 @@ internal partial class Program
         }
         finally
         {
-            PBIRInspectorWinLibrary.Main.WinMessageIssued -= Main_MessageIssued;
-            PBIRInspectorWinLibrary.Main.CleanUp();
+            PBIRInspectorClientLibrary.Main.WinMessageIssued -= Main_MessageIssued;
+            PBIRInspectorClientLibrary.Main.CleanUp();
         }
+    }
+
+    private static ServiceProvider InitServiceProvider()
+    {
+        // 1. Create the service collection.
+        var services = new ServiceCollection();
+
+        services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorImageLibrary.ReportPageWireframeRenderer>();
+
+        // 3. Build the service provider from the service collection.
+        var serviceProvider = services.BuildServiceProvider();
+
+        return serviceProvider;
+        //using (IHost host = new HostBuilder().Build())
+        //{
+        //    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+
+        //    lifetime.ApplicationStarted.Register(() =>
+        //    {
+        //        Console.WriteLine("Started");
+        //    });
+        //    lifetime.ApplicationStopping.Register(() =>
+        //    {
+        //        Console.WriteLine("Stopping firing");
+        //        Console.WriteLine("Stopping end");
+        //    });
+        //    lifetime.ApplicationStopped.Register(() =>
+        //    {
+        //        Console.WriteLine("Stopped firing");
+        //        Console.WriteLine("Stopped end");
+        //    });
+
+        //    host.Start();
+
+        //    // Listens for Ctrl+C.
+        //    host.WaitForShutdown();
+        //}
     }
 
     private static void Main_MessageIssued(object? sender, PBIRInspectorLibrary.MessageIssuedEventArgs e)
@@ -62,7 +103,7 @@ internal partial class Program
             //ADO output only
             if (_parsedArgs.ADOOutput && e.MessageType == MessageTypeEnum.Complete)
             {
-                string completionStatus = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? "Failed" : ((PBIRInspectorWinLibrary.Main.WarningCount > 0) ? "SucceededWithIssues" : "Succeeded");
+                string completionStatus = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? "Failed" : ((PBIRInspectorClientLibrary.Main.WarningCount > 0) ? "SucceededWithIssues" : "Succeeded");
 
                 Console.WriteLine(Constants.ADOCompleteTemplate, completionStatus);
             }
@@ -70,7 +111,7 @@ internal partial class Program
             //GitHub output only
             if (_parsedArgs.GITHUBOutput && e.MessageType == MessageTypeEnum.Complete)
             {
-                int exitCode = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? 1 : 0;
+                int exitCode = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? 1 : 0;
                 Environment.ExitCode = exitCode;
             }
         }
@@ -106,7 +147,7 @@ internal partial class Program
             Console.ReadLine();
         }
 
-        var exitCode = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? 1 : 0;
+        var exitCode = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? 1 : 0;
         Environment.Exit(exitCode);
     }
 }

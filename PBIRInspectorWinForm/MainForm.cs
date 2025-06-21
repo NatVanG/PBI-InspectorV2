@@ -1,17 +1,61 @@
-using PBIRInspectorWinLibrary;
-using PBIRInspectorWinLibrary.Utils;
+using Microsoft.Extensions.DependencyInjection;
+using PBIRInspectorClientLibrary;
+using PBIRInspectorClientLibrary.Utils;
+using PBIRInspectorLibrary;
+using System;
 
 namespace PBIRInspectorWinForm
 {
     public partial class MainForm : Form
     {
-        
+        IReportPageWireframeRenderer _pageRenderer = null;
+
         public MainForm()
         {
             InitializeComponent();
             this.Text = AppUtils.About();
             this.FormClosing += MainForm_FormClosing;
+            var serviceProvider = InitServiceProvider();
+            _pageRenderer = serviceProvider.GetRequiredService<IReportPageWireframeRenderer>();
         }
+
+        private static ServiceProvider InitServiceProvider()
+        {
+            // 1. Create the service collection.
+            var services = new ServiceCollection();
+
+            services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorWinImageLibrary.ReportPageWireframeRenderer>();
+
+            // 3. Build the service provider from the service collection.
+            var serviceProvider = services.BuildServiceProvider();
+
+            return serviceProvider;
+            //using (IHost host = new HostBuilder().Build())
+            //{
+            //    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+
+            //    lifetime.ApplicationStarted.Register(() =>
+            //    {
+            //        Console.WriteLine("Started");
+            //    });
+            //    lifetime.ApplicationStopping.Register(() =>
+            //    {
+            //        Console.WriteLine("Stopping firing");
+            //        Console.WriteLine("Stopping end");
+            //    });
+            //    lifetime.ApplicationStopped.Register(() =>
+            //    {
+            //        Console.WriteLine("Stopped firing");
+            //        Console.WriteLine("Stopped end");
+            //    });
+
+            //    host.Start();
+
+            //    // Listens for Ctrl+C.
+            //    host.WaitForShutdown();
+            //}
+        }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -121,7 +165,7 @@ namespace PBIRInspectorWinForm
             var jsonOutput = this.chckJsonOutput.Checked;
             var htmlOutput = this.chckHTMLOutput.Checked;
 
-            Main.Run(pbiFilePath, rulesFilePath, outputPath, verbose, jsonOutput, htmlOutput);
+            Main.Run(pbiFilePath, rulesFilePath, outputPath, verbose, jsonOutput, htmlOutput, _pageRenderer);
 
             btnRun.Enabled = true;
         }

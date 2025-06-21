@@ -4,14 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <SignAssembly>False</SignAssembly>
     <Version>2.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonLogic" Version="5.4.0" />
-    <PackageReference Include="JsonPatch.Net" Version="3.3.0" />
-    <PackageReference Include="JsonPath.Net" Version="2.1.1" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PBIRInspectorLibrary\PBIRInspectorLibrary.csproj" />
   </ItemGroup>
 
 </Project>

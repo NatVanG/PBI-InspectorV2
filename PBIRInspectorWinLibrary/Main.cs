@@ -1,20 +1,22 @@
-﻿using PBIRInspectorLibrary;
+﻿using PBIRInspectorClientLibrary.Utils;
+using PBIRInspectorLibrary;
 using PBIRInspectorLibrary.Exceptions;
 using PBIRInspectorLibrary.Output;
-using PBIRInspectorWinLibrary.Drawing;
-using PBIRInspectorWinLibrary.Utils;
 using System.Text.Json;
 
-namespace PBIRInspectorWinLibrary
+namespace PBIRInspectorClientLibrary
 {
     public class Main
     {
+        
+
         public static event EventHandler<MessageIssuedEventArgs>? WinMessageIssued;
         private static Inspector? _insp = null;
         private static Args? _args = null;
         private static int _errorCount = 0;
         private static int _warningCount = 0;
 
+        public IReportPageWireframeRenderer ReportPageWireframeRenderer { get; set; }
 
         public static int ErrorCount
         {
@@ -40,7 +42,7 @@ namespace PBIRInspectorWinLibrary
             }
         }
 
-        public static void Run(string pbiFilePath, string rulesFilePath, string outputPath, bool verbose, bool jsonOutput, bool htmlOutput)
+        public static void Run(string pbiFilePath, string rulesFilePath, string outputPath, bool verbose, bool jsonOutput, bool htmlOutput, IReportPageWireframeRenderer pageRenderer)
         {
             var formatsString = string.Concat(jsonOutput ? "JSON" : string.Empty, ",", htmlOutput ? "HTML" : string.Empty);
             var verboseString = verbose.ToString();
@@ -49,10 +51,10 @@ namespace PBIRInspectorWinLibrary
 
             var args = new Args { PBIFilePath = pbiFilePath, RulesFilePath = rulesFilePath, OutputPath = outputPath, FormatsString = formatsString, VerboseString = verboseString };
 
-            Run(args); 
+            Run(args, pageRenderer); 
         }
 
-        public static void Run(Args args)
+        public static void Run(Args args, IReportPageWireframeRenderer pageRenderer)
         {
             _args = args;
 
@@ -136,12 +138,12 @@ namespace PBIRInspectorWinLibrary
                     }
                     Directory.CreateDirectory(outputPNGDirPath);
                     OnMessageIssued(MessageTypeEnum.Information, string.Format("Writing report page wireframe images to files at \"{0}\".", outputPNGDirPath));
-                    ImageUtils.DrawReportPages(_fieldMapResults, _testResults, outputPNGDirPath);
+                    pageRenderer.DrawReportPages(_fieldMapResults, _testResults, outputPNGDirPath);
                 }
 
                 if (!(Main._args.ADOOutput || Main._args.GITHUBOutput) && Main._args.HTMLOutput)
                 {
-                    string pbiinspectorlogobase64 = string.Concat(Constants.Base64ImgPrefix, ImageUtils.ConvertBitmapToBase64(Constants.PBIInspectorPNG));
+                    string pbiinspectorlogobase64 = string.Concat(Constants.Base64ImgPrefix, pageRenderer.ConvertBitmapToBase64(Constants.PBIInspectorPNG));
                     //string nowireframebase64 = string.Concat(Base64ImgPrefix, ImageUtils.ConvertBitmapToBase64(@"Files\png\nowireframe.png"));
                     string template = File.ReadAllText(Constants.TestRunHTMLTemplate);
                     string html = template.Replace(Constants.LogoPlaceholder, pbiinspectorlogobase64, StringComparison.OrdinalIgnoreCase);
