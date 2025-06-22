@@ -223,7 +223,6 @@ namespace PBIRInspectorLibrary
             }
 
             IPartQuery partQuery = PartQueryFactory.CreatePartQuery(type, fileSystemPath);
-            ContextService.GetInstance().PartQuery = partQuery;
 
             RunRules(testResults, rulesFilteredByItemType, partQuery);
         }
@@ -235,7 +234,6 @@ namespace PBIRInspectorLibrary
             var rulesFilteredByItemType = deprecatedRules.Where(_ => _.ItemType.Replace(DEPRECATED_SUFFIX, string.Empty).Equals(type, StringComparison.InvariantCultureIgnoreCase));
 
             IPartQuery partQuery = PartQueryFactory.CreatePartQuery(string.Concat(type, DEPRECATED_SUFFIX), fileSystemPath);
-            ContextService.GetInstance().PartQuery = partQuery;
 
             RunRules(testResults, rulesFilteredByItemType, partQuery);
         }
@@ -245,7 +243,7 @@ namespace PBIRInspectorLibrary
             foreach (var rule in rules)
             {
                 var ruleLogType = ConvertRuleLogType(rule.LogType);
-                ContextService.GetInstance().Part = partQuery.RootPart;
+                ContextService.Current = new PartContext { PartQuery = partQuery, Part = partQuery.RootPart };
 
                 OnMessageIssued(MessageTypeEnum.Information, string.Format("Running Rule \"{0}\".", rule.Name));
                 Json.Logic.Rule? jrule = null;
@@ -268,7 +266,7 @@ namespace PBIRInspectorLibrary
 
                     if (!string.IsNullOrEmpty(rule.Part))
                     {
-                        var part = partQuery.Invoke(rule.Part, ContextService.GetInstance().Part);
+                        var part = partQuery.Invoke(rule.Part, ContextService.Current.Part);
 
                         if (part != null && part
                             is List<Part.Part>)
@@ -307,7 +305,7 @@ namespace PBIRInspectorLibrary
                         }
                         else
                         {
-                            ContextService.GetInstance().Part = part;
+                            ContextService.Current.Part = part;
                             var node = PartUtils.ToJsonNode(part);
                             var newdata = MapRuleDataPointersToValues(node, rule);
 

@@ -6,25 +6,14 @@ using System.Threading.Tasks;
 
 namespace PBIRInspectorLibrary.Part
 {
-    //TODO: not thread safe
-    internal class ContextService
+    internal static class ContextService
     {
-        private static ContextService instance = null;
+        private static readonly ThreadLocal<PartContext> _current = new();
 
-        internal IPartQuery PartQuery { get; set; }
-
-        internal Part Part { get; set; }
-
-        private ContextService() { }
-
-        public static ContextService GetInstance()
+        public static PartContext Current
         {
-            if (instance == null)
-            {
-                instance = new ContextService();
-            }
-            return instance;
+            get => _current.Value;
+            set => _current.Value = value;
         }
-
     }
 }

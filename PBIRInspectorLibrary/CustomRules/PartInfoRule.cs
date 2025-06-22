@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-
 namespace PBIRInspectorLibrary.CustomRules;
 
 /// <summary>
@@ -40,8 +39,8 @@ public class PartInfoRule : Json.Logic.Rule
         if (input is null) throw new ArgumentException("PartInfoRule input cannot be null");
         var stringInput = input.Stringify();
 
-        var contextPartQuery = ContextService.GetInstance().PartQuery;
-        var contextPart = ContextService.GetInstance().Part;
+        var contextPartQuery = ContextService.Current.PartQuery;
+        var contextPart = ContextService.Current.Part;
 		result = PartUtils.PartInfoToJsonNode(contextPartQuery.Invoke(stringInput, contextPart));
 
         return result;

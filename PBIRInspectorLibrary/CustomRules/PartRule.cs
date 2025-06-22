@@ -40,8 +40,9 @@ public class PartRule : Json.Logic.Rule
         if (input is null) throw new ArgumentException("PartRule input cannot be null");
         var stringInput = input.Stringify();
 
-        var contextPartQuery = ContextService.GetInstance().PartQuery;
-        var contextPart = ContextService.GetInstance().Part;
+        var context = ContextService.Current;
+        var contextPartQuery = context.PartQuery;
+        var contextPart = context.Part;
 		result = PartUtils.ToJsonNode(contextPartQuery.Invoke(stringInput, contextPart));
 
         return result;
