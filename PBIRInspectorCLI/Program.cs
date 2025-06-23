@@ -25,7 +25,7 @@ internal partial class Program
 
             PBIRInspectorClientLibrary.Main.WinMessageIssued += Main_MessageIssued;
             PBIRInspectorClientLibrary.Main.Run(_parsedArgs, pageRenderer);
-
+            
             Exit();
         }
         catch (ArgumentException e)
@@ -87,7 +87,7 @@ internal partial class Program
             }
             else
             {
-                Console.WriteLine(string.Concat(e.Message, " Y/N"));
+                SafeWriteLine(string.Concat(e.Message, " Y/N"));
                 var a = Console.ReadLine();
                 e.DialogOKResponse = !string.IsNullOrEmpty(a) && a.Equals("Y", StringComparison.OrdinalIgnoreCase);
             }
@@ -97,7 +97,7 @@ internal partial class Program
             //Console and ADO/GitHub outputs
             if ((!_parsedArgs.ADOOutput && !_parsedArgs.GITHUBOutput) || ((_parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput) && (e.MessageType == MessageTypeEnum.Error || e.MessageType == MessageTypeEnum.Warning)))
             {
-                Console.WriteLine(FormatConsoleMessage(e.MessageType, e.Message));
+                SafeWriteLine(FormatConsoleMessage(e.MessageType, e.Message));
             }
 
             //ADO output only
@@ -105,7 +105,7 @@ internal partial class Program
             {
                 string completionStatus = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? "Failed" : ((PBIRInspectorClientLibrary.Main.WarningCount > 0) ? "SucceededWithIssues" : "Succeeded");
 
-                Console.WriteLine(Constants.ADOCompleteTemplate, completionStatus);
+                SafeWriteLine(string.Format(Constants.ADOCompleteTemplate, completionStatus));
             }
 
             //GitHub output only
@@ -116,6 +116,18 @@ internal partial class Program
             }
         }
     }
+
+
+    private static readonly object consoleLock = new object();
+
+    private static void SafeWriteLine(string message)
+    {
+        lock (consoleLock)
+        {
+            Console.WriteLine(message);
+        }
+    }
+
 
     private static String FormatConsoleMessage(MessageTypeEnum messageType, string message)
     {

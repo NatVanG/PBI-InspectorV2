@@ -84,9 +84,23 @@ namespace PBIRInspectorWinForm
             }
             else
             {
-                txtConsoleOutput.AppendText(string.Concat(e.MessageType.ToString(), ": ", e.Message, "\r\n"));
+                AppendToTextBox(string.Concat(e.MessageType.ToString(), ": ", e.Message, "\r\n"));
             }
         }
+
+
+        private void AppendToTextBox(string text)
+        {
+            if (txtConsoleOutput.InvokeRequired)
+            {
+                txtConsoleOutput.BeginInvoke(new Action<string>(AppendToTextBox), text);
+            }
+            else
+            {
+                txtConsoleOutput.AppendText(text);
+            }
+        }
+
 
         private void groupBox1_Enter(object sender, EventArgs e)
         {
@@ -162,10 +176,11 @@ namespace PBIRInspectorWinForm
             var rulesFilePath = this.txtRulesFilePath.Text;
             var outputPath = this.txtOutputDirPath.Text;
             var verbose = this.chckVerbose.Checked;
+            var parallel = false; //todo: implement parallel processing option
             var jsonOutput = this.chckJsonOutput.Checked;
             var htmlOutput = this.chckHTMLOutput.Checked;
 
-            Main.Run(pbiFilePath, rulesFilePath, outputPath, verbose, jsonOutput, htmlOutput, _pageRenderer);
+            Main.Run(pbiFilePath, rulesFilePath, outputPath, verbose, parallel, jsonOutput, htmlOutput, _pageRenderer);
 
             btnRun.Enabled = true;
         }

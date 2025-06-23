@@ -58,7 +58,7 @@ namespace PBIRInspectorLibrary
 
             try
             {
-                var inspectionRules = this.DeserialiseRulesFromPath<InspectionRules>(rulesPath);
+                var inspectionRules = DeserialiseRulesFromPath<InspectionRules>(rulesPath);
 
                 if (inspectionRules == null || inspectionRules.Rules == null || inspectionRules.Rules.Count == 0)
                 {

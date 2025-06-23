@@ -14,7 +14,7 @@ namespace PBIRInspectorLibrary
         public InspectorBase(string fabricItemPath, InspectionRules inspectionRules)
         {
             if (string.IsNullOrEmpty(fabricItemPath)) throw new ArgumentNullException(nameof(fabricItemPath));
-            if (!File.Exists(fabricItemPath)) throw new FileNotFoundException();
+            //if (!File.Exists(fabricItemPath) || !Directory.Exists(fabricItemPath)) throw new FileNotFoundException();
         }
 
         public InspectorBase(string fabricItemPath, string rulesPath)
@@ -22,7 +22,7 @@ namespace PBIRInspectorLibrary
             if (string.IsNullOrEmpty(fabricItemPath)) throw new ArgumentNullException(nameof(fabricItemPath));
         }
 
-        public T? DeserialiseRulesFromPath<T>(string rulesPath)
+        public static T? DeserialiseRulesFromPath<T>(string rulesPath)
         {
             if (!File.Exists(rulesPath)) throw new FileNotFoundException(string.Format("Rules with path \"{0}\" was not found", rulesPath));
 
