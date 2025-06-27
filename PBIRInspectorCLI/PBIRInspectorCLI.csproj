@@ -8,9 +8,9 @@
     <StartupObject>Program</StartupObject>
     <SignAssembly>False</SignAssembly>
     <IsPublishable>True</IsPublishable>
-    <FileVersion>2.4.0.0</FileVersion>
-    <AssemblyVersion>2.4.0</AssemblyVersion>
-    <VersionPrefix>2.4.0</VersionPrefix>
+    <FileVersion>2.4.1.0</FileVersion>
+    <AssemblyVersion>2.4.1</AssemblyVersion>
+    <VersionPrefix>2.4.1</VersionPrefix>
     <Version>$(VersionPrefix)</Version>
     <Product>$(AssembblyName)</Product>
     <ApplicationIcon>pbiinspector.ico</ApplicationIcon>
@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1-Preview.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -19,7 +19,7 @@ namespace PBIRInspectorClientLibrary.Utils
                 {
                     var argName = args[index].ToLower();
                     var argValue = args[index + 1];
-                    dic.Add(argName.ToLower(), argValue.ToLower());
+                    dic.Add(argName.ToLower(), argValue);
                     index += 2;
                 }
                 else
