@@ -1,4 +1,4 @@
-name: PBIXInspector Tests
+name: PBIRInspector Tests
 
 on:
   push:
