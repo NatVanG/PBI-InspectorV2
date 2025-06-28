@@ -47,7 +47,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PBIRInspectorWinImageLibrary\PBIRInspectorWinImageLibrary.csproj" />
-    <ProjectReference Include="..\PBIRInspectorWinLibrary\PBIRInspectorClientLibrary.csproj" />
+    <ProjectReference Include="..\PBIRInspectorClientLibrary\PBIRInspectorClientLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>

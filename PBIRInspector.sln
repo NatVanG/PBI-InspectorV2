@@ -34,7 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocsImages", "DocsImages", 
 		DocsImages\WireframeWithHiddenVisual.png = DocsImages\WireframeWithHiddenVisual.png
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PBIRInspectorClientLibrary", "PBIRInspectorWinLibrary\PBIRInspectorClientLibrary.csproj", "{C6CBC9A2-22D7-4CA6-BC1B-5F7DD629D17F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PBIRInspectorClientLibrary", "PBIRInspectorClientLibrary\PBIRInspectorClientLibrary.csproj", "{C6CBC9A2-22D7-4CA6-BC1B-5F7DD629D17F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PBIRInspectorWinForm", "PBIRInspectorWinForm\PBIRInspectorWinForm.csproj", "{2EFEF6B8-E017-4D14-9F30-DCD093CB85CD}"
 EndProject

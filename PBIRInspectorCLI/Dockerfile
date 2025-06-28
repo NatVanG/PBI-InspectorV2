@@ -13,7 +13,7 @@ WORKDIR /src
 COPY ["PBIRInspectorCLI/PBIRInspectorCLI.csproj", "PBIRInspectorCLI/"]
 COPY ["PBIRInspectorImageLibrary/PBIRInspectorImageLibrary.csproj", "PBIRInspectorImageLibrary/"]
 COPY ["PBIRInspectorLibrary/PBIRInspectorLibrary.csproj", "PBIRInspectorLibrary/"]
-COPY ["PBIRInspectorWinLibrary/PBIRInspectorClientLibrary.csproj", "PBIRInspectorWinLibrary/"]
+COPY ["PBIRInspectorClientLibrary/PBIRInspectorClientLibrary.csproj", "PBIRInspectorClientLibrary/"]
 RUN dotnet restore "./PBIRInspectorCLI/PBIRInspectorCLI.csproj"
 COPY . .
 WORKDIR "/src/PBIRInspectorCLI"
