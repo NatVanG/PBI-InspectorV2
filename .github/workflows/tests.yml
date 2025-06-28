@@ -2,7 +2,7 @@ name: PBIRInspector Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "remove-win-dependencies" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
