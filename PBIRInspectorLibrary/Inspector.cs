@@ -6,6 +6,7 @@ using Json.Pointer;
 using PBIRInspectorLibrary.Exceptions;
 using PBIRInspectorLibrary.Output;
 using PBIRInspectorLibrary.Part;
+using System.Collections.Generic;
 using System.Data;
 using System.IO.Compression;
 using System.Reflection;
@@ -29,9 +30,9 @@ namespace PBIRInspectorLibrary
 
         public event EventHandler<MessageIssuedEventArgs>? MessageIssued;
 
-        public Inspector() : base()
+        public Inspector(IEnumerable<JsonLogicOperatorRegistry> registries) : base(registries)
         {
-            AddCustomRulesToRegistry();
+            //AddCustomRulesToRegistry();
         }
 
         /// <summary>
@@ -39,11 +40,11 @@ namespace PBIRInspectorLibrary
         /// </summary>
         /// <param name="fabricItemPath"></param>
         /// <param name="inspectionRules"></param>
-        public Inspector(string fabricItemPath, InspectionRules inspectionRules) : base(fabricItemPath, inspectionRules)
+        public Inspector(string fabricItemPath, InspectionRules inspectionRules, IEnumerable<JsonLogicOperatorRegistry> registries) : base(fabricItemPath, inspectionRules, registries)
         {
             this._fabricItemPath = fabricItemPath;
             this._inspectionRules = inspectionRules;
-            AddCustomRulesToRegistry();
+            //AddCustomRulesToRegistry();
         }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace PBIRInspectorLibrary
         /// </summary>
         /// <param name="fabricItemPath">Local PBI file path</param>
         /// <param name="rulesPath">Local rules json file path</param>
-        public Inspector(string fabricItemPath, string rulesPath) : base(fabricItemPath, rulesPath)
+        public Inspector(string fabricItemPath, string rulesPath, IEnumerable<JsonLogicOperatorRegistry> registries) : base(fabricItemPath, rulesPath, registries)
         {
             this._fabricItemPath = fabricItemPath;
             this._rulesPath = rulesPath;
@@ -78,7 +79,7 @@ namespace PBIRInspectorLibrary
                 throw new PBIRInspectorException(string.Format("Could not deserialise rules file with path \"{0}\". Check that the file is valid json and following the correct schema for PBI Inspector rules.", rulesPath), e);
             }
 
-            AddCustomRulesToRegistry();
+            //AddCustomRulesToRegistry();
         }
 
         public List<TestResult> Inspect()
@@ -167,28 +168,28 @@ namespace PBIRInspectorLibrary
 
         #region private methods
 
-        private void AddCustomRulesToRegistry()
-        {
-            PBIRInspectorSerializerContext context = new PBIRInspectorSerializerContext();
-            Json.Logic.RuleRegistry.AddRule<CustomRules.IsNullOrEmptyRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.CountRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.StringContains>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.ToString>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.ToRecordRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.DrillVariableRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.RectOverlapRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetIntersectionRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetUnionRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetDifferenceRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PartInfoRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.FileSizeRule>(context);
-            Json.Logic.RuleRegistry.AddRule<CustomRules.FileTextSearchCountRule>(context);
-        }
+        //private void AddCustomRulesToRegistry()
+        //{
+        //    PBIRInspectorSerializerContext context = new PBIRInspectorSerializerContext();
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.IsNullOrEmptyRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.CountRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.StringContains>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.ToString>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.ToRecordRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.DrillVariableRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.RectOverlapRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.SetIntersectionRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.SetUnionRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.SetDifferenceRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.SetSymmetricDifferenceRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.SetEqualRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.PartRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.PartInfoRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.QueryRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.PathRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.FileSizeRule>(context);
+        //    Json.Logic.RuleRegistry.AddRule<CustomRules.FileTextSearchCountRule>(context);
+        //}
 
         private MessageTypeEnum ConvertRuleLogType(string ruleLogType)
                 {

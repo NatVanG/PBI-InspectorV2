@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using PBIRInspectorClientLibrary;
 using PBIRInspectorClientLibrary.Utils;
 using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.CustomRules;
 
 internal partial class Program
 {
@@ -16,6 +17,8 @@ internal partial class Program
 #endif
         var serviceProvider = InitServiceProvider();
         var pageRenderer = serviceProvider.GetRequiredService<IReportPageWireframeRenderer>();
+        var operatorRegistries = serviceProvider.GetRequiredService<IEnumerable<JsonLogicOperatorRegistry>>();
+
 
         try
         {
@@ -24,7 +27,7 @@ internal partial class Program
             Welcome();
 
             PBIRInspectorClientLibrary.Main.WinMessageIssued += Main_MessageIssued;
-            PBIRInspectorClientLibrary.Main.Run(_parsedArgs, pageRenderer);
+            PBIRInspectorClientLibrary.Main.Run(_parsedArgs, pageRenderer, operatorRegistries);
             
             Exit();
         }
@@ -44,12 +47,39 @@ internal partial class Program
         // 1. Create the service collection.
         var services = new ServiceCollection();
 
+        var registries = new List<JsonLogicOperatorRegistry>();
+
+        registries.Add(new JsonLogicOperatorRegistry(
+        new PBIRInspectorSerializerContext(),
+        new IJsonLogicOperator[] {
+                new CountOperator(),
+                new DrillVariableOperator(),
+                new FileSizeOperator(),
+                new FileTextSearchCountOperator(),
+                new IsNullOrEmptyOperator(),
+                new PartInfoOperator(),
+                new PartOperator(),
+                new PathOperator(),
+                new QueryOperator(),
+                new RectangleOverlapOperator(),
+                new SetDifferenceOperator(),
+                new SetEqualOperator(),
+                new SetIntersectionOperator(),
+                new SetSymmetricDifferenceOperator(),
+                new SetUnionOperator(),
+                new StringContainsOperator(),
+                new ToRecordOperator(),
+                new ToStringOperator()}));
+        services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
+
         services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorImageLibrary.ReportPageWireframeRenderer>();
 
         // 3. Build the service provider from the service collection.
         var serviceProvider = services.BuildServiceProvider();
 
         return serviceProvider;
+
+        //TODO: cleanup on application end
         //using (IHost host = new HostBuilder().Build())
         //{
         //    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();

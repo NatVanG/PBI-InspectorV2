@@ -3,6 +3,7 @@ using PBIRInspectorLibrary;
 using PBIRInspectorLibrary.Exceptions;
 using PBIRInspectorLibrary.Output;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 
@@ -41,7 +42,7 @@ namespace PBIRInspectorClientLibrary
             Interlocked.Increment(ref _warningCount);
         }
 
-        public static void Run(string pbiFilePath, string rulesFilePath, string outputPath, bool verbose, bool parallel, bool jsonOutput, bool htmlOutput, IReportPageWireframeRenderer pageRenderer)
+        public static void Run(string pbiFilePath, string rulesFilePath, string outputPath, bool verbose, bool parallel, bool jsonOutput, bool htmlOutput, IReportPageWireframeRenderer pageRenderer, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             var formatsString = string.Concat(jsonOutput ? "JSON" : string.Empty, ",", htmlOutput ? "HTML" : string.Empty);
             var verboseString = verbose.ToString();
@@ -51,22 +52,22 @@ namespace PBIRInspectorClientLibrary
 
             var args = new Args { PBIFilePath = pbiFilePath, RulesFilePath = rulesFilePath, OutputPath = outputPath, FormatsString = formatsString, VerboseString = verboseString, ParallelString = parallelString };
 
-            Run(args, pageRenderer);
+            Run(args, pageRenderer, registries);
         }
 
-        public static void Run(Args args, IReportPageWireframeRenderer pageRenderer)
+        public static void Run(Args args, IReportPageWireframeRenderer pageRenderer, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             if (!args.Parallel)
             {
-                RunSingleThreaded(args, pageRenderer);
+                RunSingleThreaded(args, pageRenderer, registries);
             }
             else
             {
-                RunParallel(args, pageRenderer);
+                RunParallel(args, pageRenderer, registries);
             }
         }
 
-        public static void RunSingleThreaded(Args args, IReportPageWireframeRenderer pageRenderer)
+        public static void RunSingleThreaded(Args args, IReportPageWireframeRenderer pageRenderer, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             _args = args;
             IEnumerable<TestResult> testResults = null;
@@ -75,11 +76,11 @@ namespace PBIRInspectorClientLibrary
             OnMessageIssued(MessageTypeEnum.Information, string.Concat("Test run started at (UTC): ", DateTime.Now.ToUniversalTime()));
 
             var rules = Inspector.DeserialiseRulesFromPath<InspectionRules>(Main._args.RulesFilePath);
-            testResults = RunSingleThreaded(rules);
+            testResults = RunSingleThreaded(rules, registries);
 
             if (testResults != null && testResults.Any())
             {
-                OutputResults(testResults.OrderBy(_ => _.RuleId), pageRenderer);
+                OutputResults(testResults.OrderBy(_ => _.RuleId), pageRenderer, registries);
             }
             else
             {
@@ -88,7 +89,7 @@ namespace PBIRInspectorClientLibrary
             OnMessageIssued(MessageTypeEnum.Complete, string.Concat("Test run completed at (UTC): ", DateTime.Now.ToUniversalTime()));
         }
 
-        public static void RunParallel(Args args, IReportPageWireframeRenderer pageRenderer)
+        public static void RunParallel(Args args, IReportPageWireframeRenderer pageRenderer, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             _args = args;
             var rules = Inspector.DeserialiseRulesFromPath<InspectionRules>(Main._args.RulesFilePath);
@@ -99,7 +100,7 @@ namespace PBIRInspectorClientLibrary
 
             Parallel.ForEach(ruleBuckets, _ =>
             {
-                var localResults = RunSingleThreaded(_);
+                var localResults = RunSingleThreaded(_, registries);
 
                 foreach (var result in localResults ?? Enumerable.Empty<TestResult>())
                 {
@@ -107,7 +108,7 @@ namespace PBIRInspectorClientLibrary
                 }
             });
 
-            OutputResults(globalResults.ToList().OrderBy(_ => _.RuleId), pageRenderer);
+            OutputResults(globalResults.ToList().OrderBy(_ => _.RuleId), pageRenderer, registries);
             OnMessageIssued(MessageTypeEnum.Complete, string.Concat("Test run completed at (UTC): ", DateTime.Now.ToUniversalTime()));
         }
 
@@ -127,13 +128,13 @@ namespace PBIRInspectorClientLibrary
             return ruleBuckets;
         }
 
-        private static IEnumerable<TestResult>? RunSingleThreaded(InspectionRules rules)
+        private static IEnumerable<TestResult>? RunSingleThreaded(InspectionRules rules, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             Inspector? insp = null;
 
             try
             {
-                insp = new Inspector(Main._args.PBIFilePath, rules);
+                insp = new Inspector(Main._args.PBIFilePath, rules, registries);
 
                 insp.MessageIssued += Insp_MessageIssued;
                 var testResults = insp.Inspect().Where(_ => (!Main._args.Verbose && !_.Pass) || (Main._args.Verbose));
@@ -164,7 +165,7 @@ namespace PBIRInspectorClientLibrary
             return Enumerable.Empty<TestResult>();
         }
 
-        private static void OutputResults(IEnumerable<TestResult> testResults, IReportPageWireframeRenderer pageRenderer)
+        private static void OutputResults(IEnumerable<TestResult> testResults, IReportPageWireframeRenderer pageRenderer, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             string jsonTestRun = string.Empty;
             Inspector? fieldMapInsp = null;
@@ -214,7 +215,7 @@ namespace PBIRInspectorClientLibrary
 
             if (!(Main._args.ADOOutput || Main._args.GITHUBOutput) && (Main._args.PNGOutput || Main._args.HTMLOutput))
             {
-                fieldMapInsp = new Inspector(Main._args.PBIFilePath, Constants.ReportPageFieldMapFilePath);
+                fieldMapInsp = new Inspector(Main._args.PBIFilePath, Constants.ReportPageFieldMapFilePath, registries);
 
                 fieldMapResults = fieldMapInsp.Inspect();
 

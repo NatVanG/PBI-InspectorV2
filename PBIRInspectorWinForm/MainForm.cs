@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PBIRInspectorClientLibrary;
 using PBIRInspectorClientLibrary.Utils;
 using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.CustomRules;
 using System;
 
 namespace PBIRInspectorWinForm
@@ -9,6 +10,7 @@ namespace PBIRInspectorWinForm
     public partial class MainForm : Form
     {
         IReportPageWireframeRenderer _pageRenderer = null;
+        IEnumerable<JsonLogicOperatorRegistry> _registries = null;
 
         public MainForm()
         {
@@ -17,6 +19,7 @@ namespace PBIRInspectorWinForm
             this.FormClosing += MainForm_FormClosing;
             var serviceProvider = InitServiceProvider();
             _pageRenderer = serviceProvider.GetRequiredService<IReportPageWireframeRenderer>();
+            _registries = serviceProvider.GetRequiredService<IEnumerable<JsonLogicOperatorRegistry>>();
         }
 
         private static ServiceProvider InitServiceProvider()
@@ -24,12 +27,39 @@ namespace PBIRInspectorWinForm
             // 1. Create the service collection.
             var services = new ServiceCollection();
 
+            var registries = new List<JsonLogicOperatorRegistry>();
+
+            registries.Add(new JsonLogicOperatorRegistry(
+            new PBIRInspectorSerializerContext(),
+            new IJsonLogicOperator[] { 
+                new CountOperator(),
+                new DrillVariableOperator(), 
+                new FileSizeOperator(), 
+                new FileTextSearchCountOperator(), 
+                new IsNullOrEmptyOperator(), 
+                new PartInfoOperator(), 
+                new PartOperator(), 
+                new PathOperator(), 
+                new QueryOperator(), 
+                new RectangleOverlapOperator(), 
+                new SetDifferenceOperator(), 
+                new SetEqualOperator(), 
+                new SetIntersectionOperator(), 
+                new SetSymmetricDifferenceOperator(),
+                new SetUnionOperator(),
+                new StringContainsOperator(),
+                new ToRecordOperator(),
+                new ToStringOperator()}));
+            services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
+
             services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorWinImageLibrary.ReportPageWireframeRenderer>();
 
             // 3. Build the service provider from the service collection.
             var serviceProvider = services.BuildServiceProvider();
 
             return serviceProvider;
+
+            //TODO: cleanup on application end
             //using (IHost host = new HostBuilder().Build())
             //{
             //    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
@@ -180,7 +210,7 @@ namespace PBIRInspectorWinForm
             var jsonOutput = this.chckJsonOutput.Checked;
             var htmlOutput = this.chckHTMLOutput.Checked;
 
-            Main.Run(pbiFilePath, rulesFilePath, outputPath, verbose, parallel, jsonOutput, htmlOutput, _pageRenderer);
+            Main.Run(pbiFilePath, rulesFilePath, outputPath, verbose, parallel, jsonOutput, htmlOutput, _pageRenderer, _registries);
 
             btnRun.Enabled = true;
         }

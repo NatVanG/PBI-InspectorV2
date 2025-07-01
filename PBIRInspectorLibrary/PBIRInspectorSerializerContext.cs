@@ -27,4 +27,4 @@ namespace PBIRInspectorLibrary;
 [JsonSerializable(typeof(CustomRules.FileSizeRule))]
 [JsonSerializable(typeof(JsonPatch))]
 [JsonSerializable(typeof(PatchResult))]
-internal partial class PBIRInspectorSerializerContext : JsonSerializerContext;
+public partial class PBIRInspectorSerializerContext : JsonSerializerContext;
