@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Json.Logic.Rules;
 using Json.Patch;
 
+//TODO: move this and the other custom rules to a separate project e.g. Ric.Operators
 namespace PBIRInspectorLibrary;
 
 [JsonSerializable(typeof(Json.Logic.Rule))]

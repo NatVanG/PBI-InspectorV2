@@ -26,7 +26,7 @@ namespace PBIRInspectorLibrary
             }
             else
             {
-                // Optionally handle already-registered case (no-op or log)
+                //TODO: handle already-registered case (no-op or log)
             }
         }
     }

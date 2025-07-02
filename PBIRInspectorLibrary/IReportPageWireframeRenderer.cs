@@ -7,6 +7,7 @@ using PBIRInspectorLibrary.Output;
 
 namespace PBIRInspectorLibrary
 {
+    //TODO: move to PBIRInspectorClientLibrary
     public interface IReportPageWireframeRenderer
     {
         /// <summary>
