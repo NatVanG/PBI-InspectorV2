@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+  
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -26,8 +26,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -f PBIRInspectorCLI/Dockerfile -t ghcr.io/natvang/pbi-inspectorv2/fab-inspector:latest .
+          docker build -f PBIRInspectorCLI/Dockerfile -t ghcr.io/natvang/fab-inspector:latest .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/natvang/pbi-inspectorv2/fab-inspector:latest
+          docker push ghcr.io/natvang/fab-inspector:latest
