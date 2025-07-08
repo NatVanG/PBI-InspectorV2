@@ -30,11 +30,6 @@ namespace PBIRInspectorLibrary
 
         public event EventHandler<MessageIssuedEventArgs>? MessageIssued;
 
-        public Inspector(IEnumerable<JsonLogicOperatorRegistry> registries) : base(registries)
-        {
-            //AddCustomRulesToRegistry();
-        }
-
         /// <summary>
         /// 
         /// </summary>

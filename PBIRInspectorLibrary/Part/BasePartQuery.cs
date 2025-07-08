@@ -40,8 +40,9 @@ namespace PBIRInspectorLibrary.Part
 
         private protected virtual object? SearchParts(string query, Part context)
         {
+            //Normalizing FileSystemPath to easily regex match file system paths across different OS. e.g. folder1\/.*\/copyjob-content\.json$ 
             IEnumerable<Part> q = from p in Part.Flatten(TopParent(context))
-                                  where Regex.IsMatch(p.FileSystemPath, query, RegexOptions.IgnoreCase)
+                                  where Regex.IsMatch(Utils.NormalizePath(p.FileSystemPath), query, RegexOptions.IgnoreCase)
                                   select p;
 
             if (q is null) return null;
@@ -80,6 +81,8 @@ namespace PBIRInspectorLibrary.Part
                 SetParts(dirPart);
             }
         }
+
+
 
         #region Methods invokeable from rules 
         public Part Parent(Part context)

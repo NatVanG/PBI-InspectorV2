@@ -9,12 +9,6 @@ namespace PBIRInspectorLibrary
         //private readonly IEnumerable<IJsonLogicOperator> _customOperators;
         private readonly IEnumerable<JsonLogicOperatorRegistry> _registries;
 
-        public InspectorBase(IEnumerable<JsonLogicOperatorRegistry> registries)
-        {
-            _registries = registries;
-            UseRegistries();
-        }
-
         public InspectorBase(string fabricItemPath, InspectionRules inspectionRules, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             if (string.IsNullOrEmpty(fabricItemPath)) throw new ArgumentNullException(nameof(fabricItemPath));
