@@ -161,7 +161,7 @@ internal partial class Program
 
     private static String FormatConsoleMessage(string itemPath, MessageTypeEnum messageType, string message)
     {
-        string template = _parsedArgs.ADOOutput ? Constants.ADOLogIssueTemplate : _parsedArgs.GITHUBOutput ? Constants.GitHubMsgTemplate : "{0} - {1}";
+        string template = _parsedArgs.ADOOutput ? Constants.ADOLogIssueTemplate : _parsedArgs.GITHUBOutput ? Constants.GitHubMsgTemplate : Constants.ConsoleMsgTemplate;
         string msgType = _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput ? messageType.ToString().ToLower() : messageType.ToString();
         string msgSeparator = _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput ? "" : ": ";
         string messageTypeFormat = string.Format(template, msgType, itemPath);
