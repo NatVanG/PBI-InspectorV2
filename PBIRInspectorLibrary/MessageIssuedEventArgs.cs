@@ -8,6 +8,14 @@
             MessageType = messageType;
         }
 
+        public MessageIssuedEventArgs(string itemPath, string message, MessageTypeEnum messageType)
+        {
+            ItemPath = itemPath;
+            Message = message;
+            MessageType = messageType;
+        }
+        
+        public string? ItemPath { get; private set; }
         public string Message { get; private set; }
         public MessageTypeEnum MessageType { get; private set; }
         public bool DialogOKResponse { get; set; }

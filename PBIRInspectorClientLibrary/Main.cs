@@ -177,7 +177,7 @@ namespace PBIRInspectorClientLibrary
                 {
                     //TODO: use Test log type json property instead
                     var msgType = result.Pass ? MessageTypeEnum.Information : result.LogType;
-                    OnMessageIssued(msgType, result.Message);
+                    OnMessageIssued(result.ItemPath, msgType, result.Message);
                 }
             }
 
@@ -279,6 +279,12 @@ namespace PBIRInspectorClientLibrary
         private static void OnMessageIssued(MessageTypeEnum messageType, string message)
         {
             var e = new MessageIssuedEventArgs(message, messageType);
+            MessageIssued(e);
+        }
+
+        private static void OnMessageIssued(string itemPath, MessageTypeEnum messageType, string message)
+        {
+            var e = new MessageIssuedEventArgs(itemPath, message, messageType);
             MessageIssued(e);
         }
 

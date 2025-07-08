@@ -8,7 +8,9 @@ on:
   push:
     branches:
       - main
-      - remove-win-dependencies
+      
+  workflow_dispatch:
+  # Allows manual triggering of the workflow from the GitHub Actions UI
 
 jobs:
 

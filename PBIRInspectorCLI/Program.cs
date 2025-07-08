@@ -127,7 +127,7 @@ internal partial class Program
             //Console and ADO/GitHub outputs
             if ((!_parsedArgs.ADOOutput && !_parsedArgs.GITHUBOutput) || ((_parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput) && (e.MessageType == MessageTypeEnum.Error || e.MessageType == MessageTypeEnum.Warning)))
             {
-                SafeWriteLine(FormatConsoleMessage(e.MessageType, e.Message));
+                SafeWriteLine(FormatConsoleMessage(e.ItemPath, e.MessageType, e.Message));
             }
 
             //ADO output only
@@ -159,12 +159,12 @@ internal partial class Program
     }
 
 
-    private static String FormatConsoleMessage(MessageTypeEnum messageType, string message)
+    private static String FormatConsoleMessage(string itemPath, MessageTypeEnum messageType, string message)
     {
-        string template = _parsedArgs.ADOOutput ? Constants.ADOLogIssueTemplate : _parsedArgs.GITHUBOutput ? Constants.GitHubMsgTemplate : "{0}";
+        string template = _parsedArgs.ADOOutput ? Constants.ADOLogIssueTemplate : _parsedArgs.GITHUBOutput ? Constants.GitHubMsgTemplate : "{0} - {1}";
         string msgType = _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput ? messageType.ToString().ToLower() : messageType.ToString();
         string msgSeparator = _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput ? "" : ": ";
-        string messageTypeFormat = string.Format(template, msgType);
+        string messageTypeFormat = string.Format(template, msgType, itemPath);
 
         return string.Concat(messageTypeFormat, msgSeparator, message);
     }
