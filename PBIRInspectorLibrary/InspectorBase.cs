@@ -6,23 +6,34 @@ namespace PBIRInspectorLibrary
 {
     public class InspectorBase
     {
-        public InspectorBase()
-        {
+        //private readonly IEnumerable<IJsonLogicOperator> _customOperators;
+        private readonly IEnumerable<JsonLogicOperatorRegistry> _registries;
 
-        }
-
-        public InspectorBase(string fabricItemPath, InspectionRules inspectionRules)
+        public InspectorBase(string fabricItemPath, InspectionRules inspectionRules, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             if (string.IsNullOrEmpty(fabricItemPath)) throw new ArgumentNullException(nameof(fabricItemPath));
-            if (!File.Exists(fabricItemPath)) throw new FileNotFoundException();
+            if (!File.Exists(fabricItemPath) && !Directory.Exists(fabricItemPath)) throw new FileNotFoundException();
+            _registries = registries;
+            UseRegistries();
         }
 
-        public InspectorBase(string fabricItemPath, string rulesPath)
+        public InspectorBase(string fabricItemPath, string rulesPath, IEnumerable<JsonLogicOperatorRegistry> registries)
         {
             if (string.IsNullOrEmpty(fabricItemPath)) throw new ArgumentNullException(nameof(fabricItemPath));
+            _registries = registries;
+            UseRegistries();
         }
 
-        public T? DeserialiseRulesFromPath<T>(string rulesPath)
+        private void UseRegistries()
+        {
+            foreach (var registry in _registries)
+            {
+                registry.RegisterAll();
+                // Use registry.SerializerContext and registry.Operators as needed
+            }
+        }
+
+        public static T? DeserialiseRulesFromPath<T>(string rulesPath)
         {
             if (!File.Exists(rulesPath)) throw new FileNotFoundException(string.Format("Rules with path \"{0}\" was not found", rulesPath));
 

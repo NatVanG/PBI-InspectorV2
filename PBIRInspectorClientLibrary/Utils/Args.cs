@@ -1,5 +1,5 @@
 ﻿
-namespace PBIRInspectorWinLibrary.Utils
+namespace PBIRInspectorClientLibrary.Utils
 {
     public class Args
     {
@@ -76,6 +76,18 @@ namespace PBIRInspectorWinLibrary.Utils
             }
         }
 
-        public bool Verbose { get; private set; }
+        public bool Verbose { get; private set; } = false;
+
+        public string ParallelString
+        {
+            set
+            {
+                var parallel = false;
+                _ = bool.TryParse(value, out parallel);
+                Parallel = parallel;
+            }
+        }
+
+        public bool Parallel { get; private set; } = false;
     }
 }

@@ -1,6 +1,9 @@
-﻿using PBIRInspectorLibrary;
-using PBIRInspectorWinLibrary;
-using PBIRInspectorWinLibrary.Utils;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using PBIRInspectorClientLibrary;
+using PBIRInspectorClientLibrary.Utils;
+using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.CustomRules;
 
 internal partial class Program
 {
@@ -12,6 +15,10 @@ internal partial class Program
         Console.WriteLine("Attach debugger to process? Press any key to continue.");
         Console.ReadLine();
 #endif
+        var serviceProvider = InitServiceProvider();
+        var pageRenderer = serviceProvider.GetRequiredService<IReportPageWireframeRenderer>();
+        var operatorRegistries = serviceProvider.GetRequiredService<IEnumerable<JsonLogicOperatorRegistry>>();
+
 
         try
         {
@@ -19,9 +26,9 @@ internal partial class Program
 
             Welcome();
 
-            PBIRInspectorWinLibrary.Main.WinMessageIssued += Main_MessageIssued;
-            PBIRInspectorWinLibrary.Main.Run(_parsedArgs);
-
+            PBIRInspectorClientLibrary.Main.WinMessageIssued += Main_MessageIssued;
+            PBIRInspectorClientLibrary.Main.Run(_parsedArgs, pageRenderer, operatorRegistries);
+            
             Exit();
         }
         catch (ArgumentException e)
@@ -30,9 +37,73 @@ internal partial class Program
         }
         finally
         {
-            PBIRInspectorWinLibrary.Main.WinMessageIssued -= Main_MessageIssued;
-            PBIRInspectorWinLibrary.Main.CleanUp();
+            PBIRInspectorClientLibrary.Main.WinMessageIssued -= Main_MessageIssued;
+            PBIRInspectorClientLibrary.Main.CleanUp();
         }
+    }
+
+    private static ServiceProvider InitServiceProvider()
+    {
+        // 1. Create the service collection.
+        var services = new ServiceCollection();
+
+        var registries = new List<JsonLogicOperatorRegistry>();
+
+        registries.Add(new JsonLogicOperatorRegistry(
+        new PBIRInspectorSerializerContext(),
+        new IJsonLogicOperator[] {
+                new CountOperator(),
+                new DrillVariableOperator(),
+                new FileSizeOperator(),
+                new FileTextSearchCountOperator(),
+                new IsNullOrEmptyOperator(),
+                new PartInfoOperator(),
+                new PartOperator(),
+                new PathOperator(),
+                new QueryOperator(),
+                new RectangleOverlapOperator(),
+                new SetDifferenceOperator(),
+                new SetEqualOperator(),
+                new SetIntersectionOperator(),
+                new SetSymmetricDifferenceOperator(),
+                new SetUnionOperator(),
+                new StringContainsOperator(),
+                new ToRecordOperator(),
+                new ToStringOperator()}));
+        services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
+
+        services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorImageLibrary.ReportPageWireframeRenderer>();
+
+        // 3. Build the service provider from the service collection.
+        var serviceProvider = services.BuildServiceProvider();
+
+        return serviceProvider;
+
+        //TODO: cleanup on application end
+        //using (IHost host = new HostBuilder().Build())
+        //{
+        //    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+
+        //    lifetime.ApplicationStarted.Register(() =>
+        //    {
+        //        Console.WriteLine("Started");
+        //    });
+        //    lifetime.ApplicationStopping.Register(() =>
+        //    {
+        //        Console.WriteLine("Stopping firing");
+        //        Console.WriteLine("Stopping end");
+        //    });
+        //    lifetime.ApplicationStopped.Register(() =>
+        //    {
+        //        Console.WriteLine("Stopped firing");
+        //        Console.WriteLine("Stopped end");
+        //    });
+
+        //    host.Start();
+
+        //    // Listens for Ctrl+C.
+        //    host.WaitForShutdown();
+        //}
     }
 
     private static void Main_MessageIssued(object? sender, PBIRInspectorLibrary.MessageIssuedEventArgs e)
@@ -46,7 +117,7 @@ internal partial class Program
             }
             else
             {
-                Console.WriteLine(string.Concat(e.Message, " Y/N"));
+                SafeWriteLine(string.Concat(e.Message, " Y/N"));
                 var a = Console.ReadLine();
                 e.DialogOKResponse = !string.IsNullOrEmpty(a) && a.Equals("Y", StringComparison.OrdinalIgnoreCase);
             }
@@ -56,32 +127,44 @@ internal partial class Program
             //Console and ADO/GitHub outputs
             if ((!_parsedArgs.ADOOutput && !_parsedArgs.GITHUBOutput) || ((_parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput) && (e.MessageType == MessageTypeEnum.Error || e.MessageType == MessageTypeEnum.Warning)))
             {
-                Console.WriteLine(FormatConsoleMessage(e.MessageType, e.Message));
+                SafeWriteLine(FormatConsoleMessage(e.ItemPath, e.MessageType, e.Message));
             }
 
             //ADO output only
             if (_parsedArgs.ADOOutput && e.MessageType == MessageTypeEnum.Complete)
             {
-                string completionStatus = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? "Failed" : ((PBIRInspectorWinLibrary.Main.WarningCount > 0) ? "SucceededWithIssues" : "Succeeded");
+                string completionStatus = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? "Failed" : ((PBIRInspectorClientLibrary.Main.WarningCount > 0) ? "SucceededWithIssues" : "Succeeded");
 
-                Console.WriteLine(Constants.ADOCompleteTemplate, completionStatus);
+                SafeWriteLine(string.Format(Constants.ADOCompleteTemplate, completionStatus));
             }
 
             //GitHub output only
             if (_parsedArgs.GITHUBOutput && e.MessageType == MessageTypeEnum.Complete)
             {
-                int exitCode = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? 1 : 0;
+                int exitCode = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? 1 : 0;
                 Environment.ExitCode = exitCode;
             }
         }
     }
 
-    private static String FormatConsoleMessage(MessageTypeEnum messageType, string message)
+
+    private static readonly object consoleLock = new object();
+
+    private static void SafeWriteLine(string message)
     {
-        string template = _parsedArgs.ADOOutput ? Constants.ADOLogIssueTemplate : _parsedArgs.GITHUBOutput ? Constants.GitHubMsgTemplate : "{0}";
+        lock (consoleLock)
+        {
+            Console.WriteLine(message);
+        }
+    }
+
+
+    private static String FormatConsoleMessage(string itemPath, MessageTypeEnum messageType, string message)
+    {
+        string template = _parsedArgs.ADOOutput ? Constants.ADOLogIssueTemplate : _parsedArgs.GITHUBOutput ? Constants.GitHubMsgTemplate : Constants.ConsoleMsgTemplate;
         string msgType = _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput ? messageType.ToString().ToLower() : messageType.ToString();
         string msgSeparator = _parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput ? "" : ": ";
-        string messageTypeFormat = string.Format(template, msgType);
+        string messageTypeFormat = string.Format(template, msgType, itemPath);
 
         return string.Concat(messageTypeFormat, msgSeparator, message);
     }
@@ -106,7 +189,7 @@ internal partial class Program
             Console.ReadLine();
         }
 
-        var exitCode = PBIRInspectorWinLibrary.Main.ErrorCount > 0 ? 1 : 0;
+        var exitCode = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? 1 : 0;
         Environment.Exit(exitCode);
     }
 }

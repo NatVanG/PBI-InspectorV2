@@ -2,7 +2,7 @@
 using System.Drawing.Imaging;
 
 #pragma warning disable CA1416 // Validate platform compatibility
-namespace PBIRInspectorWinLibrary.Drawing
+namespace PBIRInspectorWinImageLibrary.Drawing
 {
     internal class ReportPage
     {

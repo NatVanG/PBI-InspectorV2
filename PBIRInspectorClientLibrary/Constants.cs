@@ -1,5 +1,5 @@
 ﻿
-namespace PBIRInspectorWinLibrary
+namespace PBIRInspectorClientLibrary
 {
     public static class Constants
     {
@@ -19,9 +19,10 @@ namespace PBIRInspectorWinLibrary
         public const string Base64ImgPrefix = @"data:image/png;base64,";
         public const string DefaultVisOpsFolder = "VisOps";
         public const string PNGOutputDir = "PBIInspectorPNG";
-        public const string ADOLogIssueTemplate = "##vso[task.logissue type={0};]"; //warning|error
+        public const string ADOLogIssueTemplate = "##vso[task.logissue type={0};sourcepath={1};linenumber=0;columnnumber=0;]"; //warning|error
         public const string ADOCompleteTemplate = "##vso[task.complete result={0};]DONE";//Failed|SucceededWithIssues|Succeeded
-        public const string GitHubMsgTemplate = "::{0}:: "; //warning|error
+        public const string GitHubMsgTemplate = "::{0} file={1},line=0,col=0:: "; //warning|error
+        public const string ConsoleMsgTemplate = "{0} - {1}"; //messageType, itempath
         public const string ReadmePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/blob/main/README.md";
         public const string LatestReleasePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/releases";
         public const string LicensePageUrl = "https://github.com/NatVanG/PBI-InspectorV2/blob/main/LICENSE";

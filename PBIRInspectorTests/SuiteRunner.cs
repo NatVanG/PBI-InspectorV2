@@ -20,9 +20,12 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+using Microsoft.Extensions.DependencyInjection;
 using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.CustomRules;
 using PBIRInspectorLibrary.Exceptions;
 using PBIRInspectorLibrary.Output;
+using System;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -406,11 +409,50 @@ public class SuiteRunner
     }
     #endregion
 
+    private static ServiceProvider InitServiceProvider()
+    {
+        // 1. Create the service collection.
+        var services = new ServiceCollection();
+
+        var registries = new List<JsonLogicOperatorRegistry>();
+
+        registries.Add(new JsonLogicOperatorRegistry(
+        new PBIRInspectorSerializerContext(),
+        new IJsonLogicOperator[] {
+                new CountOperator(),
+                new DrillVariableOperator(),
+                new FileSizeOperator(),
+                new FileTextSearchCountOperator(),
+                new IsNullOrEmptyOperator(),
+                new PartInfoOperator(),
+                new PartOperator(),
+                new PathOperator(),
+                new QueryOperator(),
+                new RectangleOverlapOperator(),
+                new SetDifferenceOperator(),
+                new SetEqualOperator(),
+                new SetIntersectionOperator(),
+                new SetSymmetricDifferenceOperator(),
+                new SetUnionOperator(),
+                new StringContainsOperator(),
+                new ToRecordOperator(),
+                new ToStringOperator()}));
+        services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
+        services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorWinImageLibrary.ReportPageWireframeRenderer>();
+
+        // 3. Build the service provider from the service collection.
+        var serviceProvider = services.BuildServiceProvider();
+
+        return serviceProvider;
+    }
+
     public static IEnumerable<TestCaseData> Suite(string PBIPFilePath, string RulesFilePath)
     {
         try
         {
-            Inspector insp = new Inspector(PBIPFilePath, RulesFilePath);
+            var sp = InitServiceProvider();
+            var registries = sp.GetRequiredService<IEnumerable<JsonLogicOperatorRegistry>>();
+            Inspector insp = new Inspector(PBIPFilePath, RulesFilePath, registries);
 
             var testResults = insp.Inspect();
 
@@ -436,7 +478,9 @@ public class SuiteRunner
     {
         try
         {
-            Inspector insp = new Inspector(PBIPFilePath, inspectionRules);
+            var sp = InitServiceProvider();
+            var registries = sp.GetRequiredService<IEnumerable<JsonLogicOperatorRegistry>>();
+            Inspector insp = new Inspector(PBIPFilePath, inspectionRules, registries);
 
             var testResults = insp.Inspect();
 

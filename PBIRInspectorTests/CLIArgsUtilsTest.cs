@@ -1,4 +1,4 @@
-﻿using PBIRInspectorWinLibrary.Utils;
+﻿using PBIRInspectorClientLibrary.Utils;
 
 #pragma warning disable CS8602 
 namespace PBIRInspectorTests
@@ -22,6 +22,25 @@ namespace PBIRInspectorTests
 
         //    Assert.True(parsedArgs.PBIFilePath.Equals("pbixPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.RulesFilePath.Equals("rulesPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.Verbose);
         //}
+
+        [Test]
+        public void TestCLIArgsUtilsSuccess_FabricItemVerbose()
+        {
+            string[] args = "-fabricitem fabricitempath -rules rulesPath -verbose true".Split(" ");
+            var parsedArgs = ArgsUtils.ParseArgs(args);
+
+            Assert.That(parsedArgs.PBIFilePath.Equals("fabricitempath", StringComparison.OrdinalIgnoreCase) && parsedArgs.RulesFilePath.Equals("rulesPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.Verbose);
+        }
+
+
+        [Test]
+        public void TestCLIArgsUtilsSuccess_FabricItemOptionVerboseParallel()
+        {
+            string[] args = "-fabricitem fabricitempath -rules rulesPath -verbose true -parallel true".Split(" ");
+            var parsedArgs = ArgsUtils.ParseArgs(args);
+
+            Assert.That(parsedArgs.PBIFilePath.Equals("fabricitempath", StringComparison.OrdinalIgnoreCase) && parsedArgs.RulesFilePath.Equals("rulesPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.Verbose && parsedArgs.Parallel);
+        }
 
         [Test]
         public void TestCLIArgsUtilsSuccess_PBIPOption()
@@ -109,6 +128,7 @@ namespace PBIRInspectorTests
 
             Assert.That(parsedArgs.CONSOLEOutput
                 && !parsedArgs.Verbose
+                && !parsedArgs.Parallel
                 && parsedArgs.DeleteOutputDirOnExit
                 && !string.IsNullOrEmpty(parsedArgs.OutputDirPath)
                 && !parsedArgs.HTMLOutput

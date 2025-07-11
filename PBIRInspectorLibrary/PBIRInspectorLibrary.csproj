@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <SignAssembly>False</SignAssembly>
-    <Version>2.3.4</Version>
+    <Version>2.4.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

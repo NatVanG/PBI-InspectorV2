@@ -1,17 +1,91 @@
-using PBIRInspectorWinLibrary;
-using PBIRInspectorWinLibrary.Utils;
+using Microsoft.Extensions.DependencyInjection;
+using PBIRInspectorClientLibrary;
+using PBIRInspectorClientLibrary.Utils;
+using PBIRInspectorLibrary;
+using PBIRInspectorLibrary.CustomRules;
+using System;
 
 namespace PBIRInspectorWinForm
 {
     public partial class MainForm : Form
     {
-        
+        IReportPageWireframeRenderer _pageRenderer = null;
+        IEnumerable<JsonLogicOperatorRegistry> _registries = null;
+
         public MainForm()
         {
             InitializeComponent();
             this.Text = AppUtils.About();
             this.FormClosing += MainForm_FormClosing;
+            var serviceProvider = InitServiceProvider();
+            _pageRenderer = serviceProvider.GetRequiredService<IReportPageWireframeRenderer>();
+            _registries = serviceProvider.GetRequiredService<IEnumerable<JsonLogicOperatorRegistry>>();
         }
+
+        private static ServiceProvider InitServiceProvider()
+        {
+            // 1. Create the service collection.
+            var services = new ServiceCollection();
+
+            var registries = new List<JsonLogicOperatorRegistry>();
+
+            registries.Add(new JsonLogicOperatorRegistry(
+            new PBIRInspectorSerializerContext(),
+            new IJsonLogicOperator[] { 
+                new CountOperator(),
+                new DrillVariableOperator(), 
+                new FileSizeOperator(), 
+                new FileTextSearchCountOperator(), 
+                new IsNullOrEmptyOperator(), 
+                new PartInfoOperator(), 
+                new PartOperator(), 
+                new PathOperator(), 
+                new QueryOperator(), 
+                new RectangleOverlapOperator(), 
+                new SetDifferenceOperator(), 
+                new SetEqualOperator(), 
+                new SetIntersectionOperator(), 
+                new SetSymmetricDifferenceOperator(),
+                new SetUnionOperator(),
+                new StringContainsOperator(),
+                new ToRecordOperator(),
+                new ToStringOperator()}));
+            services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
+
+            services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorWinImageLibrary.ReportPageWireframeRenderer>();
+
+            // 3. Build the service provider from the service collection.
+            var serviceProvider = services.BuildServiceProvider();
+
+            return serviceProvider;
+
+            //TODO: cleanup on application end
+            //using (IHost host = new HostBuilder().Build())
+            //{
+            //    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+
+            //    lifetime.ApplicationStarted.Register(() =>
+            //    {
+            //        Console.WriteLine("Started");
+            //    });
+            //    lifetime.ApplicationStopping.Register(() =>
+            //    {
+            //        Console.WriteLine("Stopping firing");
+            //        Console.WriteLine("Stopping end");
+            //    });
+            //    lifetime.ApplicationStopped.Register(() =>
+            //    {
+            //        Console.WriteLine("Stopped firing");
+            //        Console.WriteLine("Stopped end");
+            //    });
+
+            //    host.Start();
+
+            //    // Listens for Ctrl+C.
+            //    host.WaitForShutdown();
+            //}
+        }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -40,9 +114,23 @@ namespace PBIRInspectorWinForm
             }
             else
             {
-                txtConsoleOutput.AppendText(string.Concat(e.MessageType.ToString(), ": ", e.Message, "\r\n"));
+                AppendToTextBox(string.Concat(e.MessageType.ToString(), ": ", e.Message, "\r\n"));
             }
         }
+
+
+        private void AppendToTextBox(string text)
+        {
+            if (txtConsoleOutput.InvokeRequired)
+            {
+                txtConsoleOutput.BeginInvoke(new Action<string>(AppendToTextBox), text);
+            }
+            else
+            {
+                txtConsoleOutput.AppendText(text);
+            }
+        }
+
 
         private void groupBox1_Enter(object sender, EventArgs e)
         {
@@ -118,10 +206,11 @@ namespace PBIRInspectorWinForm
             var rulesFilePath = this.txtRulesFilePath.Text;
             var outputPath = this.txtOutputDirPath.Text;
             var verbose = this.chckVerbose.Checked;
+            var parallel = false; //todo: implement parallel processing option
             var jsonOutput = this.chckJsonOutput.Checked;
             var htmlOutput = this.chckHTMLOutput.Checked;
 
-            Main.Run(pbiFilePath, rulesFilePath, outputPath, verbose, jsonOutput, htmlOutput);
+            Main.Run(pbiFilePath, rulesFilePath, outputPath, verbose, parallel, jsonOutput, htmlOutput, _pageRenderer, _registries);
 
             btnRun.Enabled = true;
         }

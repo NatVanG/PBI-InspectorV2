@@ -9,7 +9,7 @@
         {
           "var": "properties.jobMode"
         },
-        "Batch"
+        "Batch" 
       ]
     },
     {
@@ -34,7 +34,7 @@
       "id": "CHECK_COPYJOB_JOBMODE3",
       "name": "Check that all CopyJob definitions have JobMode set to Batch.",
       "itemType": "CopyJob",
-      "logType": "Warning",
+      "disabled": true,
       "test": [
         {
           "all": [
