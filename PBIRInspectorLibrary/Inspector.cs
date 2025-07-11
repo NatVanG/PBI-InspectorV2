@@ -306,6 +306,7 @@ namespace PBIRInspectorLibrary
                             var newdata = MapRuleDataPointersToValues(node, rule);
 
                             var itemPath = part.FileSystemPath.Substring(part.FileSystemPath.IndexOf(this._fabricItemPath) + this._fabricItemPath.Length);
+                            itemPath = string.IsNullOrEmpty(itemPath) ? "root" : itemPath;
                             var parentPageName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartName(part) : null;
                             var parentPageDisplayName = part.FileSystemName.ToLowerInvariant().EndsWith("page.json") ? partQuery.PartDisplayName(part) ?? partQuery.PartName(part) : "N/A";
 

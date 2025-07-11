@@ -80,7 +80,7 @@ namespace PBIRInspectorClientLibrary
 
             if (testResults != null && testResults.Any())
             {
-                OutputResults(testResults.OrderBy(_ => _.RuleId), pageRenderer, registries);
+                OutputResults(testResults, pageRenderer, registries);
             }
             else
             {
