@@ -49,7 +49,9 @@ namespace PBIRInspectorWinForm
                 new SetUnionOperator(),
                 new StringContainsOperator(),
                 new ToRecordOperator(),
-                new ToStringOperator()}));
+                new ToStringOperator(),
+                new FromYamlOperator()
+            }));
             services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
 
             services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorWinImageLibrary.ReportPageWireframeRenderer>();

@@ -28,7 +28,7 @@ internal partial class Program
 
             PBIRInspectorClientLibrary.Main.WinMessageIssued += Main_MessageIssued;
             PBIRInspectorClientLibrary.Main.Run(_parsedArgs, pageRenderer, operatorRegistries);
-            
+            //TODO: Run Exist after CleanUp in finally close
             Exit();
         }
         catch (ArgumentException e)
@@ -39,6 +39,7 @@ internal partial class Program
         {
             PBIRInspectorClientLibrary.Main.WinMessageIssued -= Main_MessageIssued;
             PBIRInspectorClientLibrary.Main.CleanUp();
+            //TODO: run Exit() here?
         }
     }
 
@@ -69,7 +70,8 @@ internal partial class Program
                 new SetUnionOperator(),
                 new StringContainsOperator(),
                 new ToRecordOperator(),
-                new ToStringOperator()}));
+                new ToStringOperator(),
+                new FromYamlOperator()}));
         services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
 
         services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorImageLibrary.ReportPageWireframeRenderer>();
