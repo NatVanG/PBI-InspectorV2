@@ -1,0 +1,64 @@
+{
+  "rules": [
+    {
+      "id": "ENVIRONMENT_SPARKCOMPUTE",
+      "name": "Checks environment sparkcompute settings",
+      "description": "Checks that the native execution engine is enabled.",
+      "itemtype": "Environment",
+      "part": "Sparkcompute.yml",
+      "test": [
+        {
+          "query": [
+            {
+              "fromyaml": [
+                {
+                  "partinfo": ""
+                }
+              ]
+            },
+            {
+              "var": "enable_native_execution_engine"
+            }
+          ]
+        },
+        true
+      ]
+    },
+    {
+      "id": "ENVIRONMENT_DEPENDENCIES",
+      "name": "Checks environment pip dependencies",
+      "description": "Checks environment pip dependencies for references to the deprecated nose library e.g. use pytest instead.",
+      "itemtype": "Environment",
+      "part": "environment.yml",
+      "test": [
+        {
+          "none": [
+            {
+              "query": [
+                {
+                  "fromyaml": [
+                    {
+                      "partinfo": ""
+                    }
+                  ]
+                },
+                {
+                  "path": "$.dependencies[*].pip[*]"
+                }
+              ]
+            },
+            {
+              "strcontains": [
+                {
+                  "var": ""
+                },
+                "nose=="
+              ]
+            }
+          ]
+        },
+        true
+      ]
+    }
+  ]
+}
