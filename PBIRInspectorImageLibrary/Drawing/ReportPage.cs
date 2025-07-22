@@ -35,7 +35,7 @@ namespace PBIRInspectorImageLibrary.Drawing
             const int TEXTPADDINGY = VISOFFSET + 12;
             const string FONT = "Arial";
             const int FONTSIZE = 12;
-            const string ICONPATH = @"Files\icon\pbiinspector.ico";
+            const string ICONPATH = @"Files/icon/pbiinspector.ico";
 
             int[] iconSizes = [32, 64, 128];
 

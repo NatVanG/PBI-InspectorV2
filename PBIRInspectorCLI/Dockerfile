@@ -28,4 +28,5 @@ RUN dotnet publish "./PBIRInspectorCLI.csproj" -c $BUILD_CONFIGURATION -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY PBIRInspectorClientLibrary/Files ./Files
 ENTRYPOINT ["dotnet", "PBIRInspectorCLI.dll"]

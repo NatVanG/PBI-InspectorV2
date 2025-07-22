@@ -6,12 +6,12 @@ namespace PBIRInspectorClientLibrary
         public const string SamplePBIPReportFolderPath = @"Files\pbip\Inventory sample - fails.Report";
         public const string SamplePBIPReportFilePath = @"Files\pbip\Inventory sample - fails.pbip";
         public const string SampleRulesFilePath = @"Files\Base-rules.json";
-        public const string ReportPageFieldMapFilePath = @"Files\ReportPageFieldMap.json";
+        public const string ReportPageFieldMapFilePath = @"Files/ReportPageFieldMap.json";
         public const string PBIPReportJsonFileName = "report.json";
         public const string PBIPFileExtension = ".pbip";
         public const string PBIRFileExtension = ".pbir";
-        public const string TestRunHTMLTemplate = @"Files\html\TestRunTemplate.html";
-        public const string PBIInspectorPNG = @"Files\icon\pbiinspector.png";
+        public const string TestRunHTMLTemplate = @"Files/html/TestRunTemplate.html";
+        public const string PBIInspectorPNG = @"Files/icon/pbiinspector.png";
         public const string TestRunHTMLFileName = "TestRun.html";
         public const string VersionPlaceholder = "%VERSION%";
         public const string JsonPlaceholder = "%JSON%";

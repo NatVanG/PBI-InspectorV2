@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - main
+      - fromyamlrule
 
   workflow_dispatch:
   # Allows manual triggering of the workflow from the GitHub Actions UI
