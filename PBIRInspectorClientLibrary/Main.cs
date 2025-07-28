@@ -249,9 +249,9 @@ namespace PBIRInspectorClientLibrary
                 File.WriteAllText(outputHTMLFilePath, html);
 
                 //Results have been written to a temporary directory so show output to user automatically.
-                if (Main._args.DeleteOutputDirOnExit)
+                if (Main._args.DeleteOutputDirOnExit && !Main._args.CONSOLEOutput)
                 {
-                    AppUtils.WinOpen(outputHTMLFilePath);
+                    AppUtils.OpenUrl(outputHTMLFilePath);
                 }
             }
         }

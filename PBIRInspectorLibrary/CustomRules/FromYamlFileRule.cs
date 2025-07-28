@@ -13,15 +13,15 @@ using YamlDotNet.RepresentationModel;
 namespace PBIRInspectorLibrary.CustomRules
 {
     /// <summary>
-    /// Handles the `fromyaml` operation. 
+    /// Handles the `fromyamlfile` operation. 
     /// </summary>
-    [Operator("fromyaml")]
-    [JsonConverter(typeof(FromYamlRuleJsonConverter))]
-    public class FromYamlRule : Json.Logic.Rule
+    [Operator("fromyamlfile")]
+    [JsonConverter(typeof(FromYamlFileRuleJsonConverter))]
+    public class FromYamlFileRule : Json.Logic.Rule
     {
         internal Json.Logic.Rule InputString { get; }
 
-        public FromYamlRule(Json.Logic.Rule inputString)
+        public FromYamlFileRule(Json.Logic.Rule inputString)
         {
             InputString = inputString;
         }
@@ -39,11 +39,11 @@ namespace PBIRInspectorLibrary.CustomRules
         {
             var node = InputString.Apply(data, contextData);
 
-            if (node is JsonArray) throw new JsonException("The FromYamlRule filePath parameter cannot be an array.");
+            if (node is JsonArray) throw new JsonException("The FromYamlFileRule filePath parameter cannot be an array.");
 
             var partInfo = PartUtils.TryGetPartInfo(node, setAdvancedProperties: true);
 
-            if (partInfo == null || !partInfo.Exists || partInfo.PartFileSystemType != PartFileSystemTypeEnum.File) { throw new JsonLogicException($"FromYamlRule - file not found. Try using in conjunction with partinfo rule, instead of the part rule."); }
+            if (partInfo == null || !partInfo.Exists || partInfo.PartFileSystemType != PartFileSystemTypeEnum.File) { throw new JsonLogicException($"FromYamlFileRule - file not found. Try using in conjunction with partinfo rule, instead of the part rule."); }
 
 
             // Load the YAML file into the YamlStream
@@ -58,7 +58,7 @@ namespace PBIRInspectorLibrary.CustomRules
             }
             catch (YamlDotNet.Core.YamlException ex)
             {
-                throw new JsonLogicException($"FromYamlRule - error loading YAML file: {ex.Message}");
+                throw new JsonLogicException($"FromYamlFileRule - error loading YAML file: {ex.Message}");
             }
 
             //iterate through the stream.Documents and append each document's JsonNode to a JsonArray
@@ -84,23 +84,23 @@ namespace PBIRInspectorLibrary.CustomRules
         }
     }
 
-    internal class FromYamlRuleJsonConverter : WeaklyTypedJsonConverter<FromYamlRule>
+    internal class FromYamlFileRuleJsonConverter : WeaklyTypedJsonConverter<FromYamlFileRule>
     {
-        public override FromYamlRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override FromYamlFileRule? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var parameters = reader.TokenType == JsonTokenType.StartArray
            ? options.ReadArray(ref reader, PBIRInspectorSerializerContext.Default.Rule)
            : new[] { options.Read(ref reader, PBIRInspectorSerializerContext.Default.Rule)! };
 
             if (parameters is not { Length: 1 })
-                throw new JsonException("The FromYamlRule rule needs an array with 1 parameters.");
+                throw new JsonException("The FromYamlFileRule rule needs an array with 1 parameters.");
 
-            if (parameters.Length == 1) return new FromYamlRule(parameters[0]);
+            if (parameters.Length == 1) return new FromYamlFileRule(parameters[0]);
 
-            return new FromYamlRule(parameters[0]);
+            return new FromYamlFileRule(parameters[0]);
         }
 
-        public override void Write(Utf8JsonWriter writer, FromYamlRule value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, FromYamlFileRule value, JsonSerializerOptions options)
         {
             throw new NotImplementedException();
         }

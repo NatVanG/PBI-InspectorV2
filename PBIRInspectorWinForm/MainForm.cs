@@ -50,7 +50,7 @@ namespace PBIRInspectorWinForm
                 new StringContainsOperator(),
                 new ToRecordOperator(),
                 new ToStringOperator(),
-                new FromYamlOperator()
+                new FromYamlFileOperator()
             }));
             services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
 
@@ -256,7 +256,7 @@ namespace PBIRInspectorWinForm
         {
             try
             {
-                AppUtils.WinOpen(Constants.ReadmePageUrl);
+                AppUtils.OpenUrl(Constants.ReadmePageUrl);
             }
             catch (Exception ex)
             {
@@ -268,7 +268,7 @@ namespace PBIRInspectorWinForm
         {
             try
             {
-                AppUtils.WinOpen(Constants.LicensePageUrl);
+                AppUtils.OpenUrl(Constants.LicensePageUrl);
             }
             catch (Exception ex)
             {
@@ -285,7 +285,7 @@ namespace PBIRInspectorWinForm
         {
             try
             {
-                AppUtils.WinOpen(Constants.LatestReleasePageUrl);
+                AppUtils.OpenUrl(Constants.LatestReleasePageUrl);
             }
             catch (Exception ex)
             {
@@ -297,7 +297,7 @@ namespace PBIRInspectorWinForm
         {
             try
             {
-                AppUtils.WinOpen(Constants.IssuesPageUrl);
+                AppUtils.OpenUrl(Constants.IssuesPageUrl);
             }
             catch (Exception ex)
             {

@@ -1,5 +1,6 @@
 ﻿using PBIRInspectorImageLibrary.Drawing.Palette;
 using SkiaSharp;
+using System.Windows.Markup;
 
 namespace PBIRInspectorImageLibrary.Drawing
 {
@@ -34,8 +35,9 @@ namespace PBIRInspectorImageLibrary.Drawing
             const int TEXTPADDINGX = VISOFFSET + 2;
             const int TEXTPADDINGY = VISOFFSET + 12;
             const string FONT = "Arial";
-            const int FONTSIZE = 12;
-            const string ICONPATH = @"Files/icon/pbiinspector.ico";
+            const int FONTSIZE = 16;
+            const string ICONPATH = @"pbiinspector.png";
+            var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Files", "icon", ICONPATH);
 
             int[] iconSizes = [32, 64, 128];
 
@@ -53,14 +55,10 @@ namespace PBIRInspectorImageLibrary.Drawing
             var pageOutline = new SKRect() { Left = 0 + VISOFFSET, Top = 0 + VISOFFSET, Size = new SKSize(_pageSize.Width, _pageSize.Height) };
             _canvas.DrawRect(pageOutline, PaintPalette.WhiteStroke);
 
-
-            var iconBitmap = SKBitmap.Decode(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ICONPATH));
-
             var font = new SKFont(SKTypeface.FromFamilyName(FONT), FONTSIZE);
 
             foreach (var vc in _visualContainers.OrderBy(_ => !_.Pass))
             {
-
                 var paint = vc.Pass ? PaintPalette.WhiteStroke : PaintPalette.FailStroke;
                 var textPaint = vc.Pass ? PaintPalette.WhiteFill : PaintPalette.FailFill;
                 if (!vc.Visible) paint = paint.AddDash();
@@ -68,17 +66,34 @@ namespace PBIRInspectorImageLibrary.Drawing
                 var rect = new SKRect() { Left = vc.X + VISOFFSET, Top = vc.Y + VISOFFSET, Size = new SKSize(vc.Width, vc.Height) };
                 _canvas.DrawRect(rect, paint);
 
-                var iconSize = (from s in iconSizes where s <= Math.Max(rect.Width, rect.Height) / 2 orderby s descending select s).FirstOrDefault();
-
-                var ico = SKImage.FromBitmap(iconBitmap.Resize(new SKSizeI(iconSize, iconSize), SKFilterQuality.Medium));
-
                 if (!vc.Pass)
                 {
-                    _canvas.DrawImage(ico, rect.Left + VISOFFSET + (rect.Width - iconSize) / 2, rect.Top + VISOFFSET + (rect.Height - iconSize) / 2);
-                };
+                    //Draw Inspector icon if test failed
+                    SKBitmap? iconBitmap = SKBitmap.Decode(iconPath);
+                    if (iconBitmap != null)
+                    {
+                        var iconSize = (from s in iconSizes where s <= Math.Max(rect.Width, rect.Height) / 2 orderby s descending select s).FirstOrDefault();
 
-                _canvas.DrawText(string.Concat(vc.VisualType), vc.X + TEXTPADDINGX, vc.Y + TEXTPADDINGY, font, textPaint);
-                _canvas.DrawText(string.Concat(vc.Name), vc.X + TEXTPADDINGX, vc.Y + TEXTPADDINGY + FONTSIZE, font, textPaint);
+                        if (iconSize >= iconSizes.Min())
+                        {
+                            SKImage? ico = null;
+
+                            var resizedBitmap = iconBitmap.Resize(new SKSizeI(iconSize, iconSize), SKSamplingOptions.Default);
+                            if (resizedBitmap != null)
+                            {
+                                ico = SKImage.FromBitmap(resizedBitmap);
+                            }
+
+                            if (ico != null)
+                            {
+                                _canvas.DrawImage(ico, rect.Left + VISOFFSET + (rect.Width - iconSize) / 2, rect.Top + VISOFFSET + (rect.Height - iconSize) / 2);
+                            }
+                            ;
+                        }
+                    }
+                }
+                _canvas.DrawText(string.Concat(vc.VisualType), vc.X + TEXTPADDINGX, vc.Y + TEXTPADDINGY + FONTSIZE, font, textPaint);
+                _canvas.DrawText(string.Concat(vc.Name), vc.X + TEXTPADDINGX, vc.Y + TEXTPADDINGY + FONTSIZE * 2, font, textPaint);
             }
 
         }
