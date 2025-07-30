@@ -183,13 +183,6 @@ internal partial class Program
 
     private static void Exit()
     {
-        if (_parsedArgs.CONSOLEOutput || !(_parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput))
-        {
-            Console.ResetColor();
-            Console.WriteLine("\nPress any key to quit application.");
-            Console.ReadLine();
-        }
-
         var exitCode = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? 1 : 0;
         Environment.Exit(exitCode);
     }
