@@ -256,12 +256,25 @@ namespace PBIRInspectorClientLibrary
             }
         }
 
-        public static void CleanUp()
+        public static void CleanUpSessionTempFolder()
         {
             if (_args != null && _args.DeleteOutputDirOnExit && Directory.Exists(_args.OutputDirPath))
             {
+                OnMessageIssued(MessageTypeEnum.Information, string.Format("Deleting temporary session directory at \"{0}\".", _args.OutputDirPath));
                 Directory.Delete(_args.OutputDirPath, true);
             }
+        }
+
+        public static void CleanUpRootTempFolder()
+        {
+            if (!Directory.Exists(AppUtils.GetTempRootFolderPath()))
+            {
+                return;
+            }
+
+            var tempRootDir = AppUtils.GetTempRootFolderPath();  
+            OnMessageIssued(MessageTypeEnum.Information, string.Format("Deleting temporary root directory at \"{0}\".", tempRootDir));
+            Directory.Delete(tempRootDir, true);
         }
 
         private static void Insp_MessageIssued(object? sender, MessageIssuedEventArgs e)

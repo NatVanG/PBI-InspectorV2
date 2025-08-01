@@ -220,7 +220,7 @@ namespace PBIRInspectorWinForm
         internal void Clear()
         {
             txtConsoleOutput.Clear();
-            Main.CleanUp();
+            Main.CleanUpSessionTempFolder();
         }
 
         private void openPBIDesktopFileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)

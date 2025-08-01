@@ -18,7 +18,7 @@ namespace PBIRInspectorClientLibrary.Utils
                 }
                 else
                 {
-                    OutputDirPath = Path.Combine(Path.GetTempPath(), String.Concat(Constants.DefaultVisOpsFolder, Guid.NewGuid().ToString()));
+                    OutputDirPath = Path.Combine(AppUtils.GetTempRootFolderPath(), Guid.NewGuid().ToString());
                     DeleteOutputDirOnExit = true;
                 }
             }

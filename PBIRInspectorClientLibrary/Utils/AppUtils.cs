@@ -42,5 +42,10 @@ namespace PBIRInspectorClientLibrary.Utils
             return about;
         }
 
+        public static string GetTempRootFolderPath()
+        {
+            return Path.Combine(Path.GetTempPath(), Constants.FabInspectorTemp);
+        }
+
     }
 }

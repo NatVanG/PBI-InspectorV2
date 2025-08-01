@@ -17,7 +17,7 @@ namespace PBIRInspectorClientLibrary
         public const string JsonPlaceholder = "%JSON%";
         public const string LogoPlaceholder = "%LOGO%";
         public const string Base64ImgPrefix = @"data:image/png;base64,";
-        public const string DefaultVisOpsFolder = "VisOps";
+        public const string FabInspectorTemp = "FabInspectorTemp32536";
         public const string PNGOutputDir = "PBIInspectorPNG";
         public const string ADOLogIssueTemplate = "##vso[task.logissue type={0};sourcepath={1};linenumber=0;columnnumber=0;]"; //warning|error
         public const string ADOCompleteTemplate = "##vso[task.complete result={0};]DONE";//Failed|SucceededWithIssues|Succeeded

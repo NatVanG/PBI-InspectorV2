@@ -25,11 +25,9 @@ internal partial class Program
             _parsedArgs = ArgsUtils.ParseArgs(args);
 
             Welcome();
-
             PBIRInspectorClientLibrary.Main.WinMessageIssued += Main_MessageIssued;
+            PBIRInspectorClientLibrary.Main.CleanUpRootTempFolder();
             PBIRInspectorClientLibrary.Main.Run(_parsedArgs, pageRenderer, operatorRegistries);
-            //TODO: move to finally block?
-            Exit();
         }
         catch (ArgumentException e)
         {
@@ -38,7 +36,7 @@ internal partial class Program
         finally
         {
             PBIRInspectorClientLibrary.Main.WinMessageIssued -= Main_MessageIssued;
-            PBIRInspectorClientLibrary.Main.CleanUp();
+            Exit();
         }
     }
 
