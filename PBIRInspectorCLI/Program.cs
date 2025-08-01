@@ -77,32 +77,6 @@ internal partial class Program
         var serviceProvider = services.BuildServiceProvider();
 
         return serviceProvider;
-
-        //TODO: cleanup on application end
-        //using (IHost host = new HostBuilder().Build())
-        //{
-        //    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
-
-        //    lifetime.ApplicationStarted.Register(() =>
-        //    {
-        //        Console.WriteLine("Started");
-        //    });
-        //    lifetime.ApplicationStopping.Register(() =>
-        //    {
-        //        Console.WriteLine("Stopping firing");
-        //        Console.WriteLine("Stopping end");
-        //    });
-        //    lifetime.ApplicationStopped.Register(() =>
-        //    {
-        //        Console.WriteLine("Stopped firing");
-        //        Console.WriteLine("Stopped end");
-        //    });
-
-        //    host.Start();
-
-        //    // Listens for Ctrl+C.
-        //    host.WaitForShutdown();
-        //}
     }
 
     private static void Main_MessageIssued(object? sender, PBIRInspectorLibrary.MessageIssuedEventArgs e)

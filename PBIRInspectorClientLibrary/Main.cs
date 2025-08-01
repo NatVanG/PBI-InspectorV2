@@ -179,6 +179,18 @@ namespace PBIRInspectorClientLibrary
                     var msgType = result.Pass ? MessageTypeEnum.Information : result.LogType;
                     OnMessageIssued(result.ItemPath, msgType, result.Message);
                 }
+
+                // Summarise error and warning counts
+                if (testResults != null && testResults.Any())
+                {
+                    OnMessageIssued(MessageTypeEnum.Information, string.Format("Test run summary: {0} errors, {1} warnings.", 
+                        testResults.Count(_ => _.LogType == MessageTypeEnum.Error), 
+                        testResults.Count(_ => _.LogType == MessageTypeEnum.Warning)));
+                }
+                else
+                {
+                    OnMessageIssued(MessageTypeEnum.Information, "Test run summary: No test results found.");
+                }
             }
 
             //Ensure output dir exists
@@ -256,11 +268,10 @@ namespace PBIRInspectorClientLibrary
             }
         }
 
-        public static void CleanUpSessionTempFolder()
+        public static void CleanUpTestRunTempFolder()
         {
             if (_args != null && _args.DeleteOutputDirOnExit && Directory.Exists(_args.OutputDirPath))
             {
-                OnMessageIssued(MessageTypeEnum.Information, string.Format("Deleting temporary session directory at \"{0}\".", _args.OutputDirPath));
                 Directory.Delete(_args.OutputDirPath, true);
             }
         }
@@ -273,7 +284,6 @@ namespace PBIRInspectorClientLibrary
             }
 
             var tempRootDir = AppUtils.GetTempRootFolderPath();  
-            OnMessageIssued(MessageTypeEnum.Information, string.Format("Deleting temporary root directory at \"{0}\".", tempRootDir));
             Directory.Delete(tempRootDir, true);
         }
 
