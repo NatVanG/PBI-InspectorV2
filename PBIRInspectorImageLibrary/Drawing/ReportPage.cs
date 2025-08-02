@@ -34,7 +34,7 @@ namespace PBIRInspectorImageLibrary.Drawing
             const int VISOFFSET = 5;
             const int TEXTPADDINGX = VISOFFSET + 2;
             const int TEXTPADDINGY = VISOFFSET + 12;
-            const string FONT = "Arial";
+            const string FONT = "Liberation Sans";
             const int FONTSIZE = 16;
             const string ICONPATH = @"pbiinspector.png";
             var iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Files", "icon", ICONPATH);
