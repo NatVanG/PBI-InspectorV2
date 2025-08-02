@@ -43,13 +43,13 @@ jobs:
     - name: Prepare Windows package
       run: |
         mkdir -p ./package/win-x64/CLI
-        cp ./build/win-x64/* ./package/win-x64/CLI/
+        cp -r ./build/win-x64/* ./package/win-x64/CLI/
         rm -f ./package/win-x64/CLI/*.pdb ./package/win-x64/CLI/*.config
         
     - name: Prepare Linux package
       run: |
         mkdir -p ./package/linux-x64/CLI
-        cp ./build/linux-x64/* ./package/linux-x64/CLI/
+        cp -r ./build/linux-x64/* ./package/linux-x64/CLI/
         rm -f ./package/linux-x64/CLI/*.pdb ./package/linux-x64/CLI/*.config
         
     - name: Create Windows zip
