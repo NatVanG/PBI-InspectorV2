@@ -32,6 +32,42 @@ namespace PBIRInspectorTests
             Assert.That(parsedArgs.PBIFilePath.Equals("fabricitempath", StringComparison.OrdinalIgnoreCase) && parsedArgs.RulesFilePath.Equals("rulesPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.Verbose);
         }
 
+        [Test]
+        public void TestCLIArgsUtilsSuccess_FabricItemOverwriteOutputTrue()
+        {
+            string[] args = "-fabricitem fabricitempath -rules rulesPath -output outputPath -formats HTML -overwriteoutput true".Split(" ");
+            var parsedArgs = ArgsUtils.ParseArgs(args);
+
+            Assert.That(parsedArgs.PBIFilePath.Equals("fabricitempath", StringComparison.OrdinalIgnoreCase) && parsedArgs.RulesFilePath.Equals("rulesPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.HTMLOutput && parsedArgs.OverwriteOutput);
+        }
+
+        [Test]
+        public void TestCLIArgsUtilsSuccess_FabricItemOverwriteOutputFalse()
+        {
+            string[] args = "-fabricitem fabricitempath -rules rulesPath -output outputPath -formats HTML -overwriteoutput false".Split(" ");
+            var parsedArgs = ArgsUtils.ParseArgs(args);
+
+            Assert.That(parsedArgs.PBIFilePath.Equals("fabricitempath", StringComparison.OrdinalIgnoreCase) && parsedArgs.RulesFilePath.Equals("rulesPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.HTMLOutput && !parsedArgs.OverwriteOutput);
+        }
+
+        [Test]
+        public void TestCLIArgsUtilsSuccess_FabricItemOverwriteOutputFalse2()
+        {
+            string[] args = "-fabricitem fabricitempath -rules rulesPath -output outputPath -formats HTML".Split(" ");
+            var parsedArgs = ArgsUtils.ParseArgs(args);
+
+            Assert.That(parsedArgs.PBIFilePath.Equals("fabricitempath", StringComparison.OrdinalIgnoreCase) && parsedArgs.RulesFilePath.Equals("rulesPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.HTMLOutput && !parsedArgs.OverwriteOutput);
+        }
+
+        [Test]
+        public void TestCLIArgsUtilsSuccess_FabricItemOverwriteOutputTrueCaseInvariant()
+        {
+            string[] args = "-fabricitem fabricitempath -rules rulesPath -output outputPath -formats Html -OverwriteOutput true".Split(" ");
+            var parsedArgs = ArgsUtils.ParseArgs(args);
+
+            Assert.That(parsedArgs.PBIFilePath.Equals("fabricitempath", StringComparison.OrdinalIgnoreCase) && parsedArgs.RulesFilePath.Equals("rulesPath", StringComparison.OrdinalIgnoreCase) && parsedArgs.HTMLOutput && parsedArgs.OverwriteOutput);
+        }
+
 
         [Test]
         public void TestCLIArgsUtilsSuccess_FabricItemOptionVerboseParallel()

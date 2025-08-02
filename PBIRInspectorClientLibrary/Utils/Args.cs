@@ -89,5 +89,17 @@ namespace PBIRInspectorClientLibrary.Utils
         }
 
         public bool Parallel { get; private set; } = false;
+
+        public string OverwriteOutputString
+        {
+            set
+            {
+                var overwrite = false;
+                _ = bool.TryParse(value, out overwrite);
+                OverwriteOutput = overwrite;
+            }
+        }
+
+        public bool OverwriteOutput { get; private set; } = false;
     }
 }

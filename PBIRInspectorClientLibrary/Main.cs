@@ -235,10 +235,23 @@ namespace PBIRInspectorClientLibrary
 
                 if (Directory.Exists(outputPNGDirPath))
                 {
-                    var eventArgs = RaiseWinMessage(MessageTypeEnum.Dialog, string.Format("Delete all existing directory content at \"{0}\"?", outputPNGDirPath));
-                    if (eventArgs.DialogOKResponse)
+                    if (Main._args.OverwriteOutput)
                     {
                         Directory.Delete(outputPNGDirPath, true);
+                    }
+                    else
+                    {
+                        //If the directory already exists and overwrite is not set, ask user if they want to delete existing content.
+                        var eventArgs = RaiseWinMessage(MessageTypeEnum.Dialog, string.Format("Directory already exists at \"{0}\". Do you want to overwrite existing content?", outputPNGDirPath));
+                        if (eventArgs.DialogOKResponse)
+                        {
+                            Directory.Delete(outputPNGDirPath, true);
+                        }
+                        else
+                        {
+                            OnMessageIssued(MessageTypeEnum.Information, "Skipping PNG output as directory already exists and overwrite not set.");
+                            return;
+                        }
                     }
                 }
                 Directory.CreateDirectory(outputPNGDirPath);

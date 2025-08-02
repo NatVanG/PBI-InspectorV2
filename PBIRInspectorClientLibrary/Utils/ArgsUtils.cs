@@ -5,10 +5,10 @@ namespace PBIRInspectorClientLibrary.Utils
     {
         public static Args ParseArgs(string[] args)
         {
-            const string PBIX = "-pbix", PBIP = "-pbip", PBIPREPORT = "-pbipreport", FABRICITEM = "-fabricitem", RULES = "-rules", OUTPUT = "-output", FORMATS = "-formats", VERBOSE = "-verbose", PARALLEL = "-parallel";
+            const string PBIX = "-pbix", PBIP = "-pbip", PBIPREPORT = "-pbipreport", FABRICITEM = "-fabricitem", RULES = "-rules", OUTPUT = "-output", FORMATS = "-formats", VERBOSE = "-verbose", PARALLEL = "-parallel", OVERWRITEOUTPUT = "-overwriteoutput"; 
             const string TRUE = "true";
             const string FALSE = "false";
-            string[] validOptions = { PBIX, PBIP, PBIPREPORT, FABRICITEM, RULES, OUTPUT, FORMATS, VERBOSE, PARALLEL };
+            string[] validOptions = { PBIX, PBIP, PBIPREPORT, FABRICITEM, RULES, OUTPUT, FORMATS, VERBOSE, PARALLEL, OVERWRITEOUTPUT };
 
             int index = 0;
             int maxindex = args.Length - 2;
@@ -38,9 +38,10 @@ namespace PBIRInspectorClientLibrary.Utils
             var outputPath = dic.ContainsKey(OUTPUT) ? dic[OUTPUT] : string.Empty;
             var verboseString = dic.ContainsKey(VERBOSE) ? dic[VERBOSE] : FALSE;
             var parallelString = dic.ContainsKey(PARALLEL) ? dic[PARALLEL] : FALSE;
+            var overwriteOutput = dic.ContainsKey(OVERWRITEOUTPUT) ? dic[OVERWRITEOUTPUT] : FALSE;
             var formatsString = dic.ContainsKey(FORMATS) ? dic[FORMATS] : string.Empty;
 
-            return new Args { PBIFilePath = pbiFilePath, RulesFilePath = rulesPath, OutputPath = outputPath, FormatsString = formatsString, VerboseString = verboseString, ParallelString = parallelString };
+            return new Args { PBIFilePath = pbiFilePath, RulesFilePath = rulesPath, OutputPath = outputPath, FormatsString = formatsString, VerboseString = verboseString, ParallelString = parallelString, OverwriteOutputString = overwriteOutput };
         }
     }
 }
