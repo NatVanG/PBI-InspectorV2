@@ -1,0 +1,77 @@
+name: CLI Release Build
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Build Windows x64 CLI
+      run: |
+        dotnet publish PBIRInspectorCLI/PBIRInspectorCLI.csproj \
+          -c Release \
+          -r win-x64 \
+          --self-contained false \
+          -p:PublishSingleFile=true \
+          -o ./build/win-x64
+          
+    - name: Build Linux x64 CLI
+      run: |
+        dotnet publish PBIRInspectorCLI/PBIRInspectorCLI.csproj \
+          -c Release \
+          -r linux-x64 \
+          --self-contained false \
+          -p:PublishSingleFile=true \
+          -o ./build/linux-x64
+          
+    - name: Prepare Windows package
+      run: |
+        mkdir -p ./package/win-x64/CLI
+        cp ./build/win-x64/* ./package/win-x64/CLI/
+        rm -f ./package/win-x64/CLI/*.pdb ./package/win-x64/CLI/*.config
+        
+    - name: Prepare Linux package
+      run: |
+        mkdir -p ./package/linux-x64/CLI
+        cp ./build/linux-x64/* ./package/linux-x64/CLI/
+        rm -f ./package/linux-x64/CLI/*.pdb ./package/linux-x64/CLI/*.config
+        
+    - name: Create Windows zip
+      run: |
+        cd ./package
+        zip -r ../win-x64-CLI.zip win-x64/
+        
+    - name: Create Linux zip
+      run: |
+        cd ./package
+        zip -r ../linux-x64-CLI.zip linux-x64/
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: "CLI"
+        body: |
+          win-x64 and linux-x64. Command Line Interface.
+          .NET 8.0 dependency not included.
+        files: |
+          win-x64-CLI.zip
+          linux-x64-CLI.zip
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
