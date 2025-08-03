@@ -18,7 +18,7 @@ namespace PBIRInspectorClientLibrary.Utils
                 }
                 else
                 {
-                    OutputDirPath = Path.Combine(Path.GetTempPath(), String.Concat(Constants.DefaultVisOpsFolder, Guid.NewGuid().ToString()));
+                    OutputDirPath = Path.Combine(AppUtils.GetTempRootFolderPath(), Guid.NewGuid().ToString());
                     DeleteOutputDirOnExit = true;
                 }
             }
@@ -89,5 +89,17 @@ namespace PBIRInspectorClientLibrary.Utils
         }
 
         public bool Parallel { get; private set; } = false;
+
+        public string OverwriteOutputString
+        {
+            set
+            {
+                var overwrite = false;
+                _ = bool.TryParse(value, out overwrite);
+                OverwriteOutput = overwrite;
+            }
+        }
+
+        public bool OverwriteOutput { get; private set; } = false;
     }
 }

@@ -5,13 +5,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <SignAssembly>False</SignAssembly>
-    <Version>2.4.2</Version>
+    <Version>2.4.6</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="JsonLogic" Version="5.4.0" />
     <PackageReference Include="JsonPatch.Net" Version="3.3.0" />
     <PackageReference Include="JsonPath.Net" Version="2.1.1" />
+    <PackageReference Include="Yaml2JsonNode" Version="2.2.0" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 
 </Project>

@@ -27,5 +27,14 @@ RUN dotnet publish "./PBIRInspectorCLI.csproj" -c $BUILD_CONFIGURATION -o /app/p
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
+
+# Install Liberation Sans font
+USER root
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends fonts-liberation && \
+    rm -rf /var/lib/apt/lists/*
+USER $APP_UID
+
 COPY --from=publish /app/publish .
+COPY PBIRInspectorClientLibrary/Files ./Files
 ENTRYPOINT ["dotnet", "PBIRInspectorCLI.dll"]

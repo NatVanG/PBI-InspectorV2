@@ -482,6 +482,7 @@ For full rule file examples see:
 - [Example Rules](DocsExamples/Examples-rules.json) - An ever growing library of example rules
 - [Example Rules with Patches](DocsExamples/Example-patches.json) - Examples of patches to fix issues
 - [CopyJob Rules](DocsExamples/Sample-CopyJob-Rules.json) - Rules to check for CopyJob settings/metadata. Yes you can now test any Fabric item's metadata!
+- [Environment Rules](DocsExamples/Example-Environment-Rules.json) - Example rules to check Fabric Environment CI/CD item types.
 - [Rules Template](DocsExamples/RulesTemplate.json) - A simple rules file  template to get you started with your own rules
 
 ## <a id="wiki"></a>Wiki

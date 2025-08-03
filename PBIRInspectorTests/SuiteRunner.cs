@@ -436,7 +436,8 @@ public class SuiteRunner
                 new SetUnionOperator(),
                 new StringContainsOperator(),
                 new ToRecordOperator(),
-                new ToStringOperator()}));
+                new ToStringOperator(),
+                new FromYamlFileOperator()}));
         services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
         services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorWinImageLibrary.ReportPageWireframeRenderer>();
 

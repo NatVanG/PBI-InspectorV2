@@ -49,7 +49,9 @@ namespace PBIRInspectorWinForm
                 new SetUnionOperator(),
                 new StringContainsOperator(),
                 new ToRecordOperator(),
-                new ToStringOperator()}));
+                new ToStringOperator(),
+                new FromYamlFileOperator()
+            }));
             services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
 
             services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorWinImageLibrary.ReportPageWireframeRenderer>();
@@ -218,7 +220,7 @@ namespace PBIRInspectorWinForm
         internal void Clear()
         {
             txtConsoleOutput.Clear();
-            Main.CleanUp();
+            Main.CleanUpTestRunTempFolder();
         }
 
         private void openPBIDesktopFileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -254,7 +256,7 @@ namespace PBIRInspectorWinForm
         {
             try
             {
-                AppUtils.WinOpen(Constants.ReadmePageUrl);
+                AppUtils.OpenUrl(Constants.ReadmePageUrl);
             }
             catch (Exception ex)
             {
@@ -266,7 +268,7 @@ namespace PBIRInspectorWinForm
         {
             try
             {
-                AppUtils.WinOpen(Constants.LicensePageUrl);
+                AppUtils.OpenUrl(Constants.LicensePageUrl);
             }
             catch (Exception ex)
             {
@@ -283,7 +285,7 @@ namespace PBIRInspectorWinForm
         {
             try
             {
-                AppUtils.WinOpen(Constants.LatestReleasePageUrl);
+                AppUtils.OpenUrl(Constants.LatestReleasePageUrl);
             }
             catch (Exception ex)
             {
@@ -295,7 +297,7 @@ namespace PBIRInspectorWinForm
         {
             try
             {
-                AppUtils.WinOpen(Constants.IssuesPageUrl);
+                AppUtils.OpenUrl(Constants.IssuesPageUrl);
             }
             catch (Exception ex)
             {

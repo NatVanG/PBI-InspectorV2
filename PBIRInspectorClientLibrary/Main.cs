@@ -179,6 +179,18 @@ namespace PBIRInspectorClientLibrary
                     var msgType = result.Pass ? MessageTypeEnum.Information : result.LogType;
                     OnMessageIssued(result.ItemPath, msgType, result.Message);
                 }
+
+                // Summarise error and warning counts
+                if (testResults != null && testResults.Any())
+                {
+                    OnMessageIssued(MessageTypeEnum.Information, string.Format("Test run summary: {0} errors, {1} warnings.", 
+                        testResults.Count(_ => _.LogType == MessageTypeEnum.Error), 
+                        testResults.Count(_ => _.LogType == MessageTypeEnum.Warning)));
+                }
+                else
+                {
+                    OnMessageIssued(MessageTypeEnum.Information, "Test run summary: No test results found.");
+                }
             }
 
             //Ensure output dir exists
@@ -223,10 +235,23 @@ namespace PBIRInspectorClientLibrary
 
                 if (Directory.Exists(outputPNGDirPath))
                 {
-                    var eventArgs = RaiseWinMessage(MessageTypeEnum.Dialog, string.Format("Delete all existing directory content at \"{0}\"?", outputPNGDirPath));
-                    if (eventArgs.DialogOKResponse)
+                    if (Main._args.OverwriteOutput)
                     {
                         Directory.Delete(outputPNGDirPath, true);
+                    }
+                    else
+                    {
+                        //If the directory already exists and overwrite is not set, ask user if they want to delete existing content.
+                        var eventArgs = RaiseWinMessage(MessageTypeEnum.Dialog, string.Format("Directory already exists at \"{0}\". Do you want to overwrite existing content?", outputPNGDirPath));
+                        if (eventArgs.DialogOKResponse)
+                        {
+                            Directory.Delete(outputPNGDirPath, true);
+                        }
+                        else
+                        {
+                            OnMessageIssued(MessageTypeEnum.Information, "Skipping PNG output as directory already exists and overwrite not set.");
+                            return;
+                        }
                     }
                 }
                 Directory.CreateDirectory(outputPNGDirPath);
@@ -249,19 +274,30 @@ namespace PBIRInspectorClientLibrary
                 File.WriteAllText(outputHTMLFilePath, html);
 
                 //Results have been written to a temporary directory so show output to user automatically.
-                if (Main._args.DeleteOutputDirOnExit)
+                if (Main._args.DeleteOutputDirOnExit && !Main._args.CONSOLEOutput)
                 {
-                    AppUtils.WinOpen(outputHTMLFilePath);
+                    AppUtils.OpenUrl(outputHTMLFilePath);
                 }
             }
         }
 
-        public static void CleanUp()
+        public static void CleanUpTestRunTempFolder()
         {
             if (_args != null && _args.DeleteOutputDirOnExit && Directory.Exists(_args.OutputDirPath))
             {
                 Directory.Delete(_args.OutputDirPath, true);
             }
+        }
+
+        public static void CleanUpRootTempFolder()
+        {
+            if (!Directory.Exists(AppUtils.GetTempRootFolderPath()))
+            {
+                return;
+            }
+
+            var tempRootDir = AppUtils.GetTempRootFolderPath();  
+            Directory.Delete(tempRootDir, true);
         }
 
         private static void Insp_MessageIssued(object? sender, MessageIssuedEventArgs e)

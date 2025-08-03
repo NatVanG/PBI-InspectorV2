@@ -1,0 +1,31 @@
+name: Archive Old Releases
+
+on:
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Archive old releases
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+
+            const latest = releases.data[0].id;
+
+            for (const release of releases.data) {
+              if (release.id !== latest) {
+                await github.rest.repos.updateRelease({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: release.id,
+                  body: `${release.body || ''}\n\n⚠️ This release is archived and no longer maintained. Please use the latest stable version.`,
+                });
+                console.log(`Updated release: ${release.tag_name}`);
+              }
+            }

@@ -277,6 +277,8 @@ namespace PBIRInspectorLibrary
                         { 
                             var msgType = rule.PathErrorWhenNoMatch ? MessageTypeEnum.Error : MessageTypeEnum.Warning;
                             OnMessageIssued(msgType, (string.Format("Rule \"{0}\" - Part \"{1}\" not found.", rule.Name, rule.Part)));
+                            //TODO: should we fail the test altogether here?
+                            //TODO: document PathErrorWhenNoMatch in wiki
                             //OnMessageIssued(MessageTypeEnum.Error, (string.Format("Rule \"{0}\" - Part \"{1}\" not found, resuming to next rule.", rule.Name, rule.Part)));
                             //continue;
                         }

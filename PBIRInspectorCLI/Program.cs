@@ -25,11 +25,9 @@ internal partial class Program
             _parsedArgs = ArgsUtils.ParseArgs(args);
 
             Welcome();
-
             PBIRInspectorClientLibrary.Main.WinMessageIssued += Main_MessageIssued;
+            PBIRInspectorClientLibrary.Main.CleanUpRootTempFolder();
             PBIRInspectorClientLibrary.Main.Run(_parsedArgs, pageRenderer, operatorRegistries);
-            
-            Exit();
         }
         catch (ArgumentException e)
         {
@@ -38,7 +36,7 @@ internal partial class Program
         finally
         {
             PBIRInspectorClientLibrary.Main.WinMessageIssued -= Main_MessageIssued;
-            PBIRInspectorClientLibrary.Main.CleanUp();
+            Exit();
         }
     }
 
@@ -69,7 +67,8 @@ internal partial class Program
                 new SetUnionOperator(),
                 new StringContainsOperator(),
                 new ToRecordOperator(),
-                new ToStringOperator()}));
+                new ToStringOperator(),
+                new FromYamlFileOperator()}));
         services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
 
         services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorImageLibrary.ReportPageWireframeRenderer>();
@@ -78,32 +77,6 @@ internal partial class Program
         var serviceProvider = services.BuildServiceProvider();
 
         return serviceProvider;
-
-        //TODO: cleanup on application end
-        //using (IHost host = new HostBuilder().Build())
-        //{
-        //    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
-
-        //    lifetime.ApplicationStarted.Register(() =>
-        //    {
-        //        Console.WriteLine("Started");
-        //    });
-        //    lifetime.ApplicationStopping.Register(() =>
-        //    {
-        //        Console.WriteLine("Stopping firing");
-        //        Console.WriteLine("Stopping end");
-        //    });
-        //    lifetime.ApplicationStopped.Register(() =>
-        //    {
-        //        Console.WriteLine("Stopped firing");
-        //        Console.WriteLine("Stopped end");
-        //    });
-
-        //    host.Start();
-
-        //    // Listens for Ctrl+C.
-        //    host.WaitForShutdown();
-        //}
     }
 
     private static void Main_MessageIssued(object? sender, PBIRInspectorLibrary.MessageIssuedEventArgs e)
@@ -182,13 +155,6 @@ internal partial class Program
 
     private static void Exit()
     {
-        if (_parsedArgs.CONSOLEOutput || !(_parsedArgs.ADOOutput || _parsedArgs.GITHUBOutput))
-        {
-            Console.ResetColor();
-            Console.WriteLine("\nPress any key to quit application.");
-            Console.ReadLine();
-        }
-
         var exitCode = PBIRInspectorClientLibrary.Main.ErrorCount > 0 ? 1 : 0;
         Environment.Exit(exitCode);
     }

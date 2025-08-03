@@ -1,17 +1,6 @@
 {
   "rules": [
     {
-      "id": "TEST_TENANTSETTINGS",
-      "name": "Test tenant settings.",
-      "itemtype": "json",
-      "test": [
-        {
-          "var": "tenantSettings.0.settingName"
-        },
-        "AllowServicePrincipalsUseReadAdminAPIsX"
-      ]
-    },
-    {
       "id": "AZURE_MAPS_ENABLED",
       "name": "Check tenant setting for AzureMaps is enabled if we want to deploy a Power BI report that uses the visual.",
       "logType": "error",
@@ -19,7 +8,7 @@
       "itemtype": "*",
       "test": [
         {
-          "and": [
+          "if": [
             {
               "some": [
                 {
@@ -32,26 +21,34 @@
                     }
                   ]
                 },
-                "azureMap"
+                {
+                  "==": [
+                    {
+                      "var": ""
+                    },
+                    "azureMap"
+                  ]
+                }
               ]
             },
             {
               "query": [
                 {
-                  "query": [
-                    {
-                      "part": "TenantSettings.json$"
-                    },
-                    {
-                      "path": "$.*.tenantSettings[?@.settingName=='AzureMaps'].enabled"
-                    }
-                  ]
+                  "part": "tenant-settings.json$"
                 },
                 {
-                  "var": 0
+                  "query": [
+                    {
+                      "path": "$[0][?@.settingName=='AzureMaps'].enabled"
+                    },
+                    {
+                      "var": 0
+                    }
+                  ]
                 }
               ]
-            }
+            },
+            true
           ]
         },
         true
@@ -65,7 +62,7 @@
       "itemtype": "*",
       "test": [
         {
-          "and": [
+          "if": [
             {
               "some": [
                 {
@@ -78,72 +75,34 @@
                     }
                   ]
                 },
-                "SQLDatabase"
+                {
+                  "==": [
+                    {
+                      "var": ""
+                    },
+                    "SQLDatabase"
+                  ]
+                }
               ]
             },
             {
               "query": [
                 {
-                  "query": [
-                    {
-                      "part": "TenantSettings.json$"
-                    },
-                    {
-                      "path": "$.*.tenantSettings[?@.settingName=='SQLDbNativeTenant'].enabled"
-                    }
-                  ]
+                  "part": "tenant-settings.json$"
                 },
                 {
-                  "var": 0
+                  "query": [
+                    {
+                      "path": "$[0][?@.settingName=='SQLDbNativeTenant'].enabled"
+                    },
+                    {
+                      "var": 0
+                    }
+                  ]
                 }
-              ]
-            }
-          ]
-        },
-        true
-      ]
-    },
-    {
-      "id": "CAPACITYSETTINGS_SQLDB_ENABLED",
-      "name": "Check capacity setting for SQLDB is enabled if we want to deploy a SQL Database.",
-      "logType": "error",
-      "disabled": false,
-      "itemtype": "*",
-      "test": [
-        {
-          "and": [
-            {
-              "some": [
-                {
-                  "query": [
-                    {
-                      "part": ".platform$"
-                    },
-                    {
-                      "path": "$.*.metadata.type"
-                    }
-                  ]
-                },
-                "SQLDatabase"
               ]
             },
-            {
-              "query": [
-                {
-                  "query": [
-                    {
-                      "part": "CapacitySettingsTenantOverrides.json$"
-                    },
-                    {
-                      "path": "$.*.value[?@.settingName=='SQLDbNativeTenant'].enabled"
-                    }
-                  ]
-                },
-                {
-                  "var": 0
-                }
-              ]
-            }
+            true
           ]
         },
         true
