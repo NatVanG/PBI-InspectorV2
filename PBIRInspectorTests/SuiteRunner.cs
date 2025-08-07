@@ -22,10 +22,9 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using PBIRInspectorLibrary;
-using PBIRInspectorLibrary.CustomRules;
+using FabInspector.Operators;
 using PBIRInspectorLibrary.Exceptions;
 using PBIRInspectorLibrary.Output;
-using System;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -417,7 +416,7 @@ public class SuiteRunner
         var registries = new List<JsonLogicOperatorRegistry>();
 
         registries.Add(new JsonLogicOperatorRegistry(
-        new PBIRInspectorSerializerContext(),
+        new FabInspectorSerializerContext(),
         new IJsonLogicOperator[] {
                 new CountOperator(),
                 new DrillVariableOperator(),

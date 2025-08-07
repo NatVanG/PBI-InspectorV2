@@ -2,8 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PBIRInspectorClientLibrary;
 using PBIRInspectorClientLibrary.Utils;
 using PBIRInspectorLibrary;
-using PBIRInspectorLibrary.CustomRules;
-using System;
+using FabInspector.Operators;
 
 namespace PBIRInspectorWinForm
 {
@@ -30,7 +29,7 @@ namespace PBIRInspectorWinForm
             var registries = new List<JsonLogicOperatorRegistry>();
 
             registries.Add(new JsonLogicOperatorRegistry(
-            new PBIRInspectorSerializerContext(),
+            new FabInspectorSerializerContext(),
             new IJsonLogicOperator[] { 
                 new CountOperator(),
                 new DrillVariableOperator(), 

@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FabInspector.Operators\FabInspector.Operators.csproj" />
     <ProjectReference Include="..\PBIRInspectorLibrary\PBIRInspectorLibrary.csproj" />
   </ItemGroup>
 
