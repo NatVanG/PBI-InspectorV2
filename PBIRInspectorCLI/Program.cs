@@ -4,6 +4,7 @@ using PBIRInspectorClientLibrary;
 using PBIRInspectorClientLibrary.Utils;
 using PBIRInspectorLibrary;
 using FabInspector.Operators;
+using Ric.Operators;
 
 internal partial class Program
 {
@@ -48,7 +49,7 @@ internal partial class Program
         var registries = new List<JsonLogicOperatorRegistry>();
 
         registries.Add(new JsonLogicOperatorRegistry(
-        new FabInspectorSerializerContext(),
+        new RicSerializerContext(),
         new IJsonLogicOperator[] {
                 new CountOperator(),
                 new DrillVariableOperator(),
@@ -59,7 +60,6 @@ internal partial class Program
                 new PartOperator(),
                 new PathOperator(),
                 new QueryOperator(),
-                new RectangleOverlapOperator(),
                 new SetDifferenceOperator(),
                 new SetEqualOperator(),
                 new SetIntersectionOperator(),
@@ -68,7 +68,14 @@ internal partial class Program
                 new StringContainsOperator(),
                 new ToRecordOperator(),
                 new ToStringOperator(),
-                new FromYamlFileOperator()}));
+                new FromYamlFileOperator()
+        }));
+
+        registries.Add(new JsonLogicOperatorRegistry(
+        new FabInspectorSerializerContext(),
+        new IJsonLogicOperator[] {
+                new RectangleOverlapOperator()}));
+
         services.AddTransient<IEnumerable<JsonLogicOperatorRegistry>>(provider => registries);
 
         services.AddTransient<IReportPageWireframeRenderer, PBIRInspectorImageLibrary.ReportPageWireframeRenderer>();

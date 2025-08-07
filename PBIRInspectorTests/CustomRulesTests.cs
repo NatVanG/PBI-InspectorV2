@@ -1,5 +1,6 @@
 ﻿using Json.More;
 using FabInspector.Operators;
+using Ric.Operators;
 using System.Text.Json.Nodes;
 
 namespace PBIRInspectorTests

@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FabInspector.Operators\FabInspector.Operators.csproj" />
     <ProjectReference Include="..\PBIRInspectorLibrary\PBIRInspectorLibrary.csproj" />
+    <ProjectReference Include="..\Ric.Operators\Ric.Operators.csproj" />
   </ItemGroup>
 
   <ItemGroup>
