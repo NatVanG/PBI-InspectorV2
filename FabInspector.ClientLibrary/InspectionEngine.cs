@@ -199,7 +199,12 @@ namespace FabInspector.ClientLibrary
             var resolvedRuleSets = await ResolveRuleSetsAsync(args).ConfigureAwait(false);
             var fileSystem = await CreateFileSystemAsync().ConfigureAwait(false);
 
-            var targetItemTypes = await ResolveTargetItemTypesAsync(fileSystem).ConfigureAwait(false);
+            var targetItemTypes = ParseFabricItemTypes(args.FabricItemTypes);
+            if (targetItemTypes.Count == 0)
+            {
+                targetItemTypes = await ResolveTargetItemTypesAsync(fileSystem).ConfigureAwait(false);
+            }
+
             var requestedTags = ParseTags(tags);
 
             var discoveredRules = resolvedRuleSets
@@ -352,6 +357,19 @@ namespace FabInspector.ClientLibrary
             return tags
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        }
+
+        private static HashSet<string> ParseFabricItemTypes(IEnumerable<string>? fabricItemTypes)
+        {
+            if (fabricItemTypes == null)
+            {
+                return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            }
+
+            return fabricItemTypes
+                .Where(itemType => !string.IsNullOrWhiteSpace(itemType))
+                .Select(itemType => itemType.Trim())
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
         }
 

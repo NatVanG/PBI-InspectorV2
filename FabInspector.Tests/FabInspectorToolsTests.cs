@@ -118,6 +118,41 @@ public class FabInspectorToolsTests
     }
 
     [Test]
+    public async Task DiscoverRules_UsesFabricItemTypesWhenFabricItemIsNotProvided()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "fab-inspector-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        var rulesPath = Path.Combine(tempDir, "discover-rules.json");
+        File.WriteAllText(rulesPath, BuildDiscoverRulesJson(), Encoding.UTF8);
+
+        try
+        {
+            var sut = CreateSut();
+
+            var json = await sut.DiscoverRules(
+                fabricItemTypes: new List<string> { "report" },
+                rules: rulesPath,
+                tags: "governance",
+                authMethod: "local");
+
+            var discovered = JsonSerializer.Deserialize<DiscoverRulesResponse>(json);
+
+            Assert.That(discovered, Is.Not.Null);
+            Assert.That(discovered!.FabricItem, Is.Null);
+            Assert.That(discovered.TargetItemTypes, Is.EquivalentTo(new[] { "report" }));
+            Assert.That(discovered.Rules.Select(rule => rule.Name), Is.EquivalentTo(new[] { "Report Rule" }));
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
+    }
+
+    [Test]
     public void JsonUtils_DeserialiseFromPath_DeserialisesRuleTagsAsStringList()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "fab-inspector-tests", Guid.NewGuid().ToString("N"));

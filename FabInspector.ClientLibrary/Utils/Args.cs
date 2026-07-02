@@ -5,6 +5,8 @@ namespace FabInspector.ClientLibrary.Utils
     {
         public string? FabricItem { get; set; }
 
+        public List<string>? FabricItemTypes { get; set; }
+
         public string? RulesFilePath { get; set; }
 
         public string? RulesCatalogPath { get; set; }

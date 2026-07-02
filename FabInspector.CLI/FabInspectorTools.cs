@@ -48,18 +48,20 @@ public class FabInspectorTools
 
     [McpServerTool(Name = "discover_rules"), Description("Discover applicable Fabric Inspector guardrails for a Power BI / Fabric item and return planning metadata as JSON.")]
     public async Task<string> DiscoverRules(
-        [Description("Path to a local folder containing Fabric item definitions (e.g. .pbip, .Report folder), or a Fabric item GUID when used with fabricWorkspaceId.")] string fabricItem,
+        [Description("Optional path to a local folder containing Fabric item definitions (e.g. .pbip, .Report folder), or a Fabric item GUID when used with fabricWorkspaceId.")] string? fabricItem = null,
+        [Description("If a fabricItem or fabricWorkspaceId is not provided then pass a list of one or more Fabric item types. When provided, discovery filters rules by matching itemType instead of resolving a concrete item.")] List<string>? fabricItemTypes = null,
         [Description("Path to the rules file (JSON) or a OneLake DFS URL pointing to the rules file. Provide exactly one of 'rules' or 'rulesCatalogPath'.")] string? rules = null,
         [Description("Path to the rules catalog file (JSON) or a OneLake DFS URL pointing to the rules catalog. Provide exactly one of 'rules' or 'rulesCatalogPath'.")] string? rulesCatalogPath = null,
         [Description("Optional comma-separated rule tags. When provided, returns rules containing any matching tag.")] string tags = "",
         [Description("Authentication method to retrieve rules or rules catalog file from OneLake if a remote OneLake URL is provided, default is local. Valid: local, interactive, azurecli. Default: local.")] string authMethod = "local",
-        [Description("Fabric workspace ID (GUID). Requires authentication.")] string? fabricWorkspaceId = null)
+        [Description("Optional Fabric workspace ID (GUID). Requires authentication.")] string? fabricWorkspaceId = null)
     {
         ValidateRulesInput(rules, rulesCatalogPath);
 
         var args = new Args
         {
             FabricItem = fabricItem,
+            FabricItemTypes = fabricItemTypes,
             RulesFilePath = rules ?? string.Empty,
             RulesCatalogPath = rulesCatalogPath ?? string.Empty,
             AuthMethod = authMethod,
