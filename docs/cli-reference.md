@@ -328,4 +328,4 @@ The following environment variables are read automatically when the correspondin
 
 ---
 
-*For CI/CD pipeline setup and tutorials see [Azure DevOps and GitHub integration](usage-scenarios.md). For operator reference see [Ric Operators](Ric-Operators.md) and [FabInspector Operators](FabInspector-Operators.md).*
+*For CI/CD pipeline setup and tutorials see the example GitHub repository at https://github.com/NatVanG/fab-inspector-cicd-example. For operator reference see [Ric Operators](Ric-Operators.md) and [FabInspector Operators](FabInspector-Operators.md).*
