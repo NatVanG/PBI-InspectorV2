@@ -80,6 +80,13 @@ Optional, false by default. If true, rules are split across available processors
 > - Rules that call remote APIs (`apiget`, `dfsget`, `daxquery`, `sqlquery`, `scannerapi`) may hit service throttling/rate limits sooner under parallel fan-out.
 > - `scannerapi` polls for up to 5 minutes per request; parallel use with this operator is not recommended.
 
+```-tags tag1,tag2,...```  
+Optional. Comma-separated rule tags used to filter which rules run.
+- Matching is case-insensitive.
+- A rule is included when it contains **any** requested tag.
+- If omitted or empty, all applicable rules run.
+- Works with both `-rules` and `-rulescatalog`.
+
 ```-pbip filepath``` / ```-pbipreport filepath```  
 Deprecated. Use `-fabricitem` instead. Targeting a `*.pbip` file still works for local mode.
 
@@ -108,6 +115,11 @@ fab-inspector -fabricitem "C:\Files\Sales.Report" -rules ".\Files\Base-rules.jso
 fab-inspector -fabricitem "C:\Files\Sales.Report" -rules ".\Files\Base-rules.json" -formats "ADO"
 ```
 
+**Local mode — run only tagged rules (`governance` or `performance`):**
+```bash
+fab-inspector -fabricitem "C:\Files\Sales.Report" -rules ".\Files\Base-rules.json" -tags "governance,performance" -formats "Console,JSON"
+```
+
 **Local mode — CopyJob item with GitHub logging:**
 ```bash
 fab-inspector -fabricitem "C:\Files\copyjob1.CopyJob" -rules "C:\Files\Sample-CopyJob-Rules.json" -formats GitHub
@@ -126,6 +138,11 @@ fab-inspector -fabricworkspace "12345678-1234-1234-1234-123456789abc" -rules ".\
 **Item-scoped — single item, interactive auth:**
 ```bash
 fab-inspector -fabricworkspace "12345678-1234-1234-1234-123456789abc" -fabricitem "87654321-4321-4321-4321-cba987654321" -rules ".\Files\Base-rules.json" -authmethod interactive -formats Console
+```
+
+**Item-scoped — single item with tag filter + Azure CLI auth:**
+```bash
+fab-inspector -fabricworkspace "12345678-1234-1234-1234-123456789abc" -fabricitem "87654321-4321-4321-4321-cba987654321" -rules ".\Files\Base-rules.json" -authmethod azurecli -tags "security" -formats Console
 ```
 
 **Item-scoped — CI/CD pipeline with client secret:**
@@ -163,6 +180,7 @@ This is useful in agentic workflows where an agent is creating or editing Fabric
 | `rules` | Conditional | Local rules JSON path or OneLake DFS URL. Provide exactly one of `rules` or `rulesCatalogPath`. |
 | `rulesCatalogPath` | Conditional | Local rules catalog JSON path or OneLake DFS URL. Provide exactly one of `rules` or `rulesCatalogPath`. |
 | `verbose` | No | `false` by default. If `true`, passing and failing rule results are included. |
+| `tags` | No | Comma-separated tags. When supplied, rules are filtered by any matching tag (case-insensitive). If omitted or empty, all applicable rules run. |
 | `authMethod` | No | `local` (default), `interactive`, or `azurecli`. |
 | `fabricWorkspaceId` | No | Fabric workspace GUID. Required for workspace/item GUID scenarios. |
 
@@ -206,6 +224,19 @@ This is useful in agentic workflows where an agent is creating or editing Fabric
 }
 ```
 
+**Local folder + local rules (tag-filtered):**
+```json
+{
+	"tool": "inspect",
+	"arguments": {
+		"fabricItem": "C:\\Files\\Sales.Report",
+		"rules": "C:\\Rules\\Base-rules.json",
+		"tags": "governance,performance",
+		"authMethod": "local"
+	}
+}
+```
+
 **Workspace item GUID + interactive auth:**
 ```json
 {
@@ -228,7 +259,7 @@ This is useful in agentic workflows where an agent is creating or editing Fabric
 | `fabricItem` | Yes | Local path to a Fabric item/folder, or a Fabric item GUID when used with `fabricWorkspaceId`. |
 | `rules` | Conditional | Local rules JSON path or OneLake DFS URL. Provide exactly one of `rules` or `rulesCatalogPath`. |
 | `rulesCatalogPath` | Conditional | Local rules catalog JSON path or OneLake DFS URL. Provide exactly one of `rules` or `rulesCatalogPath`. |
-| `tags` | No | Comma-separated tags. When supplied, rules are filtered by any matching tag (case-insensitive). |
+| `tags` | No | Comma-separated tags. When supplied, rules are filtered by any matching tag (case-insensitive). If omitted or empty, all applicable rules are returned. |
 | `authMethod` | No | `local` (default), `interactive`, or `azurecli`. |
 | `fabricWorkspaceId` | No | Fabric workspace GUID. Required for workspace/item GUID scenarios. |
 
@@ -280,6 +311,20 @@ This is useful in agentic workflows where an agent is creating or editing Fabric
 		"fabricWorkspaceId": "12345678-1234-1234-1234-123456789abc",
 		"fabricItem": "87654321-4321-4321-4321-cba987654321",
 		"rules": "./Rules/ci-rules.json",
+		"tags": "governance,security",
+		"authMethod": "interactive"
+	}
+}
+```
+
+**Workspace-scoped (all items) + local rules (tag-filtered):**
+```json
+{
+	"tool": "discover_rules",
+	"arguments": {
+		"fabricWorkspaceId": "12345678-1234-1234-1234-123456789abc",
+		"rules": "./Rules/ci-rules.json",
+		"tags": "performance",
 		"authMethod": "interactive"
 	}
 }

@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0] - 2026-07-22
+
+### Added
+- Rule tags filtering: new `-tags` CLI option and `tags` MCP tool parameter to run only rules containing any matching tag (case-insensitive); an empty value runs all applicable rules. Matched tags are now surfaced in JSON and HTML output.
+- `fabricItemTypes` parameter for `discover_rules`, allowing rule discovery to filter by one or more Fabric item types without resolving a concrete item.
+
+### Changed
+- `DiscoverRules` now exposes an async `DiscoverRulesAsync` method and propagates the active tags filter through the inspection engine and output context.
+- Updated CLI, operators, examples, intro, and usage-scenarios documentation, including a corrected CI/CD pipeline reference link.
+
+[3.5.0]: https://github.com/NatVanG/fab-inspector/compare/v3.4.0...v3.5.0
+
 ## [3.4.0] - 2026-06-29
 
 ### Added
