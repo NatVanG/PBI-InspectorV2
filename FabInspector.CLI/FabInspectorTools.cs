@@ -24,6 +24,7 @@ public class FabInspectorTools
         [Description("Path to the rules file (JSON) or a OneLake DFS URL pointing to the rules file. Provide exactly one of 'rules' or 'rulesCatalogPath'.")] string? rules = null,
         [Description("Path to the rules catalog file (JSON) or a OneLake DFS URL pointing to the rules catalog. Provide exactly one of 'rules' or 'rulesCatalogPath'.")] string? rulesCatalogPath = null,
         [Description("Enable verbose output to include passing results. Default: false.")] bool verbose = false,
+        [Description("Optional comma-separated rule tags. When provided, only rules containing any matching tag (case-insensitive) are run; empty runs all applicable rules.")] string tags = "",
         [Description("Authentication method. Valid: local, interactive, azurecli. Default: local.")] string authMethod = "local",
         [Description("Fabric workspace ID (GUID). Requires authentication.")] string? fabricWorkspaceId = null)
     {
@@ -35,6 +36,7 @@ public class FabInspectorTools
             RulesFilePath = rules ?? string.Empty,
             RulesCatalogPath = rulesCatalogPath ?? string.Empty,
             VerboseString = verbose.ToString(),
+            Tags = tags,
             AuthMethod = authMethod,
             FabricWorkspaceId = fabricWorkspaceId,
             OutputPath = string.Empty,
@@ -64,13 +66,14 @@ public class FabInspectorTools
             FabricItemTypes = fabricItemTypes,
             RulesFilePath = rules ?? string.Empty,
             RulesCatalogPath = rulesCatalogPath ?? string.Empty,
+            Tags = tags,
             AuthMethod = authMethod,
             FabricWorkspaceId = fabricWorkspaceId,
             OutputPath = string.Empty,
             FormatsString = string.Empty
         };
 
-        var discoveredRules = await FabInspector.ClientLibrary.Main.DiscoverRulesAsync(args, tags);
+        var discoveredRules = await FabInspector.ClientLibrary.Main.DiscoverRulesAsync(args);
 
         return JsonSerializer.Serialize(discoveredRules, new JsonSerializerOptions { WriteIndented = true });
     }

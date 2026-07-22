@@ -189,7 +189,7 @@ public class DiRefactorTests
             };
 
             var engine = new InspectionEngine();
-            var discovered = await engine.DiscoverRulesAsync(args, tags: string.Empty);
+            var discovered = await engine.DiscoverRulesAsync(args);
 
             Assert.That(discovered.Rules.Select(_ => _.Name), Is.EquivalentTo(new[]
             {
@@ -233,8 +233,9 @@ public class DiRefactorTests
                 AuthMethod = "local"
             };
 
+            args.Tags = "governance, PERFORMANCE";
             var engine = new InspectionEngine();
-            var discovered = await engine.DiscoverRulesAsync(args, tags: "governance, PERFORMANCE");
+            var discovered = await engine.DiscoverRulesAsync(args);
 
             Assert.That(discovered.Rules.Select(_ => _.Name), Is.EquivalentTo(new[]
             {
@@ -276,7 +277,7 @@ public class DiRefactorTests
             };
 
             var engine = new InspectionEngine();
-            var discovered = await engine.DiscoverRulesAsync(args, tags: string.Empty);
+            var discovered = await engine.DiscoverRulesAsync(args);
 
             Assert.That(discovered.Rules, Has.Count.EqualTo(1));
 

@@ -51,6 +51,8 @@ OPTIONAL PARAMETERS:
   -verbose <true|false>           Display all results including passes (default: false)
   -parallel <true|false>          Enable parallel rule processing (default: false)
   -overwriteoutput <true|false>   Overwrite existing output (default: false)
+  -tags <tag1,tag2,...>           Comma-separated rule tags. When provided, only rules containing any
+                                  matching tag (case-insensitive) are run; empty runs all applicable rules.
 
 AUTHENTICATION PARAMETERS (use -authmethod):
   -authmethod <method>            Authentication method (default: local)
@@ -127,9 +129,9 @@ For more information, visit: https://github.com/NatVanG/fab-inspector
 
         public static Args ParseArgs(string[] args)
         {
-            const string PBIX = "-pbix", PBIP = "-pbip", PBIPREPORT = "-pbipreport", FABRICITEM = "-fabricitem", FABRICWORKSPACE = "-fabricworkspace", RULES = "-rules", RULESCATALOG = "-rulescatalog", OUTPUT = "-output", FORMATS = "-formats", VERBOSE = "-verbose", PARALLEL = "-parallel", OVERWRITEOUTPUT = "-overwriteoutput", AUTHMETHOD = "-authmethod", TENANTID = "-tenantid", CLIENTID = "-clientid", CLIENTSECRET = "-clientsecret", CERTIFICATEPATH = "-certificatepath", CERTIFICATEPASSWORD = "-certificatepassword", FEDERATEDTOKEN = "-federatedtoken", HELP = "-help";
+            const string PBIX = "-pbix", PBIP = "-pbip", PBIPREPORT = "-pbipreport", FABRICITEM = "-fabricitem", FABRICWORKSPACE = "-fabricworkspace", RULES = "-rules", RULESCATALOG = "-rulescatalog", OUTPUT = "-output", FORMATS = "-formats", VERBOSE = "-verbose", PARALLEL = "-parallel", OVERWRITEOUTPUT = "-overwriteoutput", TAGS = "-tags", AUTHMETHOD = "-authmethod", TENANTID = "-tenantid", CLIENTID = "-clientid", CLIENTSECRET = "-clientsecret", CERTIFICATEPATH = "-certificatepath", CERTIFICATEPASSWORD = "-certificatepassword", FEDERATEDTOKEN = "-federatedtoken", HELP = "-help";
             const string FALSE = "false";
-            string[] validOptions = { PBIX, PBIP, PBIPREPORT, FABRICITEM, FABRICWORKSPACE, RULES, RULESCATALOG, OUTPUT, FORMATS, VERBOSE, PARALLEL, OVERWRITEOUTPUT, AUTHMETHOD, TENANTID, CLIENTID, CLIENTSECRET, CERTIFICATEPATH, CERTIFICATEPASSWORD, FEDERATEDTOKEN, HELP };
+            string[] validOptions = { PBIX, PBIP, PBIPREPORT, FABRICITEM, FABRICWORKSPACE, RULES, RULESCATALOG, OUTPUT, FORMATS, VERBOSE, PARALLEL, OVERWRITEOUTPUT, TAGS, AUTHMETHOD, TENANTID, CLIENTID, CLIENTSECRET, CERTIFICATEPATH, CERTIFICATEPASSWORD, FEDERATEDTOKEN, HELP };
 
             int index = 0;
             int maxindex = args.Length - 2;
@@ -167,6 +169,7 @@ For more information, visit: https://github.com/NatVanG/fab-inspector
             var parallelString = dic.ContainsKey(PARALLEL) ? dic[PARALLEL] : FALSE;
             var overwriteOutput = dic.ContainsKey(OVERWRITEOUTPUT) ? dic[OVERWRITEOUTPUT] : FALSE;
             var formatsString = dic.ContainsKey(FORMATS) ? dic[FORMATS] : string.Empty;
+            var tags = dic.ContainsKey(TAGS) ? dic[TAGS] : null;
             
             // Fabric workspace parameter
             var fabricWorkspaceId = dic.ContainsKey(FABRICWORKSPACE) ? dic[FABRICWORKSPACE] : null;
@@ -278,6 +281,7 @@ For more information, visit: https://github.com/NatVanG/fab-inspector
                 VerboseString = verboseString, 
                 ParallelString = parallelString, 
                 OverwriteOutputString = overwriteOutput, 
+                Tags = tags,
                 AuthMethod = authMethod,
                 TenantId = tenantId,
                 ClientId = clientId,

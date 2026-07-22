@@ -110,7 +110,7 @@ namespace FabInspector.ClientLibrary
         /// Resolves applicable rules without executing tests and returns
         /// planning metadata for agent workflows.
         /// </summary>
-        public static async Task<DiscoverRulesResponse> DiscoverRulesAsync(Args args, string? tags)
+        public static async Task<DiscoverRulesResponse> DiscoverRulesAsync(Args args)
         {
             _args = args;
 
@@ -118,7 +118,7 @@ namespace FabInspector.ClientLibrary
             using var hook = HookEngine(engine);
             try
             {
-                return await engine.DiscoverRulesAsync(args, tags).ConfigureAwait(false);
+                return await engine.DiscoverRulesAsync(args).ConfigureAwait(false);
             }
             finally
             {

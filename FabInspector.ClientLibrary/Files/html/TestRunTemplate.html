@@ -103,6 +103,11 @@
                         </div>
 
                         <div>
+                            <label for="filterTags" class="form-label small mb-1">Tags</label>
+                            <input id="filterTags" name="tags" type="search" class="form-control form-control-sm" placeholder="Contains...">
+                        </div>
+
+                        <div>
                             <label for="filterPass" class="form-label small mb-1">Pass</label>
                             <select id="filterPass" name="pass" class="form-select form-select-sm">
                                 <option value="any" selected>Any</option>
@@ -213,6 +218,19 @@
                             "<>": "p",
                             "class": "pb-3 mb-0 small lh-sm",
                             "html": [{ "<>": "strong", "class": "d-block text-gray-dark", "text": "Verbose" }, { "text": "${Verbose}" }]
+                        }
+                    ]
+                },
+                {
+                    "<>": "div",
+                    "class": "d-flex text-body-secondary pt-3",
+                    "html": [
+                        {
+                            "<>": "p",
+                            "class": function () {
+                                return this.TagsFilter ? "pb-3 mb-0 small lh-sm" : "pb-3 mb-0 small lh-sm d-none";
+                            },
+                            "html": [{ "<>": "strong", "class": "d-block text-gray-dark", "text": "Tags Filter" }, { "text": function () { return this.TagsFilter || ""; } }]
                         }
                     ]
                 },
@@ -365,6 +383,24 @@
                                                 },
                                                 {
                                                     "<>": "p",
+                                                    "class": function () {
+                                                        return (this.Tags && this.Tags.length > 0) ? "pb-3 mb-0 small lh-sm" : "pb-3 mb-0 small lh-sm d-none";
+                                                    },
+                                                    "html": [
+                                                        {
+                                                            "<>": "strong",
+                                                            "class": "d-block text-gray-dark",
+                                                            "text": "Tags"
+                                                        },
+                                                        {
+                                                            "text": function () {
+                                                                return (this.Tags && this.Tags.length > 0) ? this.Tags.join(", ") : "";
+                                                            }
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "<>": "p",
                                                     "class": "pb-3 mb-0 small lh-sm",
                                                     "html": [
                                                         {
@@ -469,6 +505,20 @@
             return normalizeText(sourceValue).includes(expectedValue);
         }
 
+        function matchesTags(tagsArray, expectedValue) {
+            if (!expectedValue) {
+                return true;
+            }
+
+            if (!Array.isArray(tagsArray) || tagsArray.length === 0) {
+                return false;
+            }
+
+            return tagsArray.some(function (tag) {
+                return normalizeText(tag).includes(expectedValue);
+            });
+        }
+
         function getActiveFilters() {
             const passFilterDisabled = $("#filterPass").prop("disabled");
 
@@ -476,9 +526,10 @@
                 ruleSetName: normalizeText($("#filterRuleSetName").val()),
                 ruleName: normalizeText($("#filterRuleName").val()),
                 logType: $("#filterLogType").val(),
-                ruleItemType: normalizeText($("#filterRuleItemType").val()),
+                 ruleItemType: normalizeText($("#filterRuleItemType").val()),
                 itemPath: normalizeText($("#filterItemPath").val()),
                 parentDisplayName: normalizeText($("#filterParentDisplayName").val()),
+                tags: normalizeText($("#filterTags").val()),
                 pass: passFilterDisabled ? "any" : $("#filterPass").val()
             };
         }
@@ -552,6 +603,7 @@
                     && matchesContains(item.RuleItemType, filters.ruleItemType)
                     && matchesContains(item.ItemPath, filters.itemPath)
                     && matchesContains(item.ParentDisplayName, filters.parentDisplayName)
+                    && matchesTags(item.Tags, filters.tags)
                     && matchPass(item, filters.pass);
             });
 

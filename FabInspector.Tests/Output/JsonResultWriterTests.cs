@@ -193,6 +193,32 @@ namespace FabInspector.Tests.Output
             Assert.That(testRun!.Id, Is.EqualTo(context.TestRunId));
         }
 
+        [Test]
+        public async Task WriteAsync_SerializedTestRun_IncludesTagsFilterAndResultTags()
+        {
+            var results = new List<TestResult>
+            {
+                new() { RuleName = "R1", Message = "ok", Pass = true, Tags = new List<string> { "governance", "security" } }
+            };
+
+            var context = new OutputContext
+            {
+                TestResults = results,
+                LocalOutputDirPath = _tempDir,
+                IsOneLakeOutput = false,
+                TestedFilePath = "test",
+                TagsFilter = "governance",
+            };
+
+            var writer = new JsonResultWriter();
+            await writer.WriteAsync(context);
+
+            var testRun = JsonSerializer.Deserialize<TestRun>(context.JsonTestRun);
+            Assert.That(testRun, Is.Not.Null);
+            Assert.That(testRun!.TagsFilter, Is.EqualTo("governance"));
+            Assert.That(testRun.Results.Single().Tags, Is.EqualTo(new[] { "governance", "security" }));
+        }
+
         private OutputContext CreateContext(
             IEnumerable<TestResult> results,
             bool isOneLakeOutput = false,

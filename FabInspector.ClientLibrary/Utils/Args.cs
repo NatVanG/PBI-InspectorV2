@@ -121,5 +121,7 @@ namespace FabInspector.ClientLibrary.Utils
         public string? FederatedToken { get; set; }
         
         public string? FabricWorkspaceId { get; set; }
+
+        public string? Tags { get; set; }
     }
 }
