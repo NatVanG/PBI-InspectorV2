@@ -11,6 +11,7 @@ namespace FabInspector.ClientLibrary.Output
         public required string TestedFilePath { get; init; }
         public string? RulesFilePath { get; init; }
         public string? RulesCatalogPath { get; init; }
+        public string? TagsFilter { get; init; }
         public bool Verbose { get; init; }
         public bool OverwriteOutput { get; init; }
         public string? FabricItem { get; init; }

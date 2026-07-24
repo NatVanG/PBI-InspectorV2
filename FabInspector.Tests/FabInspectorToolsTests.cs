@@ -78,6 +78,82 @@ public class FabInspectorToolsTests
     }
 
     [Test]
+    public async Task Inspect_WithTags_FiltersRulesAndPopulatesResultTags()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "fab-inspector-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        var itemDir = Path.Combine(tempDir, "Sales.Report");
+        Directory.CreateDirectory(itemDir);
+        File.WriteAllText(Path.Combine(itemDir, ".platform"), "{\"metadata\":{\"type\":\"Report\",\"displayName\":\"Sales\"}}", Encoding.UTF8);
+
+        var rulesPath = Path.Combine(tempDir, "tagged-inspect-rules.json");
+        File.WriteAllText(rulesPath, BuildTaggedInspectRulesJson(), Encoding.UTF8);
+
+        try
+        {
+            var sut = CreateSut();
+
+            var json = await sut.Inspect(
+                fabricItem: itemDir,
+                rules: rulesPath,
+                verbose: true,
+                tags: "governance",
+                authMethod: "local");
+
+            var testRun = JsonSerializer.Deserialize<TestRun>(json);
+
+            Assert.That(testRun, Is.Not.Null);
+            Assert.That(testRun!.Results.Select(r => r.RuleName), Is.EquivalentTo(new[] { "Governance Rule" }));
+            Assert.That(testRun.Results.Single().Tags, Is.EqualTo(new[] { "governance" }));
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
+    }
+
+    [Test]
+    public async Task Inspect_WithoutTags_RunsAllApplicableRules()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "fab-inspector-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        var itemDir = Path.Combine(tempDir, "Sales.Report");
+        Directory.CreateDirectory(itemDir);
+        File.WriteAllText(Path.Combine(itemDir, ".platform"), "{\"metadata\":{\"type\":\"Report\",\"displayName\":\"Sales\"}}", Encoding.UTF8);
+
+        var rulesPath = Path.Combine(tempDir, "tagged-inspect-rules.json");
+        File.WriteAllText(rulesPath, BuildTaggedInspectRulesJson(), Encoding.UTF8);
+
+        try
+        {
+            var sut = CreateSut();
+
+            var json = await sut.Inspect(
+                fabricItem: itemDir,
+                rules: rulesPath,
+                verbose: true,
+                authMethod: "local");
+
+            var testRun = JsonSerializer.Deserialize<TestRun>(json);
+
+            Assert.That(testRun, Is.Not.Null);
+            Assert.That(testRun!.Results.Select(r => r.RuleName), Is.EquivalentTo(new[] { "Governance Rule", "Performance Rule" }));
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
+    }
+
+    [Test]
     public async Task DiscoverRules_ReturnsSerializedDiscoverRulesJson()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "fab-inspector-tests", Guid.NewGuid().ToString("N"));
@@ -107,6 +183,41 @@ public class FabInspectorToolsTests
             Assert.That(discovered.RulesFilePath, Is.EqualTo(rulesPath));
             Assert.That(discovered.Rules.Any(rule => string.Equals(rule.Name, "Report Rule", StringComparison.Ordinal)), Is.True);
             Assert.That(discovered.Rules.Any(rule => string.Equals(rule.Name, "Json Rule", StringComparison.Ordinal)), Is.False);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
+    }
+
+    [Test]
+    public async Task DiscoverRules_UsesFabricItemTypesWhenFabricItemIsNotProvided()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), "fab-inspector-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+
+        var rulesPath = Path.Combine(tempDir, "discover-rules.json");
+        File.WriteAllText(rulesPath, BuildDiscoverRulesJson(), Encoding.UTF8);
+
+        try
+        {
+            var sut = CreateSut();
+
+            var json = await sut.DiscoverRules(
+                fabricItemTypes: new List<string> { "report" },
+                rules: rulesPath,
+                tags: "governance",
+                authMethod: "local");
+
+            var discovered = JsonSerializer.Deserialize<DiscoverRulesResponse>(json);
+
+            Assert.That(discovered, Is.Not.Null);
+            Assert.That(discovered!.FabricItem, Is.Null);
+            Assert.That(discovered.TargetItemTypes, Is.EquivalentTo(new[] { "report" }));
+            Assert.That(discovered.Rules.Select(rule => rule.Name), Is.EquivalentTo(new[] { "Report Rule" }));
         }
         finally
         {
@@ -237,8 +348,7 @@ public class FabInspectorToolsTests
     }
 
     private static string BuildInspectRulesJson()
-    {
-        return """
+    {        return """
 {
   "rules": [
     {
@@ -246,6 +356,18 @@ public class FabInspectorToolsTests
       "itemType": "none",
       "test": [ { "==": [1, 1] }, true ]
     }
+  ]
+}
+""";
+    }
+
+    private static string BuildTaggedInspectRulesJson()
+    {
+        return """
+{
+  "rules": [
+    { "name": "Governance Rule", "itemType": "report", "tags": ["governance"], "test": [ { "==": [1, 1] }, true ] },
+    { "name": "Performance Rule", "itemType": "report", "tags": ["performance"], "test": [ { "==": [1, 1] }, true ] }
   ]
 }
 """;

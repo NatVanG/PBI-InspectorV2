@@ -25,6 +25,7 @@ namespace FabInspector.ClientLibrary.Output
                 TestedFilePath = context.TestedFilePath,
                 RulesFilePath = context.RulesFilePath,
                 RulesCatalogPath = context.RulesCatalogPath,
+                TagsFilter = context.TagsFilter,
                 Verbose = context.Verbose,
                 Results = context.TestResults
             };

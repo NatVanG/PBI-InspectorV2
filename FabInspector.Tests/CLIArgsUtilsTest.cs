@@ -79,6 +79,24 @@ namespace FabInspector.Tests
         }
 
         [Test]
+        public void TestCLIArgsUtilsSuccess_TagsOption()
+        {
+            string[] args = "-fabricitem fabricitempath -rules rulesPath -tags governance,performance".Split(" ");
+            var parsedArgs = ArgsUtils.ParseArgs(args);
+
+            Assert.That(parsedArgs.Tags, Is.EqualTo("governance,performance"));
+        }
+
+        [Test]
+        public void TestCLIArgsUtilsSuccess_TagsOptionMissingIsNull()
+        {
+            string[] args = "-fabricitem fabricitempath -rules rulesPath".Split(" ");
+            var parsedArgs = ArgsUtils.ParseArgs(args);
+
+            Assert.That(parsedArgs.Tags, Is.Null);
+        }
+
+        [Test]
         public void TestCLIArgsUtilsSuccess_PBIPOption()
         {
             string[] args = "-pbip pbipPath -rules rulesPath -verbose true".Split(" ");

@@ -5,6 +5,8 @@ namespace FabInspector.ClientLibrary.Utils
     {
         public string? FabricItem { get; set; }
 
+        public List<string>? FabricItemTypes { get; set; }
+
         public string? RulesFilePath { get; set; }
 
         public string? RulesCatalogPath { get; set; }
@@ -119,5 +121,7 @@ namespace FabInspector.ClientLibrary.Utils
         public string? FederatedToken { get; set; }
         
         public string? FabricWorkspaceId { get; set; }
+
+        public string? Tags { get; set; }
     }
 }

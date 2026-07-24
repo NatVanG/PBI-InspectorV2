@@ -120,6 +120,20 @@ namespace FabInspector.Tests.Output
             Assert.That(messages.Any(m => m.Contains("Writing HTML output")), Is.True);
         }
 
+        [Test]
+        public async Task WriteAsync_HtmlContainsTagsFilterInput()
+        {
+            var renderer = new StubPageRenderer();
+            var context = CreateContext(jsonTestRun: "{}");
+
+            var writer = new HtmlResultWriter(renderer);
+            await writer.WriteAsync(context);
+
+            var htmlFile = Path.Combine(_tempDir, Constants.TestRunHTMLFileName);
+            var html = File.ReadAllText(htmlFile);
+            Assert.That(html, Does.Contain("filterTags"));
+        }
+
         private OutputContext CreateContext(
             string jsonTestRun,
             bool isOneLakeOutput = false,

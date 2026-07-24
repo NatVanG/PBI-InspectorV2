@@ -6,6 +6,7 @@ namespace FabInspector.Core.Output
             public string? TestedFilePath { get; set; }
             public string? RulesFilePath { get; set; }
             public string? RulesCatalogPath { get; set; }
+            public string? TagsFilter { get; set; }
         public DateTime CompletionTime { get; set; }
         public bool Verbose { get; set; }
             public IEnumerable<TestResult> Results { get; set; } = [];

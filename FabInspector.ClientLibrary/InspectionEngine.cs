@@ -187,7 +187,7 @@ namespace FabInspector.ClientLibrary
         /// Resolves applicable rules for the provided item/workspace context without executing tests
         /// and returns agent-oriented planning metadata.
         /// </summary>
-        public async Task<DiscoverRulesResponse> DiscoverRulesAsync(Args args, string? tags)
+        public async Task<DiscoverRulesResponse> DiscoverRulesAsync(Args args)
         {
             _args = args;
 
@@ -199,8 +199,13 @@ namespace FabInspector.ClientLibrary
             var resolvedRuleSets = await ResolveRuleSetsAsync(args).ConfigureAwait(false);
             var fileSystem = await CreateFileSystemAsync().ConfigureAwait(false);
 
-            var targetItemTypes = await ResolveTargetItemTypesAsync(fileSystem).ConfigureAwait(false);
-            var requestedTags = ParseTags(tags);
+            var targetItemTypes = ParseFabricItemTypes(args.FabricItemTypes);
+            if (targetItemTypes.Count == 0)
+            {
+                targetItemTypes = await ResolveTargetItemTypesAsync(fileSystem).ConfigureAwait(false);
+            }
+
+            var requestedTags = ParseTags(args.Tags);
 
             var discoveredRules = resolvedRuleSets
                 .SelectMany(ruleSet => ProjectDiscoverableRules(ruleSet, targetItemTypes, requestedTags))
@@ -286,6 +291,7 @@ namespace FabInspector.ClientLibrary
             using var holderScope = InspectionContextHolder.PushScope(inspectionContext);
 
             var resolvedRuleSets = await ResolveRuleSetsAsync(args).ConfigureAwait(false);
+            resolvedRuleSets = FilterRuleSetsByTags(resolvedRuleSets, ParseTags(args.Tags));
             var fileSystem = await CreateFileSystemAsync().ConfigureAwait(false);
             fileSystem.ScopedItemTypes = GetScopedItemTypes(resolvedRuleSets);
             var remoteFs = SubscribeToProgressEvents(fileSystem);
@@ -352,6 +358,40 @@ namespace FabInspector.ClientLibrary
             return tags
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Filters the rules within each resolved rule set to those matching any of the
+        /// requested tags. When no tags are requested every rule is retained.
+        /// </summary>
+        private static IReadOnlyList<ResolvedRuleSet> FilterRuleSetsByTags(IReadOnlyList<ResolvedRuleSet> resolvedRuleSets, HashSet<string> requestedTags)
+        {
+            if (requestedTags.Count == 0)
+            {
+                return resolvedRuleSets;
+            }
+
+            foreach (var ruleSet in resolvedRuleSets)
+            {
+                ruleSet.Rules.Rules = ruleSet.Rules.Rules
+                    .Where(rule => RuleApplicabilityService.MatchesTags(rule, requestedTags))
+                    .ToList();
+            }
+
+            return resolvedRuleSets;
+        }
+
+        private static HashSet<string> ParseFabricItemTypes(IEnumerable<string>? fabricItemTypes)
+        {
+            if (fabricItemTypes == null)
+            {
+                return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            }
+
+            return fabricItemTypes
+                .Where(itemType => !string.IsNullOrWhiteSpace(itemType))
+                .Select(itemType => itemType.Trim())
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
         }
 

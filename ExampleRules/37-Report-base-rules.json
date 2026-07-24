@@ -4,6 +4,7 @@
       "id": "REMOVE_UNUSED_CUSTOM_VISUALS",
       "name": "Remove custom visuals which are not used in the report.",
       "description": "Returns an array of custom visual names to be removed if any. To disable this rule, mark it as disabled in the base rules file.",
+      "tags": ["performance", "governance"],
       "disabled": false,
       "itemType": "Report",
       "part": "Report",
@@ -32,6 +33,7 @@
       "name": "Reduce the number of visible visuals on the page",
       "description": "Reports a test fail if the rule's maximum number of visible visuals on the page is exceeded. By default the base rules file specifies 20 as the maximum, set the paramMaxVisualsPerPage parameter to change this. To disable this rule, mark it as disabled in the base rules file.",
       "disabled": false,
+      "tags": ["accessiblity","performance"],
       "itemType": "Report",
       "part": "Pages",
       "test": [

@@ -16,6 +16,8 @@ namespace FabInspector.Core.Output
 
         public string? RuleItemType { get; set; }
 
+        public List<string>? Tags { get; set; }
+
         public string? RuleSetName { get; set; }
 
         public string? RuleSetPath { get; set; }

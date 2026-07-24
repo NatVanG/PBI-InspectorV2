@@ -328,7 +328,7 @@ namespace FabInspector.Core
 
                             if (rule.PathErrorWhenNoMatch)
                             {
-                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, ItemPath = null, ParentName = null, ParentDisplayName = "N/A", Pass = false, Message = msg, Expected = rule.Test.Expected, Actual = null });
+                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, Tags = rule.Tags, ItemPath = null, ParentName = null, ParentDisplayName = "N/A", Pass = false, Message = msg, Expected = rule.Test.Expected, Actual = null });
                             }
                         }
                         else
@@ -354,7 +354,7 @@ namespace FabInspector.Core
                                 result = expectedResult?.IsEquivalentTo(jruleresult) ?? jruleresult is null;
 
                                 string resultString = string.Format("Rule \"{0}\" {1} with result: {2}, expected: {3}", rule.Name, result ? "PASSED" : "FAILED", actualResultString, expectedResultString);
-                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, ItemPath = itemPath, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = expectedResult, Actual = jruleresult });
+                                testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = ruleLogType, RuleDescription = rule.Description, RuleItemType = rule.ItemType, Tags = rule.Tags, ItemPath = itemPath, ParentName = parentPageName, ParentDisplayName = parentPageDisplayName, Pass = result, Message = resultString, Expected = expectedResult, Actual = jruleresult });
 
                                 //PATCH
                                 if (!result && rule.ApplyPatch && rule.Patch != null && rule.Patch.Ops != null)
@@ -398,7 +398,7 @@ namespace FabInspector.Core
                 }
                 catch (PBIRInspectorException e)
                 {
-                    testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, RuleItemType = rule.ItemType, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
+                    testResults.Add(new TestResult { RuleId = rule.Id, RuleName = rule.Name, LogType = MessageTypeEnum.Error, RuleDescription = rule.Description, RuleItemType = rule.ItemType, Tags = rule.Tags, Pass = false, Message = e.Message, Expected = rule.Test.Expected, Actual = null });
                     continue;
                 }
 
